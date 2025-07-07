@@ -1,0 +1,12 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Municipios</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div style="padding: 16px;">
+    <ion-title size="large">Listado</ion-title>
+    <p *ngFor="let i of [].constructor(50)">Municipio {{ i + 1 }}</p>
+  </div>
+</ion-content>

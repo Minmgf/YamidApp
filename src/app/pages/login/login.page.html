@@ -1,0 +1,55 @@
+<ion-content class="login-content" fullscreen>
+  <div class="login-wrapper">
+    <img src="assets/img/logo.png" class="login-logo" />
+
+    <h1 class="login-title">Bienvenido</h1>
+    <p class="login-subtitle">Inicia sesión para continuar</p>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="login-form">
+
+      <ion-item lines="none" class="login-input">
+        <ion-avatar slot="start"><img src="assets/icons/email-icon.svg" /></ion-avatar>
+        <ion-input
+          type="email"
+          placeholder="Correo electrónico"
+          formControlName="email"
+          inputmode="email"
+          autocapitalize="off"
+        ></ion-input>
+      </ion-item>
+
+      <ion-text color="danger" *ngIf="form.controls['email'].touched && form.controls['email'].invalid">
+        <small>Correo inválido</small>
+      </ion-text>
+
+      <ion-item lines="none" class="login-input">
+        <ion-avatar slot="start"><img src="assets/icons/password-icon.svg" /></ion-avatar>
+
+        <ion-input
+          [type]="showPassword ? 'text' : 'password'"
+          placeholder="Contraseña"
+          formControlName="password"
+          inputmode="text"
+          autocapitalize="off"
+        ></ion-input>
+
+        <ion-avatar slot="end" (click)="togglePassword()">
+          <img [src]="showPassword ? 'assets/icons/eye-off-icon.svg' : 'assets/icons/eye-icon.svg'" />
+        </ion-avatar>
+      </ion-item>
+
+      <ion-text color="danger" *ngIf="form.controls['password'].touched && form.controls['password'].invalid">
+        <small>La contraseña es obligatoria</small>
+      </ion-text>
+      
+
+      <ion-button expand="block" type="submit" [disabled]="form.invalid" class="login-button">
+        Iniciar sesión
+      </ion-button>
+
+      <ion-text class="forgot-link">
+        <a href="#">¿Olvidaste tu contraseña?</a>
+      </ion-text>
+    </form>
+  </div>
+</ion-content>

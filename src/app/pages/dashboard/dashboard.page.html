@@ -1,0 +1,79 @@
+<ion-header translucent="true">
+  <ion-toolbar class="dashboard-toolbar">
+    <ion-avatar slot="start">
+      <img src="assets/img/foto.png" />
+    </ion-avatar>
+    <ion-title>
+      <strong>Yamid Sanabria</strong>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear">
+        <ion-icon src="assets/icons/user-icon.svg"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [scrollY]="true" fullscreen>
+
+
+  <!-- 🗺️ MAPA -->
+  <div id="map-wrapper">
+    <div id="map"></div>
+  
+  
+    <div class="leyenda">
+      <div><span class="color rojo"></span> Mayor</div>
+      <div><span class="color amarillo"></span> 10–20 días</div>
+      <div><span class="color verde"></span> Menos de 10</div>
+    </div>
+  </div>
+
+  <!-- 🔢 TARJETAS SUPERIORES -->
+  <div class="dashboard-grid">
+    <div class="card alert">
+      <ion-icon name="warning-outline"></ion-icon>
+      <p>Incidencias</p>
+      <h2>12</h2>
+    </div>
+    <div class="card group">
+      <ion-icon name="people-outline"></ion-icon>
+      <p>Votantes</p>
+      <h2>1,250</h2>
+    </div>
+    <div class="card total-lideres">
+      <ion-icon name="person-add-outline"></ion-icon>
+      <p>Total Líderes</p>
+      <h2>340</h2>
+    </div>
+  </div>
+
+  <!-- 🔽 TARJETAS INFERIORES -->
+  <div class="dashboard-subgrid">
+    <div class="card-info lider-card">
+      <h3>Líderes</h3>
+      <canvas id="liderChart" width="100" height="40"></canvas>
+      <p>14 registrados esta semana (vs 8 semana pasada)</p>
+      <ion-button size="small" expand="block" class="boton-neutro">Registrar líder</ion-button>
+    </div>
+    
+    
+
+
+    <!-- Blog -->
+    <div class="card-info blog-card">
+  <h3>Blog</h3>
+  <canvas id="blogChart" width="100" height="40"></canvas>
+  <p>7 artículos esta semana (vs 5 semana pasada)</p>
+  <ion-button size="small" expand="block" class="boton-neutro">Ver más</ion-button>
+</div>
+
+    
+  </div>
+
+  <!-- 🔚 CTA Final -->
+  <ion-item button lines="none" class="casta-item">
+    <ion-label>Casta</ion-label>
+    <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+  </ion-item>
+</ion-content>

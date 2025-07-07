@@ -1,0 +1,50 @@
+.splash-screen {
+    --background: none;
+    background: url('/assets/img/splash.jpg') no-repeat center center/cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .splash-text-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  
+    // espaciado compacto entre líneas
+    line-height: 1.1;
+  }
+  
+  .typing-line {
+    font-size: 48px;
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    color: white;
+    overflow: hidden;
+    white-space: nowrap;
+    display: block;
+    border: none;
+  }
+  
+  .first-line {
+    width: 0;
+    animation: typing1 0.7s steps(10, end) forwards;
+  }
+  
+  .second-line {
+    width: 0;
+    animation: typing2 0.7s steps(15, end) forwards 0.8s;
+  }
+  
+  @keyframes typing1 {
+    from { width: 0 }
+    to { width: 6ch }
+  }
+  
+  @keyframes typing2 {
+    from { width: 0 }
+    to { width: 9ch }
+  }
+  
