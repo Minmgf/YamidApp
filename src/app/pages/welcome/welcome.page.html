@@ -1,0 +1,33 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Bienvenido</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="logout()">
+        <ion-icon name="log-out-outline"></ion-icon>
+        Salir
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-card *ngIf="user">
+    <ion-card-header>
+      <ion-card-title>Hola {{ user.nombre }}</ion-card-title>
+      <ion-card-subtitle>Rol: {{ user.rol }}</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      <p><strong>Email:</strong> {{ user.email }}</p>
+      <p><strong>Cédula:</strong> {{ user.cedula }}</p>
+      <p><strong>Celular:</strong> {{ user.celular }}</p>
+      <p><strong>Municipio:</strong> {{ user.municipio }}</p>
+      <p><strong>Lugar de votación:</strong> {{ user.lugar_votacion }}</p>
+      <div *ngIf="user.permisos">
+        <strong>Permisos:</strong>
+        <ion-chip *ngFor="let permiso of getPermissionsList()" color="success">
+          <ion-label>{{ permiso }}</ion-label>
+        </ion-chip>
+      </div>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

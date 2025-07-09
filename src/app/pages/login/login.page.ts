@@ -45,7 +45,7 @@ export class LoginPage {
 
     this.authService.login(email, password).subscribe({
       next: () => {
-        this.navCtrl.navigateRoot('/tabs');
+        this.navCtrl.navigateRoot('/welcome');
       },
       error: async (err) => {
         const alert = await this.alertCtrl.create({
