@@ -2,6 +2,7 @@ import { Component, AfterViewInit } from '@angular/core';
 import { ViewDidEnter } from '@ionic/angular';
 import * as L from 'leaflet';
 import Chart from 'chart.js/auto';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
@@ -12,6 +13,14 @@ import Chart from 'chart.js/auto';
 export class DashboardPage implements AfterViewInit, ViewDidEnter {
 
   private map!: L.Map;
+
+  constructor(private router: Router) {}
+
+  logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('currentUser');
+    this.router.navigate(['/login'], { replaceUrl: true });
+  }
 
   ngAfterViewInit(): void {
     /** 1. Inicializar el mapa */

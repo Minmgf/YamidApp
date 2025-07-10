@@ -1,13 +1,9 @@
 <ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>Bienvenido</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="logout()">
-        <ion-icon name="log-out-outline"></ion-icon>
-        Salir
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
+  <app-main-header
+    [nombre]="user?.nombre + ' ' + user?.apellido"
+    [avatar]="user?.foto || 'assets/img/foto.png'"
+    (logout)="logout()"
+  ></app-main-header>
 </ion-header>
 
 <ion-content class="ion-padding">

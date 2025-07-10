@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MainHeaderComponent } from '../../shared/main-header/main-header.component';
 
 @Component({
   standalone: true,
@@ -12,7 +13,8 @@ import { FormsModule } from '@angular/forms';
   imports: [
     CommonModule,
     FormsModule,
-    IonicModule // <--- Importante para los componentes ion-*
+    IonicModule, // <--- Importante para los componentes ion-*
+    MainHeaderComponent
   ]
 })
 export class WelcomePage implements OnInit {

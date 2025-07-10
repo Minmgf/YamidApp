@@ -11,6 +11,7 @@ const routes: Routes = [
       { path: 'municipios',  loadChildren: () => import('../municipios/municipios.module').then(m => m.MunicipiosPageModule) },
       { path: 'agenda',      loadChildren: () => import('../agenda/agenda.module').then(m => m.AgendaPageModule) },
       { path: 'blog',        loadChildren: () => import('../blog/blog.module').then(m => m.BlogPageModule) },
+      { path: 'welcome',        loadChildren: () => import('../welcome/welcome.module').then(m => m.WelcomePageModule) },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ]
   }

@@ -1,0 +1,13 @@
+<ion-toolbar class="main-header-toolbar">
+  <div class="main-header-row">
+    <ion-avatar class="main-header-avatar">
+      <img [src]="avatar" />
+    </ion-avatar>
+    <div class="main-header-info">
+      <span class="main-header-nombre">Yamid Sanabria</span>
+    </div>
+    <ion-button fill="clear" color="danger" (click)="logout.emit()" class="main-header-logout">
+      <ion-icon name="log-out-outline"></ion-icon>
+    </ion-button>
+  </div>
+</ion-toolbar>
