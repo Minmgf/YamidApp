@@ -1,20 +1,9 @@
-<ion-header translucent="true">
-  <ion-toolbar class="dashboard-toolbar">
-    <ion-avatar slot="start">
-      <img src="assets/img/foto.png" />
-    </ion-avatar>
-    <ion-title>
-      <strong>Yamid Sanabria</strong>
-      <ion-button fill="clear" color="light" (click)="logout()" style="float:right;">
-        <ion-icon name="log-out-outline"></ion-icon>
-      </ion-button>
-    </ion-title>
-    <ion-buttons slot="end">
-      <ion-button fill="clear">
-        <ion-icon src="assets/icons/user-icon.svg"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
+<ion-header>
+  <app-main-header
+    [nombre]="'Yamid Sanabria'"
+    [avatar]="'assets/img/foto.png'"
+    (logout)="logout()"
+  ></app-main-header>
 </ion-header>
 
 <ion-content class="dash" [scrollY]="true" fullscreen>

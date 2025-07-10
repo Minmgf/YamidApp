@@ -1,7 +1,9 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>agenda</ion-title>
-  </ion-toolbar>
+<ion-header>
+  <app-main-header
+    [nombre]="'Yamid Sanabria'"
+    [avatar]="'assets/img/foto.png'"
+    (logout)="logout()"
+  ></app-main-header>
 </ion-header>
 
 <ion-content [fullscreen]="true">

@@ -1,14 +1,17 @@
 import { Component, AfterViewInit } from '@angular/core';
-import { ViewDidEnter } from '@ionic/angular';
+import { ViewDidEnter, IonicModule } from '@ionic/angular';
 import * as L from 'leaflet';
 import Chart from 'chart.js/auto';
 import { Router } from '@angular/router';
+import { MainHeaderComponent } from '../../shared/main-header/main-header.component';
+
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.page.html',
   styleUrls: ['./dashboard.page.scss'],
-  standalone: false
+  standalone: true,
+  imports: [IonicModule, MainHeaderComponent]
 })
 export class DashboardPage implements AfterViewInit, ViewDidEnter {
 
