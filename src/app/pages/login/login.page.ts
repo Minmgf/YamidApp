@@ -41,11 +41,11 @@ export class LoginPage {
   async submit() {
     if (this.form.invalid) return;
 
-    const { email, password } = this.form.value;
-
-    this.authService.login(email, password).subscribe({
+    const { email, password } = this.form.value;    this.authService.login(email, password).subscribe({
       next: () => {
-        this.navCtrl.navigateRoot('/tabs');
+        // Navegar a la ruta por defecto
+        const defaultRoute = this.authService.getDefaultRoute();
+        this.navCtrl.navigateRoot(defaultRoute);
       },
       error: async (err) => {
         const alert = await this.alertCtrl.create({
