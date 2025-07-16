@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { ModalController, AlertController, IonicModule } from '@ionic/angular';
+import { ModalController, IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
+import { HotToastService } from '@ngxpert/hot-toast';
 import { UserRegistrationService, Municipio, Rol, UsuarioRegistro } from '../../../services/user-registration.service';
 
 @Component({
@@ -25,7 +26,7 @@ export class RegisterUserModalComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private modalCtrl: ModalController,
-    private alertCtrl: AlertController,
+    private toast: HotToastService,
     private userRegistrationService: UserRegistrationService
   ) {
     this.registerForm = this.fb.group({
@@ -50,6 +51,7 @@ export class RegisterUserModalComponent implements OnInit {
     this.userRegistrationService.getMunicipios().subscribe({
       next: (municipios) => {
         this.municipios = municipios;
+        console.log('Municipios cargados:', municipios.length);
       },
       error: (error) => {
         console.error('Error loading municipios:', error);
@@ -62,9 +64,10 @@ export class RegisterUserModalComponent implements OnInit {
           { id: 5, nombre: "Pitalito" },
           { id: 6, nombre: "La Plata" },
           { id: 7, nombre: "Gigante" },
-          { id: 8, nombre: "Aipe" }
+          { id: 8, nombre: "Aipe" },
+          { id: 9, nombre: "Palestina" }
         ];
-        this.showAlert('Aviso', 'Se cargaron los municipios desde datos locales. Verifica la conexión al servidor.');
+        this.toast.warning('⚠️ Se cargaron municipios desde datos locales. Verifica tu conexión');
       }
     });
   }
@@ -75,6 +78,7 @@ export class RegisterUserModalComponent implements OnInit {
     this.userRegistrationService.getRoles().subscribe({
       next: (roles) => {
         this.roles = roles;
+        console.log('Roles cargados:', roles.length);
       },
       error: (error) => {
         console.error('Error loading roles:', error);
@@ -101,7 +105,7 @@ export class RegisterUserModalComponent implements OnInit {
             descripcion: "Aliado sin permisos de registro ni métricas"
           }
         ];
-        this.showAlert('Aviso', 'Se cargaron los roles desde datos locales. Verifica la conexión al servidor.');
+        this.toast.warning('⚠️ Se cargaron roles desde datos locales. Verifica tu conexión');
       }
     });
   }
@@ -144,13 +148,16 @@ export class RegisterUserModalComponent implements OnInit {
     this.userRegistrationService.registerUser(formData).subscribe({
       next: async (response) => {
         this.isLoading = false;
-        await this.showAlert('Éxito', 'Usuario registrado correctamente');
+        const userName = formData.nombre || 'Usuario';
+        this.toast.success(`${userName} registrado correctamente`);
+        console.log('Usuario registrado exitosamente:', response);
         this.modalCtrl.dismiss({ success: true, user: response.user });
       },
       error: async (error) => {
         this.isLoading = false;
-        const message = error.error?.message || 'Error al registrar usuario';
-        await this.showAlert('Error', message);
+        const errorMessage = this.extractErrorMessage(error);
+        this.toast.error(errorMessage);
+        console.error('Error al registrar usuario:', error);
       }
     });
   }
@@ -163,18 +170,6 @@ export class RegisterUserModalComponent implements OnInit {
       const control = this.registerForm.get(key);
       control?.markAsTouched();
     });
-  }
-
-  /**
-   * Muestra una alerta
-   */
-  private async showAlert(header: string, message: string) {
-    const alert = await this.alertCtrl.create({
-      header,
-      message,
-      buttons: ['OK']
-    });
-    await alert.present();
   }
 
   /**
@@ -215,5 +210,64 @@ export class RegisterUserModalComponent implements OnInit {
       rol_id: 'Rol'
     };
     return labels[fieldName] || fieldName;
+  }
+
+  /**
+   * Extrae el mensaje de error más específico de la respuesta del servidor
+   */
+  private extractErrorMessage(error: any): string {
+    console.log('Error completo recibido:', error);
+
+    // Caso 1: error.error es string directo (ej: "La cédula ya está registrada")
+    if (error.error && typeof error.error === 'string') {
+      return `${error.error}`;
+    }
+
+    // Caso 2: error.error.error existe (estructura: {error: "mensaje"})
+    if (error.error?.error && typeof error.error.error === 'string') {
+      return `${error.error.error}`;
+    }
+
+    // Caso 3: error.error.message existe (estructura: {message: "mensaje"})
+    if (error.error?.message && typeof error.error.message === 'string') {
+      return `${error.error.message}`;
+    }
+
+    // Caso 4: error.message existe (error de red o HTTP)
+    if (error.message && typeof error.message === 'string') {
+      return `${error.message}`;
+    }
+
+    // Caso 5: Error HTTP con status específico
+    if (error.status) {
+      switch (error.status) {
+        case 400:
+          return 'Datos inválidos. Verifica la información ingresada';
+        case 401:
+          return 'No tienes permisos para realizar esta acción';
+        case 403:
+          return 'Acceso denegado';
+        case 404:
+          return 'Servicio no encontrado';
+        case 409:
+          return 'El usuario ya existe en el sistema';
+        case 422:
+          return 'Datos no válidos. Revisa los campos del formulario';
+        case 500:
+          return 'Error interno del servidor. Intenta más tarde';
+        case 503:
+          return 'Servicio no disponible temporalmente';
+        default:
+          return `Error del servidor (${error.status})`;
+      }
+    }
+
+    // Caso 6: Error de red (sin conexión)
+    if (error.name === 'HttpErrorResponse' && error.status === 0) {
+      return 'Sin conexión al servidor. Verifica tu conexión a internet';
+    }
+
+    // Mensaje por defecto
+    return 'Error al registrar usuario. Intenta nuevamente';
   }
 }
