@@ -1,10 +1,10 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit, OnInit } from '@angular/core';
 import { ViewDidEnter, IonicModule } from '@ionic/angular';
 import * as L from 'leaflet';
 import Chart from 'chart.js/auto';
 import { Router } from '@angular/router';
 import { MainHeaderComponent } from '../../shared/main-header/main-header.component';
-
+import { UserCountService } from '../../services/user-count.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -13,16 +13,37 @@ import { MainHeaderComponent } from '../../shared/main-header/main-header.compon
   standalone: true,
   imports: [IonicModule, MainHeaderComponent]
 })
-export class DashboardPage implements AfterViewInit, ViewDidEnter {
+export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
+  userCount: number = 0; // Variable para almacenar el conteo
 
   private map!: L.Map;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private userCountService: UserCountService, // Inyectar el servicio
+  ) {}
 
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('currentUser');
     this.router.navigate(['/login'], { replaceUrl: true });
+  }
+
+  ngOnInit() {
+    this.loadUserCount();
+  }
+
+  loadUserCount() {
+    this.userCountService.getUserCount().subscribe({
+      next: (response) => {
+        this.userCount = response.count || response.total || response;
+        console.log('User count:', this.userCount);
+      },
+      error: (error) => {
+        console.error('Error loading user count:', error);
+        this.userCount = 0; // Valor por defecto en caso de error
+      }
+    });
   }
 
   ngAfterViewInit(): void {
