@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, ModalController, AlertController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MainHeaderComponent } from '../../shared/main-header/main-header.component';
+import { RegisterUserModalComponent } from '../../shared/modals/register-user-modal/register-user-modal.component';
 
 @Component({
   standalone: true,
@@ -20,7 +21,11 @@ import { MainHeaderComponent } from '../../shared/main-header/main-header.compon
 export class WelcomePage implements OnInit {
   user: any = null;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private modalCtrl: ModalController,
+    private alertCtrl: AlertController
+  ) {}
 
   ngOnInit() {
     const userData = localStorage.getItem('currentUser');
@@ -53,5 +58,44 @@ export class WelcomePage implements OnInit {
     localStorage.removeItem('currentUser');
     this.user = null; // Limpiar usuario en memoria
     this.router.navigate(['/login'], { replaceUrl: true }); // Evitar volver atrás
+  }
+
+  /**
+   * Abre el modal para registrar un nuevo usuario
+   */
+  async openRegisterModal() {
+    // Verificar permisos antes de abrir el modal
+    if (!this.user?.permisos?.puede_registrar_usuarios) {
+      await this.showAlert('Sin permisos', 'No tienes permisos para registrar usuarios');
+      return;
+    }
+
+    const modal = await this.modalCtrl.create({
+      component: RegisterUserModalComponent,
+      cssClass: 'register-user-modal',
+      backdropDismiss: false,
+      showBackdrop: true,
+      animated: true
+    });
+
+    modal.onDidDismiss().then((result) => {
+      if (result.data?.success) {
+        this.showAlert('Éxito', 'Usuario registrado correctamente');
+      }
+    });
+
+    await modal.present();
+  }
+
+  /**
+   * Muestra una alerta
+   */
+  private async showAlert(header: string, message: string) {
+    const alert = await this.alertCtrl.create({
+      header,
+      message,
+      buttons: ['OK']
+    });
+    await alert.present();
   }
 }

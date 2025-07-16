@@ -77,3 +77,76 @@
   color: #444;
   font-size: 1rem;
 }
+
+// Estilos para la tarjeta de registro de usuario
+.register-card {
+  margin-top: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.register-card-content {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  gap: 16px;
+
+  .register-icon {
+    font-size: 32px;
+    color: var(--ion-color-primary);
+    min-width: 32px;
+  }
+
+  .register-text {
+    flex: 1;
+
+    h3 {
+      margin: 0 0 4px 0;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--ion-color-dark);
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--ion-color-medium);
+    }
+  }
+
+  .chevron-icon {
+    font-size: 20px;
+    color: var(--ion-color-medium);
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .register-card-content {
+    padding: 16px;
+    gap: 12px;
+
+    .register-icon {
+      font-size: 28px;
+    }
+
+    .register-text {
+      h3 {
+        font-size: 1.1rem;
+      }
+
+      p {
+        font-size: 0.85rem;
+      }
+    }
+  }
+}

@@ -26,4 +26,16 @@
       </div>
     </ion-card-content>
   </ion-card>
+
+  <!-- Botón para registrar usuarios (solo si tiene permisos) -->
+  <ion-card *ngIf="user?.permisos?.puede_registrar_usuarios" button (click)="openRegisterModal()" class="register-card">
+    <ion-card-content class="register-card-content">
+      <ion-icon name="person-add-outline" class="register-icon"></ion-icon>
+      <div class="register-text">
+        <h3>Registrar Usuario</h3>
+        <p>Agregar un nuevo usuario al sistema</p>
+      </div>
+      <ion-icon name="chevron-forward-outline" class="chevron-icon"></ion-icon>
+    </ion-card-content>
+  </ion-card>
 </ion-content>

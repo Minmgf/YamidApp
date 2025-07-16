@@ -35,3 +35,27 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 // @import "@ionic/angular/css/palettes/dark.system.css";
+
+// Estilos para el modal de registro de usuario
+.register-user-modal {
+  --width: 90%;
+  --max-width: 500px;
+  --height: 80vh;
+  --min-height: 600px;
+  --max-height: 90vh;
+
+  .modal-wrapper {
+    height: 100%;
+  }
+
+  ion-content {
+    --overflow: auto;
+    height: 100% !important;
+  }
+
+  @media (max-width: 768px) {
+    --width: 95%;
+    --height: 85vh;
+    --min-height: 500px;
+  }
+}

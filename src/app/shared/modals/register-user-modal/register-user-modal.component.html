@@ -1,0 +1,144 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Registrar Usuario</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+
+    <!-- Nombre -->
+    <ion-item>
+      <ion-label position="stacked">Nombre *</ion-label>
+      <ion-input
+        formControlName="nombre"
+        placeholder="Ingrese el nombre completo"
+        [class.ion-invalid]="registerForm.get('nombre')?.invalid && registerForm.get('nombre')?.touched">
+      </ion-input>
+    </ion-item>
+    <div class="error-message" *ngIf="getErrorMessage('nombre')">
+      {{ getErrorMessage('nombre') }}
+    </div>
+
+    <!-- Cédula -->
+    <ion-item>
+      <ion-label position="stacked">Cédula *</ion-label>
+      <ion-input
+        formControlName="cedula"
+        type="number"
+        placeholder="Ingrese la cédula"
+        [class.ion-invalid]="registerForm.get('cedula')?.invalid && registerForm.get('cedula')?.touched">
+      </ion-input>
+    </ion-item>
+    <div class="error-message" *ngIf="getErrorMessage('cedula')">
+      {{ getErrorMessage('cedula') }}
+    </div>
+
+    <!-- Celular -->
+    <ion-item>
+      <ion-label position="stacked">Celular *</ion-label>
+      <ion-input
+        formControlName="celular"
+        type="tel"
+        placeholder="Ingrese el número de celular"
+        [class.ion-invalid]="registerForm.get('celular')?.invalid && registerForm.get('celular')?.touched">
+      </ion-input>
+    </ion-item>
+    <div class="error-message" *ngIf="getErrorMessage('celular')">
+      {{ getErrorMessage('celular') }}
+    </div>
+
+    <!-- Contraseña -->
+    <ion-item>
+      <ion-label position="stacked">Contraseña *</ion-label>
+      <ion-input
+        formControlName="password"
+        [type]="showPassword ? 'text' : 'password'"
+        placeholder="Ingrese la contraseña"
+        [class.ion-invalid]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
+      </ion-input>
+      <ion-button
+        slot="end"
+        fill="clear"
+        (click)="togglePassword()"
+        type="button">
+        <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+      </ion-button>
+    </ion-item>
+    <div class="error-message" *ngIf="getErrorMessage('password')">
+      {{ getErrorMessage('password') }}
+    </div>
+
+    <!-- Municipio -->
+    <ion-item>
+      <ion-label position="stacked">Municipio *</ion-label>
+      <ion-select
+        formControlName="municipio_id"
+        placeholder="Seleccione un municipio"
+        [class.ion-invalid]="registerForm.get('municipio_id')?.invalid && registerForm.get('municipio_id')?.touched">
+        <ion-select-option
+          *ngFor="let municipio of municipios"
+          [value]="municipio.id">
+          {{ municipio.nombre }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+    <div class="error-message" *ngIf="getErrorMessage('municipio_id')">
+      {{ getErrorMessage('municipio_id') }}
+    </div>
+
+    <!-- Lugar de votación -->
+    <ion-item>
+      <ion-label position="stacked">Lugar de Votación</ion-label>
+      <ion-input
+        formControlName="lugar_votacion"
+        placeholder="Ingrese el lugar de votación (opcional)">
+      </ion-input>
+    </ion-item>
+
+    <!-- Rol -->
+    <ion-item>
+      <ion-label position="stacked">Rol *</ion-label>
+      <ion-select
+        formControlName="rol_id"
+        placeholder="Seleccione un rol"
+        [class.ion-invalid]="registerForm.get('rol_id')?.invalid && registerForm.get('rol_id')?.touched">
+        <ion-select-option
+          *ngFor="let rol of roles"
+          [value]="rol.id">
+          {{ rol.nombre }} - {{ rol.descripcion }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+    <div class="error-message" *ngIf="getErrorMessage('rol_id')">
+      {{ getErrorMessage('rol_id') }}
+    </div>
+
+    <!-- Botones -->
+    <div class="button-container">
+      <ion-button
+        expand="block"
+        type="submit"
+        [disabled]="registerForm.invalid || isLoading"
+        class="register-button">
+        <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
+        <span *ngIf="!isLoading">Registrar Usuario</span>
+      </ion-button>
+
+      <ion-button
+        expand="block"
+        fill="outline"
+        (click)="dismiss()"
+        [disabled]="isLoading"
+        class="cancel-button">
+        Cancelar
+      </ion-button>
+    </div>
+
+  </form>
+</ion-content>

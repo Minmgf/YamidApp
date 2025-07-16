@@ -1,0 +1,107 @@
+// Estilos para el modal de registro de usuario
+
+// Asegurar que el modal use toda la altura disponible
+:host {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+ion-header {
+  flex-shrink: 0;
+
+  ion-toolbar {
+    --background: var(--ion-color-primary);
+    --color: white;
+  }
+}
+
+ion-content {
+  --background: var(--ion-background-color, #fafafa);
+  flex: 1;
+  height: 100%;
+
+  .inner-scroll {
+    height: 100%;
+  }
+
+  form {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 20px;
+  }
+}
+
+// Forzar visibilidad y espaciado de elementos del formulario
+ion-item {
+  margin-bottom: 8px;
+
+  &.ion-invalid {
+    --border-color: var(--ion-color-danger);
+    --highlight-color: var(--ion-color-danger);
+  }
+}
+
+.error-message {
+  color: var(--ion-color-danger);
+  font-size: 0.875rem;
+  margin: 4px 16px 12px 16px;
+  display: block;
+}
+
+.button-container {
+  margin-top: auto;
+  padding-top: 24px;
+  gap: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.register-button {
+  --background: var(--ion-color-primary);
+  --color: white;
+  margin-bottom: 8px;
+
+  ion-spinner {
+    margin-right: 8px;
+  }
+}
+
+.cancel-button {
+  --color: var(--ion-color-medium);
+  --border-color: var(--ion-color-medium);
+}
+
+// Estilos para los campos de formulario
+ion-item {
+  margin-bottom: 8px;
+
+  &.ion-invalid {
+    --border-color: var(--ion-color-danger);
+    --highlight-color: var(--ion-color-danger);
+  }
+}
+
+ion-input, ion-select {
+  &.ion-invalid {
+    --color: var(--ion-color-danger);
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .button-container {
+    margin-top: 16px;
+  }
+
+  ion-content form {
+    padding-bottom: 16px;
+  }
+}
+
+// Estilos para el botón de mostrar/ocultar contraseña
+ion-button[slot="end"] {
+  --color: var(--ion-color-medium);
+  margin: 0;
+}
