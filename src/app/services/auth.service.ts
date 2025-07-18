@@ -18,14 +18,32 @@ export class AuthService {
   /**
    * Login del usuario
    */
-  login(email: string, password: string) {
+  login(identifier: string, password: string) {
     return this.http
-      .post<any>(`${this.apiUrl}/login`, { email, password })
+      .post<any>(`${this.apiUrl}/login`, { identifier, password })
       .pipe(
         tap((res) => {
-          localStorage.setItem('token', res.token);
-          localStorage.setItem('currentUser', JSON.stringify(res.user));
-          this.currentUserSubject.next(res.user);
+          console.log('Respuesta completa del login:', res);
+
+          // Ahora el backend devuelve data.user y data.token
+          const usuario = res.user;
+
+          if (usuario) {
+            // Por ahora guardamos el usuario tal como viene del backend
+            localStorage.setItem('currentUser', JSON.stringify(usuario));
+            this.currentUserSubject.next(usuario);
+            console.log('Usuario guardado:', usuario);
+          } else {
+            console.warn('No se encontró usuario en la respuesta');
+          }
+
+          // Ahora el token sí viene del backend
+          if (res.token) {
+            localStorage.setItem('token', res.token);
+            console.log('Token guardado:', res.token);
+          } else {
+            console.warn('No se encontró token en la respuesta');
+          }
         })
       );
   }
@@ -111,14 +129,23 @@ export class AuthService {
     const user = this.getCurrentUser();
     if (!user) return '/login';
 
-    // Verificar rutas en orden de prioridad
-    if (this.hasPermission('dashboard')) return '/tabs/dashboard';
-    if (this.hasPermission('municipios')) return '/tabs/municipios';
-    if (this.hasPermission('agenda')) return '/tabs/agenda';
-    if (this.hasPermission('blog')) return '/tabs/blog';
-    if (this.hasPermission('perfil')) return '/tabs/welcome';
+    // Simplificar la lógica basada en rol_id del backend
+    const userAny = user as any; // Cast temporal para acceder a rol_id
+    if (userAny.rol_id) {
+      switch (userAny.rol_id) {
+        case 1: // super_admin
+        case 2: // admin
+        case 3: // coordinador
+          return '/tabs/dashboard';
+        case 4: // lider
+          return '/tabs/agenda';
+        default:
+          return '/tabs/welcome';
+      }
+    }
 
-    return '/login'; // Si no tiene acceso a ninguna ruta
+    // Fallback por defecto
+    return '/tabs/welcome';
   }
 
   /**

@@ -8,18 +8,18 @@
     <form [formGroup]="form" (ngSubmit)="submit()" class="login-form">
 
       <ion-item lines="none" class="login-input">
-        <ion-avatar slot="start"><img src="assets/icons/email-icon.svg" /></ion-avatar>
+        <ion-avatar slot="start"><img src="assets/icons/user.svg" /></ion-avatar>
         <ion-input
-          type="email"
-          placeholder="Correo electrónico"
-          formControlName="email"
-          inputmode="email"
+          type="text"
+          placeholder="Correo electrónico o cédula"
+          formControlName="identifier"
+          inputmode="text"
           autocapitalize="off"
         ></ion-input>
       </ion-item>
 
-      <ion-text color="danger" *ngIf="form.controls['email'].touched && form.controls['email'].invalid">
-        <small>Correo inválido</small>
+      <ion-text color="danger" *ngIf="form.controls['identifier'].touched && form.controls['identifier'].invalid">
+        <small>{{ getEmailErrorMessage() }}</small>
       </ion-text>
 
       <ion-item lines="none" class="login-input">
