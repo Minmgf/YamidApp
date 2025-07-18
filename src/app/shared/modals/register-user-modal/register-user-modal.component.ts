@@ -33,6 +33,7 @@ export class RegisterUserModalComponent implements OnInit {
       nombre: ['', [Validators.required, Validators.minLength(2)]],
       cedula: ['', [Validators.required, Validators.pattern(/^\d{8,10}$/)]],
       celular: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
+      email: ['', [Validators.required, Validators.email, Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       municipio_id: ['', Validators.required],
       lugar_votacion: [''],
@@ -67,7 +68,7 @@ export class RegisterUserModalComponent implements OnInit {
           { id: 8, nombre: "Aipe" },
           { id: 9, nombre: "Palestina" }
         ];
-        this.toast.warning('⚠️ Se cargaron municipios desde datos locales. Verifica tu conexión');
+        this.toast.warning('Se cargaron municipios desde datos locales. Verifica tu conexión');
       }
     });
   }
@@ -105,7 +106,7 @@ export class RegisterUserModalComponent implements OnInit {
             descripcion: "Aliado sin permisos de registro ni métricas"
           }
         ];
-        this.toast.warning('⚠️ Se cargaron roles desde datos locales. Verifica tu conexión');
+        this.toast.warning('Se cargaron roles desde datos locales. Verifica tu conexión');
       }
     });
   }
@@ -192,7 +193,9 @@ export class RegisterUserModalComponent implements OnInit {
       if (errors['pattern']) {
         if (fieldName === 'cedula') return 'La cédula debe tener entre 8 y 10 dígitos';
         if (fieldName === 'celular') return 'El celular debe tener 10 dígitos';
+        if (fieldName === 'email') return 'Ingrese un correo electrónico válido';
       }
+      if (errors['email']) return 'Ingrese un correo electrónico válido';
     }
     return '';
   }
@@ -205,6 +208,7 @@ export class RegisterUserModalComponent implements OnInit {
       nombre: 'Nombre',
       cedula: 'Cédula',
       celular: 'Celular',
+      email: 'Correo electrónico',
       password: 'Contraseña',
       municipio_id: 'Municipio',
       rol_id: 'Rol'

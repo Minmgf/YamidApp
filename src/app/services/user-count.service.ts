@@ -24,3 +24,4 @@ export class UserCountService {
     return this.http.get(`${this.apiUrl}`, {headers})
   }
 }
+

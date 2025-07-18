@@ -18,6 +18,7 @@ export interface UsuarioRegistro {
   nombre: string;
   cedula: string;
   celular: string;
+  email: string;
   password: string;
   municipio_id: number;
   lugar_votacion: string;

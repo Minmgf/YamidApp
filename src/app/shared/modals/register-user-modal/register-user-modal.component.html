@@ -53,6 +53,20 @@
       {{ getErrorMessage('celular') }}
     </div>
 
+    <!-- Correo electrónico -->
+    <ion-item>
+      <ion-label position="stacked">Correo electrónico *</ion-label>
+      <ion-input
+        formControlName="email"
+        type="email"
+        placeholder="Ingrese el correo electrónico"
+        [class.ion-invalid]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
+      </ion-input>
+    </ion-item>
+    <div class="error-message" *ngIf="getErrorMessage('email')">
+      {{ getErrorMessage('email') }}
+    </div>
+
     <!-- Contraseña -->
     <ion-item>
       <ion-label position="stacked">Contraseña *</ion-label>
