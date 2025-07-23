@@ -13,11 +13,12 @@
       <ion-card-subtitle>Rol: {{ user.rol }}</ion-card-subtitle>
     </ion-card-header>
     <ion-card-content>
-      <p><strong>Email:</strong> {{ user.correo	 }}</p>
+      <p><strong>Email:</strong> {{ user.correo }}</p>
       <p><strong>Cédula:</strong> {{ user.cedula }}</p>
-      <p><strong>Celular:</strong> {{ user.celular }}</p>
-      <p><strong>Municipio:</strong> {{ user.municipio }}</p>
-      <p><strong>Lugar de votación:</strong> {{ user.lugar_votacion }}</p>
+      <p><strong>Celular:</strong> {{ user.celular || 'No disponible' }}</p>
+      <p><strong>Municipio:</strong> {{ user.municipio || 'ID: ' + user.municipio_id }}</p>
+      <p><strong>Lugar de votación:</strong> {{ user.lugar_votacion || 'No disponible' }}</p>
+      <p><strong>Registrado por:</strong> {{ getCreatedByName() }}</p>
       <div *ngIf="user.permisos">
         <strong>Permisos:</strong>
         <ion-chip *ngFor="let permiso of getPermissionsList()" color="success">

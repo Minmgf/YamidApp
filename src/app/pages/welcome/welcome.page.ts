@@ -5,6 +5,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MainHeaderComponent } from '../../shared/main-header/main-header.component';
 import { RegisterUserModalComponent } from '../../shared/modals/register-user-modal/register-user-modal.component';
+import { UserRegistrationService } from '../../services/user-registration.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   standalone: true,
@@ -20,51 +22,98 @@ import { RegisterUserModalComponent } from '../../shared/modals/register-user-mo
 })
 export class WelcomePage implements OnInit {
   user: any = null;
+  createdByName: string = 'Cargando...';
 
   constructor(
     private router: Router,
     private modalCtrl: ModalController,
-    private alertCtrl: AlertController
+    private alertCtrl: AlertController,
+    private userService: UserRegistrationService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
-    const userData = localStorage.getItem('currentUser');
-    if (userData) {
-      this.user = JSON.parse(userData);
+    // Usar el AuthService para obtener el usuario
+    this.user = this.authService.getCurrentUser();
+    if (this.user) {
+      // Cargar el nombre del usuario que registró
+      if (this.user.created_by) {
+        this.loadCreatedByName();
+      } else {
+        // Si created_by es null, es un usuario creado por el sistema
+        this.createdByName = 'Sistema';
+      }
     } else {
       this.router.navigate(['/login']);
     }
   }
 
+  /**
+   * Carga el nombre del usuario que registró al usuario actual
+   */
+  private loadCreatedByName(): void {
+    if (!this.user?.created_by) {
+      this.createdByName = 'Sistema';
+      return;
+    }
+
+    this.userService.getUserById(this.user.created_by).subscribe({
+      next: (response) => {
+        console.log('Respuesta del usuario que registró:', response);
+        if (response && response.nombre_completo) {
+          this.createdByName = response.nombre_completo;
+        } else {
+          this.createdByName = `Usuario ID: ${this.user.created_by}`;
+        }
+      },
+      error: (err) => {
+        console.error('Error al cargar el usuario que registró:', err);
+        // Si hay error, mostrar un mensaje más amigable
+        if (err.status === 404) {
+          this.createdByName = 'Usuario no encontrado';
+        } else if (err.status === 403) {
+          this.createdByName = 'Sin permisos para consultar';
+        } else {
+          this.createdByName = `Usuario ID: ${this.user.created_by}`;
+        }
+      }
+    });
+  }
+
   getPermissionsList(): string[] {
     if (!this.user?.permisos) return [];
+
+    // Ahora usar las etiquetas que coinciden con los permisos del backend
     const labels: { [key: string]: string } = {
       puede_registrar_usuarios: 'Registrar usuarios',
       puede_ver_metricas: 'Ver métricas',
       puede_gestionar_roles: 'Gestionar roles',
       acceso_completo: 'Acceso completo'
     };
+
     return Object.entries(this.user.permisos)
       .filter(([_, v]) => v)
       .map(([k, _]) => labels[k] || k);
   }
 
+  /**
+   * Obtiene el nombre del usuario que registró al usuario actual
+   */
+  getCreatedByName(): string {
+    return this.createdByName;
+  }
+
   logout() {
-    const token = localStorage.getItem('token');
-    const currentUser = localStorage.getItem('currentUser');
-    console.log('Token antes de salir:', token);
-    console.log('CurrentUser antes de salir:', currentUser);
-    localStorage.removeItem('token');
-    localStorage.removeItem('currentUser');
-    this.user = null; // Limpiar usuario en memoria
-    this.router.navigate(['/login'], { replaceUrl: true }); // Evitar volver atrás
+    this.authService.logout();
+    this.user = null;
+    this.router.navigate(['/login'], { replaceUrl: true });
   }
 
   /**
    * Abre el modal para registrar un nuevo usuario
    */
   async openRegisterModal() {
-    // Verificar permisos antes de abrir el modal
+    // Verificar permisos antes de abrir el modal usando los permisos del backend
     if (!this.user?.permisos?.puede_registrar_usuarios) {
       await this.showAlert('Sin permisos', 'No tienes permisos para registrar usuarios');
       return;

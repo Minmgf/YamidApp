@@ -29,6 +29,17 @@
 @import "@ionic/angular/css/flex-utils.css";
 
 /**
+ * Forzar modo light en toda la aplicación
+ */
+:root {
+  --ion-background-color: #ffffff;
+  --ion-text-color: #000000;
+  --ion-card-background: #ffffff;
+  --ion-toolbar-background: #ffffff;
+  --ion-header-background: #ffffff;
+}
+
+/**
  * Ionic Dark Mode
  * -----------------------------------------------------
  * For more info, please see:

@@ -68,4 +68,12 @@ export class UserRegistrationService {
     const headers = this.getAuthHeaders();
     return this.http.post(`${this.apiUrl}/usuarios`, userData, { headers });
   }
+
+  /**
+   * Obtiene un usuario por su ID
+   */
+  getUserById(userId: number): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.get(`${this.apiUrl}/usuarios/${userId}`, { headers });
+  }
 }

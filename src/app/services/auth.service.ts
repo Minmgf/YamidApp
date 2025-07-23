@@ -129,8 +129,8 @@ export class AuthService {
     const user = this.getCurrentUser();
     if (!user) return '/login';
 
-    // Simplificar la lógica basada en rol_id del backend
-    const userAny = user as any; // Cast temporal para acceder a rol_id
+    // Usar los roles del backend directamente
+    const userAny = user as any;
     if (userAny.rol_id) {
       switch (userAny.rol_id) {
         case 1: // super_admin
@@ -138,6 +138,20 @@ export class AuthService {
         case 3: // coordinador
           return '/tabs/dashboard';
         case 4: // lider
+          return '/tabs/agenda';
+        default:
+          return '/tabs/welcome';
+      }
+    }
+
+    // También verificar por nombre del rol si está disponible
+    if (userAny.rol) {
+      switch (userAny.rol) {
+        case 'super_admin':
+        case 'admin':
+        case 'coordinador':
+          return '/tabs/dashboard';
+        case 'lider':
           return '/tabs/agenda';
         default:
           return '/tabs/welcome';
