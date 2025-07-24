@@ -1,0 +1,64 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Evaluar Líder</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="closeModal()" fill="clear" [disabled]="isSubmitting">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="modal-content">
+    <div class="content-area">
+      <div class="leader-info">
+        <ion-icon name="person-circle-outline" class="leader-avatar"></ion-icon>
+        <h2>{{ leaderName }}</h2>
+        <p>¿Cómo calificas el desempeño de tu líder?</p>
+      </div>
+
+      <!-- Rating de estrellas -->
+      <div class="rating-container">
+        <ion-icon
+          *ngFor="let star of getStarsArray(); let i = index"
+          [name]="rating > i ? 'star' : 'star-outline'"
+          class="star-icon"
+          [class.active]="rating > i"
+          (click)="setRating(i + 1)"
+          [style.pointer-events]="isSubmitting ? 'none' : 'auto'"
+          [style.opacity]="isSubmitting ? '0.6' : '1'"
+        ></ion-icon>
+      </div>
+
+      <div class="rating-text" *ngIf="rating > 0">
+        <p>Has seleccionado {{ rating }} estrella{{ rating !== 1 ? 's' : '' }}</p>
+      </div>
+    </div>
+
+    <div class="modal-buttons">
+      <ion-button
+        expand="block"
+        fill="outline"
+        color="medium"
+        class="cancel-button"
+        (click)="closeModal()"
+        [disabled]="isSubmitting"
+      >
+        Cancelar
+      </ion-button>
+
+      <ion-button
+        expand="block"
+        fill="solid"
+        color="success"
+        class="submit-button"
+        [disabled]="rating === 0 || isSubmitting"
+        (click)="enviarCalificacion()"
+      >
+        <ion-spinner *ngIf="isSubmitting" name="crescent" slot="start"></ion-spinner>
+        {{ isSubmitting ? 'Enviando...' : 'Enviar Calificación' }}
+      </ion-button>
+    </div>
+  </div>
+</ion-content>

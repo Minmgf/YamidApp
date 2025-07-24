@@ -9,6 +9,8 @@
 <ion-content [fullscreen]="true">
   <div style="padding: 16px;">
     <ion-title size="large">Listado</ion-title>
-    <p *ngFor="let i of [].constructor(50)">Municipio {{ i + 1 }}</p>
+    @for (item of [].constructor(50); track $index) {
+      <p>Municipio {{ $index + 1 }}</p>
+    }
   </div>
 </ion-content>

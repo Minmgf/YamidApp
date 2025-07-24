@@ -18,7 +18,7 @@
       <p><strong>Celular:</strong> {{ user.celular || 'No disponible' }}</p>
       <p><strong>Municipio:</strong> {{ user.municipio || 'ID: ' + user.municipio_id }}</p>
       <p><strong>Lugar de votación:</strong> {{ user.lugar_votacion || 'No disponible' }}</p>
-      <p><strong>Registrado por:</strong> {{ getCreatedByName() }}</p>
+      <!-- <p><strong>Registrado por:</strong> {{ getCreatedByName() }}</p> -->
       <div *ngIf="user.permisos">
         <strong>Permisos:</strong>
         <ion-chip *ngFor="let permiso of getPermissionsList()" color="success">
@@ -35,6 +35,18 @@
       <div class="register-text">
         <h3>Registrar Usuario</h3>
         <p>Agregar un nuevo usuario al sistema</p>
+      </div>
+      <ion-icon name="chevron-forward-outline" class="chevron-icon"></ion-icon>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Card para evaluar líder (solo para usuarios con rol 3 registrados por líderes) -->
+  <ion-card *ngIf="user?.created_by && createdByName !== 'Sistema' && user?.rol_id === 3" button (click)="openEvaluateModal()" class="evaluate-card">
+    <ion-card-content class="evaluate-card-content">
+      <ion-icon name="star-outline" class="evaluate-icon"></ion-icon>
+      <div class="evaluate-text">
+        <h3>Evaluar Líder</h3>
+        <p>Califica a {{ createdByName }}</p>
       </div>
       <ion-icon name="chevron-forward-outline" class="chevron-icon"></ion-icon>
     </ion-card-content>

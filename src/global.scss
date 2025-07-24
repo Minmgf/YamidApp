@@ -60,6 +60,7 @@
 
   .modal-wrapper {
     height: 100%;
+    will-change: transform, opacity;
   }
 
   ion-content {
@@ -71,5 +72,31 @@
     --width: 95%;
     --height: 85vh;
     --min-height: 500px;
+  }
+}
+
+// Estilos para el modal de evaluación de líder
+.evaluate-leader-modal {
+  --width: 85%;
+  --max-width: 450px;
+  --height: 60vh;
+  --min-height: 500px;
+  --max-height: 70vh;
+
+  .modal-wrapper {
+    height: 100%;
+    will-change: transform, opacity;
+  }
+
+  ion-content {
+    --overflow: auto;
+    height: 100% !important;
+  }
+
+  @media (max-width: 768px) {
+    --width: 90%;
+    --height: 65vh;
+    --min-height: 450px;
+    --max-height: 75vh;
   }
 }

@@ -84,7 +84,8 @@
 .register-card {
   margin-top: 16px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  will-change: transform;
 
   &:hover {
     transform: translateY(-2px);
@@ -93,6 +94,7 @@
 
   &:active {
     transform: translateY(0);
+    transition: transform 0.1s ease;
   }
 }
 
@@ -142,6 +144,84 @@
     }
 
     .register-text {
+      h3 {
+        font-size: 1.1rem;
+      }
+
+      p {
+        font-size: 0.85rem;
+      }
+    }
+  }
+}
+
+// Estilos para la card de evaluación de líder
+.evaluate-card {
+  margin-top: 16px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  will-change: transform;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  &:active {
+    transform: translateY(0);
+    transition: transform 0.1s ease;
+  }
+}
+
+.evaluate-card-content {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  gap: 16px;
+
+  .evaluate-icon {
+    font-size: 32px;
+    color: #2ec421ff;
+    min-width: 32px;
+  }
+
+  .evaluate-text {
+    flex: 1;
+
+    h3 {
+      margin: 0 0 4px 0;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--ion-color-dark);
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--ion-color-medium);
+    }
+  }
+
+  .chevron-icon {
+    font-size: 20px;
+    color: var(--ion-color-medium);
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .register-card-content,
+  .evaluate-card-content {
+    padding: 16px;
+    gap: 12px;
+
+    .register-icon,
+    .evaluate-icon {
+      font-size: 28px;
+    }
+
+    .register-text,
+    .evaluate-text {
       h3 {
         font-size: 1.1rem;
       }

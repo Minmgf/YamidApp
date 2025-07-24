@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MainHeaderComponent } from '../../shared/main-header/main-header.component';
 import { RegisterUserModalComponent } from '../../shared/modals/register-user-modal/register-user-modal.component';
+import { EvaluateLeaderModalComponent } from '../../shared/modals/evaluate-leader-modal/evaluate-leader-modal.component';
 import { UserRegistrationService } from '../../services/user-registration.service';
 import { AuthService } from '../../services/auth.service';
 
@@ -23,6 +24,10 @@ import { AuthService } from '../../services/auth.service';
 export class WelcomePage implements OnInit {
   user: any = null;
   createdByName: string = 'Cargando...';
+
+  // Precargar modales para evitar delays
+  private registerModalPreloaded: HTMLIonModalElement | null = null;
+  private evaluateModalPreloaded: HTMLIonModalElement | null = null;
 
   constructor(
     private router: Router,
@@ -119,21 +124,67 @@ export class WelcomePage implements OnInit {
       return;
     }
 
-    const modal = await this.modalCtrl.create({
-      component: RegisterUserModalComponent,
-      cssClass: 'register-user-modal',
-      backdropDismiss: false,
-      showBackdrop: true,
-      animated: true
-    });
+    try {
+      const modal = await this.modalCtrl.create({
+        component: RegisterUserModalComponent,
+        cssClass: 'register-user-modal',
+        backdropDismiss: false,
+        showBackdrop: true,
+        animated: true,
+        keyboardClose: true
+      });
 
-    modal.onDidDismiss().then((result) => {
-      if (result.data?.success) {
-        this.showAlert('Éxito', 'Usuario registrado correctamente');
-      }
-    });
+      // Presentar inmediatamente sin esperar
+      modal.present();
 
-    await modal.present();
+      // Manejar el cierre de forma asíncrona
+      modal.onDidDismiss().then((result) => {
+        if (result.data?.success) {
+          this.showAlert('Éxito', 'Usuario registrado correctamente');
+        }
+      });
+    } catch (error) {
+      console.error('Error al abrir modal de registro:', error);
+    }
+  }
+
+  /**
+   * Abre el modal para evaluar al líder
+   */
+  async openEvaluateModal() {
+    // Verificar que sea un usuario con rol 3, registrado por un líder y no por el sistema
+    if (!this.user?.created_by || this.createdByName === 'Sistema' || this.user?.rol_id !== 3) {
+      return;
+    }
+
+    try {
+      const modal = await this.modalCtrl.create({
+        component: EvaluateLeaderModalComponent,
+        cssClass: 'evaluate-leader-modal',
+        backdropDismiss: false,
+        showBackdrop: true,
+        animated: true,
+        keyboardClose: true,
+        componentProps: {
+          leaderName: this.createdByName,
+          leaderId: this.user.created_by,
+          evaluatorId: this.user.id,
+          evaluatorName: this.user.nombre_completo
+        }
+      });
+
+      // Presentar inmediatamente sin esperar
+      modal.present();
+
+      // Manejar el cierre de forma asíncrona
+      modal.onDidDismiss().then((result) => {
+        if (result.data?.success) {
+          this.showAlert('Calificación enviada', `Has calificado a ${this.createdByName} con ${result.data.rating} estrella${result.data.rating !== 1 ? 's' : ''}`);
+        }
+      });
+    } catch (error) {
+      console.error('Error al abrir modal de evaluación:', error);
+    }
   }
 
   /**

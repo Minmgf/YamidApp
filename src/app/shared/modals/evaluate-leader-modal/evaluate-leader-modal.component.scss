@@ -1,0 +1,226 @@
+// Estilos para el modal de evaluación de líder
+
+// Asegurar que el modal use toda la altura disponible
+:host {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+ion-header {
+  flex-shrink: 0;
+
+  ion-toolbar {
+    --background: linear-gradient(135deg, #2ec421ff, #26a51c);
+    --color: white;
+    --box-shadow: 0 2px 8px rgba(46, 196, 33, 0.2);
+
+    ion-title {
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    ion-button {
+      --color: white;
+      --background-hover: rgba(255, 255, 255, 0.1);
+    }
+  }
+}
+
+ion-content {
+  --background: linear-gradient(180deg, #fafcfa, #f5f9f5);
+  flex: 1;
+  height: 100%;
+
+  .inner-scroll {
+    height: 100%;
+  }
+}
+
+.modal-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 100%;
+}
+
+.content-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.leader-info {
+  text-align: center;
+  margin-bottom: 32px;
+
+  .leader-avatar {
+    font-size: 80px;
+    color: #2ec421ff;
+    margin-bottom: 16px;
+    filter: drop-shadow(0 4px 12px rgba(46, 196, 33, 0.2));
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1a7a14;
+    margin: 0 0 8px 0;
+  }
+
+  p {
+    font-size: 1rem;
+    color: #6b6b6b;
+    margin: 0;
+  }
+}
+
+.rating-container {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 32px 0;
+
+  .star-icon {
+    font-size: 40px;
+    color: #e0e0e0;
+    cursor: pointer;
+    transition: transform 0.1s ease, color 0.1s ease;
+    will-change: transform, color;
+    filter: drop-shadow(0 2px 4px rgba(46, 196, 33, 0.1));
+
+    &:hover {
+      transform: scale(1.15);
+      color: #4ed946;
+      filter: drop-shadow(0 4px 8px rgba(46, 196, 33, 0.3));
+    }
+
+    &.active {
+      color: #2ec421ff;
+      transform: scale(1.1);
+      filter: drop-shadow(0 3px 6px rgba(46, 196, 33, 0.4));
+    }
+  }
+}
+
+  .rating-text {
+  text-align: center;
+  // margin-bottom: 32px;
+
+  p {
+    font-size: 1.1rem;
+    color: #2ec421ff;
+    font-weight: 600;
+    background: linear-gradient(135deg, #e8f8e7, #f0fcef);
+    padding: 12px 20px;
+    border-radius: 20px;
+    margin: 0 auto;
+    max-width: 280px;
+    border: 1px solid #c8f2c6;
+    box-shadow: 0 2px 8px rgba(46, 196, 33, 0.15);
+  }
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 24px;
+  flex-shrink: 0;
+
+  ion-button {
+    flex: 1;
+    font-weight: 600;
+    height: 48px;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+  }
+
+  .cancel-button {
+    --color: #8e8e8e;
+    --border-color: #d0d0d0;
+    --background-hover: #f5f5f5;
+
+    &:hover {
+      --border-color: #bfbfbf;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  .submit-button {
+    --background: linear-gradient(135deg, #2ec421ff, #26a51c);
+    --color: white;
+    --box-shadow: 0 4px 12px rgba(46, 196, 33, 0.3);
+
+    &:hover:not([disabled]) {
+      --background: linear-gradient(135deg, #26a51c, #1f8d17);
+      transform: translateY(-1px);
+      --box-shadow: 0 6px 16px rgba(46, 196, 33, 0.4);
+    }
+
+    &[disabled] {
+      --background: #b8b8b8;
+      --color: #6b6b6b;
+      --box-shadow: none;
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 480px) {
+  ion-content {
+    padding: 16px;
+  }
+
+  .leader-info {
+    margin-bottom: 24px;
+
+    .leader-avatar {
+      font-size: 60px;
+      filter: drop-shadow(0 3px 8px rgba(46, 196, 33, 0.25));
+    }
+
+    h2 {
+      font-size: 1.3rem;
+    }
+
+    p {
+      font-size: 0.9rem;
+    }
+  }
+
+  .rating-container {
+    gap: 8px;
+    margin: 24px 0;
+
+    .star-icon {
+      font-size: 32px;
+
+      &:hover {
+        transform: scale(1.1);
+      }
+
+      &.active {
+        transform: scale(1.05);
+      }
+    }
+  }
+
+  .rating-text p {
+    font-size: 1rem;
+    padding: 10px 16px;
+    max-width: 240px;
+  }
+
+  .modal-buttons {
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 16px;
+
+    ion-button {
+      height: 44px;
+    }
+  }
+}
