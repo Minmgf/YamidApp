@@ -1,0 +1,123 @@
+<ion-header>
+  <app-main-header
+    [nombre]="currentUser?.nombre + ' ' + currentUser?.apellido"
+    [avatar]="currentUser?.foto || 'assets/img/foto.png'"
+    (logout)="logout()"
+  ></app-main-header>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <!-- Título y búsqueda -->
+  <div class="page-header">
+    <ion-title size="large">Votantes</ion-title>
+
+    <div class="search-filter-row">
+      <ion-searchbar
+        [(ngModel)]="searchTerm"
+        (ionInput)="onSearchChange()"
+        placeholder="Buscar por nombre, email o cédula..."
+        debounce="300">
+      </ion-searchbar>
+
+      <ion-button
+        fill="outline"
+        size="default"
+        (click)="toggleFiltros()"
+        class="filter-button">
+        <ion-icon name="filter-outline" slot="start"></ion-icon>
+        Filtros
+        <ion-icon [name]="mostrarFiltros ? 'chevron-up' : 'chevron-down'" slot="end"></ion-icon>
+      </ion-button>
+    </div>
+
+    <!-- Filtros desplegables -->
+    <div *ngIf="mostrarFiltros" class="filters-dropdown" [@slideInOut]>
+      <!-- Filtro por municipio -->
+      <ion-item lines="none" class="municipio-filter">
+        <ion-label position="stacked">Filtrar por municipio</ion-label>
+        <ion-select
+          [(ngModel)]="municipioSeleccionado"
+          (ionChange)="onMunicipioChange()"
+          placeholder="Todos los municipios"
+          interface="popover">
+          <ion-select-option value="">Todos los municipios</ion-select-option>
+          <ion-select-option
+            *ngFor="let municipio of municipiosDisponibles"
+            [value]="municipio">
+            {{ municipio }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- Filtros por rol -->
+      <div class="role-filters">
+        <ion-label class="filter-label">Filtrar por rol</ion-label>
+        <ion-segment
+          [(ngModel)]="filtroSeleccionado"
+          (ionChange)="onFiltroChange($event.detail.value)"
+          scrollable="true"
+          *ngIf="filtros && filtros.length > 0">
+          <ion-segment-button
+            *ngFor="let filtro of filtros; trackBy: trackByValue"
+            [value]="filtro.value">
+            <ion-label>
+              {{ filtro.label }}
+              <ion-badge color="primary">{{ filtro.count }}</ion-badge>
+            </ion-label>
+          </ion-segment-button>
+        </ion-segment>
+
+        <!-- Mensaje de carga para filtros -->
+        <div *ngIf="!filtros || filtros.length === 0" class="loading-filters">
+          <ion-spinner name="dots" size="small"></ion-spinner>
+          <span>Cargando filtros...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-container">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Cargando usuarios...</p>
+  </div>
+
+  <!-- Lista de usuarios -->
+  <div *ngIf="!isLoading" class="users-container">
+    <!-- Refresh -->
+    <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+      <ion-refresher-content></ion-refresher-content>
+    </ion-refresher>
+
+    <!-- Sin resultados -->
+    <div *ngIf="usuariosFiltrados.length === 0" class="no-results">
+      <ion-icon name="people-outline" size="large"></ion-icon>
+      <h3>No se encontraron usuarios</h3>
+      <p>No hay usuarios que coincidan con los filtros seleccionados.</p>
+    </div>
+
+    <!-- Lista de usuarios -->
+    <div *ngFor="let usuario of usuariosFiltrados" class="user-item">
+      <div class="user-content">
+        <div class="user-main-info">
+          <div class="user-name">{{ usuario.nombre_completo }}</div>
+          <div class="user-location">{{ usuario.municipio }}</div>
+        </div>
+        <div class="user-right-info">
+          <div class="user-role">
+            <ion-chip [color]="getRolColor(usuario.rol_id)" size="small">
+              <ion-label>{{ usuario.rol }}</ion-label>
+            </ion-chip>
+          </div>
+          <!-- <div class="user-status">
+            <ion-checkbox
+              [checked]="usuario.estado === 'activo'"
+              [disabled]="true"
+              color="success">
+            </ion-checkbox>
+          </div> -->
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-content>

@@ -15,6 +15,7 @@ export interface UserData {
     acceso_completo?: boolean;
     dashboard?: boolean;
     municipios?: boolean;
+    usuarios?: boolean;
     agenda?: boolean;
     blog?: boolean;
     perfil?: boolean;

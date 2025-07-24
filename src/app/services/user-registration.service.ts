@@ -76,4 +76,12 @@ export class UserRegistrationService {
     const headers = this.getAuthHeaders();
     return this.http.get(`${this.apiUrl}/usuarios/${userId}`, { headers });
   }
+
+  /**
+   * Obtiene todos los usuarios (solo para super admins)
+   */
+  getAllUsers(): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.get<any>(`${this.apiUrl}/usuarios`, { headers });
+  }
 }

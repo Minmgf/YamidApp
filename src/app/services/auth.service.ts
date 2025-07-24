@@ -111,6 +111,8 @@ export class AuthService {
         return user.permisos?.dashboard || user.permisos?.puede_ver_metricas || false;
       case 'municipios':
         return user.permisos?.municipios || user.permisos?.puede_ver_metricas || false;
+      case 'usuarios':
+        return (user as any).rol_id === 1 || user.permisos?.usuarios || false; // Solo super_admin (rol_id: 1)
       case 'agenda':
         return user.permisos?.agenda || true; // Agenda disponible para todos por defecto
       case 'blog':

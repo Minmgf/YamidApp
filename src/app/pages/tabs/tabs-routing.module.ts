@@ -60,6 +60,16 @@ const routes: Routes = [
         }
       },
       {
+        path: 'usuarios',
+        loadChildren: () => import('../usuarios/usuarios.module').then(m => m.UsuariosPageModule),
+        canActivate: [RoleGuard],
+        data: {
+          roles: ['super_admin'],
+          permission: 'usuarios',
+          title: 'Usuarios'
+        }
+      },
+      {
         path: '',
         canActivate: [AutoRedirectGuard],
         children: []

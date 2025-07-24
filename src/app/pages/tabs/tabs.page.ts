@@ -67,6 +67,13 @@ export class TabsPage implements OnInit, OnDestroy {
         visible: (user) => this.authService.hasPermission('blog')
       },
       {
+        label: 'Votantes',
+        icon: 'people-outline',
+        tab: 'usuarios',
+        href: '/tabs/usuarios',
+        visible: (user) => this.authService.hasPermission('usuarios')
+      },
+      {
         label: 'Perfil',
         icon: 'person-outline',
         tab: 'welcome',
