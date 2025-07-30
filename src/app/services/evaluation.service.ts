@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface EvaluationRequest {
-  lider_id: number;
+  evaluado_id: number;
   evaluador_id: number;
   calificacion: number;
   comentario: string;

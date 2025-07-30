@@ -16,7 +16,7 @@ import { AuthService } from '../../../services/auth.service';
 })
 export class EvaluateLeaderModalComponent implements OnInit {
   @Input() leaderName: string = '';
-  @Input() leaderId: number = 0;
+  @Input() evaluadoId: number = 0;
   @Input() evaluatorId: number = 0;
   @Input() evaluatorName: string = '';
 
@@ -67,11 +67,13 @@ export class EvaluateLeaderModalComponent implements OnInit {
       }
 
       const evaluationData: EvaluationRequest = {
-        lider_id: this.leaderId,
+        evaluado_id: this.evaluadoId,
         evaluador_id: Number(currentUser.id),
         calificacion: this.rating,
         comentario: ""
       };
+
+      console.log('Enviando evaluación con estructura:', evaluationData);
 
       const response = await this.evaluationService.submitEvaluation(evaluationData).toPromise();
 

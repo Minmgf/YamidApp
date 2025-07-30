@@ -4,6 +4,7 @@ import { ModalController, IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { HotToastService } from '@ngxpert/hot-toast';
 import { UserRegistrationService, Municipio, Rol, UsuarioRegistro } from '../../../services/user-registration.service';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-register-user-modal',
@@ -27,7 +28,8 @@ export class RegisterUserModalComponent implements OnInit {
     private fb: FormBuilder,
     private modalCtrl: ModalController,
     private toast: HotToastService,
-    private userRegistrationService: UserRegistrationService
+    private userRegistrationService: UserRegistrationService,
+    private authService: AuthService
   ) {
     this.registerForm = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(2)]],
@@ -130,20 +132,16 @@ export class RegisterUserModalComponent implements OnInit {
     this.isLoading = true;
     const formData: UsuarioRegistro = this.registerForm.value;
 
-    // Obtener el ID del usuario actual desde localStorage
-    const currentUserData = localStorage.getItem('userData');
-    if (currentUserData) {
-      try {
-        const userData = JSON.parse(currentUserData);
-        formData.created_by = userData.id || userData.user_id;
-      } catch (error) {
-        console.warn('Error al obtener datos del usuario actual:', error);
-        // Si no se puede obtener el ID, usar un valor por defecto o mostrar error
-        formData.created_by = 1; // Valor por defecto
-      }
+    // Obtener el ID del usuario actual usando el AuthService
+    const currentUser = this.authService.getCurrentUser();
+    if (currentUser && currentUser.id) {
+      formData.created_by = Number(currentUser.id);
+      console.log('Usuario registrador (created_by):', formData.created_by);
     } else {
-      // Si no hay datos de usuario, usar valor por defecto
-      formData.created_by = 1;
+      console.error('No se pudo obtener el usuario actual para created_by');
+      this.isLoading = false;
+      this.toast.error('Error: No se pudo identificar el usuario registrador');
+      return;
     }
 
     this.userRegistrationService.registerUser(formData).subscribe({

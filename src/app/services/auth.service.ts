@@ -33,6 +33,7 @@ export class AuthService {
             localStorage.setItem('currentUser', JSON.stringify(usuario));
             this.currentUserSubject.next(usuario);
             console.log('Usuario guardado:', usuario);
+            console.log('ID del usuario para created_by:', usuario.id);
           } else {
             console.warn('No se encontró usuario en la respuesta');
           }
@@ -57,10 +58,14 @@ export class AuthService {
       try {
         const user: UserData = JSON.parse(userData);
         this.currentUserSubject.next(user);
+        console.log('Usuario cargado desde localStorage:', user);
+        console.log('ID del usuario cargado:', user.id);
       } catch (error) {
         console.error('Error parsing user data from localStorage:', error);
         this.logout();
       }
+    } else {
+      console.log('No hay datos de usuario en localStorage');
     }
   }
 

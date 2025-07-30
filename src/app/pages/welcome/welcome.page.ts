@@ -152,8 +152,8 @@ export class WelcomePage implements OnInit {
    * Abre el modal para evaluar al líder
    */
   async openEvaluateModal() {
-    // Verificar que sea un usuario con rol 3, registrado por un líder y no por el sistema
-    if (!this.user?.created_by || this.createdByName === 'Sistema' || this.user?.rol_id !== 3) {
+    // Verificar que el usuario haya sido registrado por otro usuario (no por el sistema)
+    if (!this.user?.created_by || this.createdByName === 'Sistema') {
       return;
     }
 
@@ -167,7 +167,7 @@ export class WelcomePage implements OnInit {
         keyboardClose: true,
         componentProps: {
           leaderName: this.createdByName,
-          leaderId: this.user.created_by,
+          evaluadoId: this.user.created_by,
           evaluatorId: this.user.id,
           evaluatorName: this.user.nombre_completo
         }
