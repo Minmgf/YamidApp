@@ -1,15 +1,80 @@
 <ion-header>
   <app-main-header
-    [nombre]="'Yamid Sanabria'"
-    [avatar]="'assets/img/foto.png'"
+    [nombre]="currentUser?.nombre_completo || 'Usuario'"
+    [avatar]="currentUser?.foto || 'assets/img/foto.png'"
     (logout)="logout()"
   ></app-main-header>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">agenda</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <!-- Título -->
+  <div class="page-header">
+    <ion-title size="large">Próximos Eventos - {{ currentUser?.municipio }}</ion-title>
+    <p class="subtitle">{{ formatDate(fechaActual.toISOString()) }}</p>
+
+    <!-- Botón de debug temporal -->
+    <ion-button size="small" fill="outline" color="warning" (click)="testEventosAPI()">
+      Debug Eventos API
+    </ion-button>
+
+    <!-- Botón para recargar eventos -->
+    <ion-button size="small" fill="outline" color="success" (click)="recargarEventos()">
+      Recargar Eventos
+    </ion-button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-container">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Cargando eventos...</p>
+  </div>
+
+  <!-- Contenido principal -->
+  <div *ngIf="!isLoading" class="agenda-container">
+    <!-- Refresh -->
+    <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+      <ion-refresher-content></ion-refresher-content>
+    </ion-refresher>
+
+    <!-- Sin eventos próximos -->
+    <div *ngIf="eventosProximos.length === 0" class="no-agendas">
+      <ion-icon name="calendar-outline" size="large"></ion-icon>
+      <h3>No hay eventos próximos</h3>
+      <p>No hay eventos programados en las próximas fechas</p>
+    </div>
+
+    <!-- Lista de eventos próximos -->
+    <div *ngFor="let evento of eventosProximos" class="evento-card">
+      <ion-card>
+        <ion-card-header>
+          <div class="evento-header">
+            <ion-card-title>{{ evento.nombre_evento }}</ion-card-title>
+            <ion-chip color="primary">
+              <ion-label>{{ formatDate(evento.agenda_fecha) }}</ion-label>
+            </ion-chip>
+          </div>
+        </ion-card-header>
+
+        <ion-card-content>
+          <div class="evento-details">
+            <div class="evento-time">
+              <ion-icon name="time-outline"></ion-icon>
+              <span>{{ formatTime(evento.hora) }}</span>
+            </div>
+            <div class="evento-lugar" *ngIf="evento.lugar">
+              <ion-icon name="location-outline"></ion-icon>
+              <span>{{ evento.lugar }}</span>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </div>
+
+  <!-- Botón flotante para crear agenda (solo administradores) -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="canCreateAgenda()">
+    <ion-fab-button (click)="openCreateAgendaModal()" color="primary">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>

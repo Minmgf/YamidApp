@@ -1,0 +1,203 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ step === 'agenda' ? 'Crear Agenda' : 'Agregar Eventos' }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <!-- Paso 1: Crear Agenda -->
+  <div *ngIf="step === 'agenda'" class="step-container">
+    <div class="step-header">
+      <ion-icon name="calendar-outline" color="primary"></ion-icon>
+      <h2>Información de la Agenda</h2>
+      <p>Completa los datos básicos de la agenda</p>
+    </div>
+
+    <form [formGroup]="agendaForm" (ngSubmit)="crearAgenda()">
+      <!-- Municipio -->
+      <ion-item lines="inset">
+        <ion-label position="stacked">Municipio *</ion-label>
+        <ion-select
+          formControlName="municipio_id"
+          placeholder="Seleccione un municipio"
+          [class.ion-invalid]="agendaForm.get('municipio_id')?.invalid && agendaForm.get('municipio_id')?.touched">
+          <ion-select-option
+            *ngFor="let municipio of municipios"
+            [value]="municipio.id">
+            {{ municipio.nombre }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+      <div class="error-message" *ngIf="getErrorMessage(agendaForm, 'municipio_id')">
+        {{ getErrorMessage(agendaForm, 'municipio_id') }}
+      </div>
+
+      <!-- Fecha (opcional) -->
+      <ion-item lines="inset">
+        <ion-label position="stacked">Fecha de la Agenda (Opcional)</ion-label>
+        <ion-datetime
+          class="centered-datetime"
+          formControlName="fecha"
+          presentation="date"
+          display-format="DD/MM/YYYY"
+          picker-format="DD/MM/YYYY"
+          placeholder="Fecha de referencia de la agenda">
+        </ion-datetime>
+      </ion-item>
+
+      <!-- Nota del asesor -->
+      <ion-item lines="inset">
+        <ion-label position="stacked">Descripción de la Agenda</ion-label>
+        <ion-textarea
+          formControlName="nota_asesor"
+          placeholder="Descripción de esta agenda (ej: Agenda general del municipio)"
+          rows="3">
+        </ion-textarea>
+      </ion-item>
+
+      <!-- Botón siguiente -->
+      <div class="button-container">
+        <ion-button
+          expand="block"
+          type="submit"
+          [disabled]="agendaForm.invalid || isLoading"
+          class="next-button">
+          <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
+          <span *ngIf="!isLoading">Crear/Usar Agenda General</span>
+        </ion-button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Paso 2: Agregar Eventos -->
+  <div *ngIf="step === 'eventos'" class="step-container">
+    <div class="step-header">
+      <ion-icon name="list-outline" color="secondary"></ion-icon>
+      <h2>Eventos de la Agenda</h2>
+      <p>Agrega los eventos para esta fecha (opcional)</p>
+    </div>
+
+    <!-- Formulario para agregar evento -->
+    <form [formGroup]="eventosForm" (ngSubmit)="agregarEvento()" class="eventos-form">
+      <!-- Fecha del evento -->
+      <ion-item lines="inset">
+        <ion-label position="stacked">Fecha del Evento *</ion-label>
+        <ion-datetime
+          class="centered-datetime"
+          presentation="date"
+          formControlName="fecha_evento"
+          display-format="DD/MM/YYYY"
+          picker-format="DD/MM/YYYY"
+          placeholder="Seleccione la fecha del evento"
+          [class.ion-invalid]="eventosForm.get('fecha_evento')?.invalid && eventosForm.get('fecha_evento')?.touched">
+        </ion-datetime>
+      </ion-item>
+
+      <div class="form-row">
+        <!-- Nombre del evento -->
+        <ion-item lines="inset" class="evento-nombre">
+          <ion-label position="stacked">Nombre del Evento *</ion-label>
+          <ion-input
+            formControlName="nombre_evento"
+            placeholder="Ej: Reunión con líderes"
+            [class.ion-invalid]="eventosForm.get('nombre_evento')?.invalid && eventosForm.get('nombre_evento')?.touched">
+          </ion-input>
+        </ion-item>
+
+        <!-- Hora -->
+        <ion-item lines="inset" class="evento-hora">
+          <ion-label position="stacked">Hora *</ion-label>
+          <ion-datetime
+            class="centered-datetime"
+            formControlName="hora"
+            presentation="time"
+            display-format="HH:mm"
+            picker-format="HH:mm"
+            [class.ion-invalid]="eventosForm.get('hora')?.invalid && eventosForm.get('hora')?.touched">
+          </ion-datetime>
+          <!-- <ion-datetime
+            formControlName="hora"
+            display-format="HH:mm"
+            picker-format="HH:mm"
+            placeholder="09:00"
+            [class.ion-invalid]="eventosForm.get('hora')?.invalid && eventosForm.get('hora')?.touched">
+          </ion-datetime> -->
+        </ion-item>
+      </div>
+
+      <!-- Lugar -->
+      <ion-item lines="inset">
+        <ion-label position="stacked">Lugar *</ion-label>
+        <ion-input
+          formControlName="lugar"
+          placeholder="Ej: Salón principal del municipio"
+          [class.ion-invalid]="eventosForm.get('lugar')?.invalid && eventosForm.get('lugar')?.touched">
+        </ion-input>
+      </ion-item>
+
+      <!-- Botón agregar evento -->
+      <ion-button
+        expand="block"
+        fill="outline"
+        type="submit"
+        [disabled]="eventosForm.invalid"
+        class="add-event-button">
+        <ion-icon name="add" slot="start"></ion-icon>
+        Agregar Evento
+      </ion-button>
+    </form>
+
+    <!-- Lista de eventos agregados -->
+    <div *ngIf="eventos.length > 0" class="eventos-list">
+      <h3>Eventos Agregados ({{ eventos.length }})</h3>
+      <ion-card *ngFor="let evento of eventos; let i = index" class="evento-card">
+        <ion-card-content>
+          <div class="evento-header">
+            <strong>{{ evento.nombre_evento }}</strong>
+            <ion-button fill="clear" size="small" color="danger" (click)="eliminarEvento(i)">
+              <ion-icon name="trash-outline"></ion-icon>
+            </ion-button>
+          </div>
+          <div class="evento-details">
+            <span><ion-icon name="time-outline"></ion-icon> {{ evento.hora }}</span>
+            <span><ion-icon name="location-outline"></ion-icon> {{ evento.lugar }}</span>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="button-container">
+      <ion-button
+        expand="block"
+        fill="outline"
+        (click)="volverAtras()"
+        [disabled]="isLoading">
+        <ion-icon name="arrow-back" slot="start"></ion-icon>
+        Volver
+      </ion-button>
+
+      <ion-button
+        expand="block"
+        (click)="guardarEventos()"
+        [disabled]="isLoading"
+        class="finish-button">
+        <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
+        <span *ngIf="!isLoading">Finalizar Agenda</span>
+      </ion-button>
+
+      <ion-button
+        expand="block"
+        fill="clear"
+        (click)="omitirEventos()"
+        [disabled]="isLoading">
+        Omitir eventos y finalizar
+      </ion-button>
+    </div>
+  </div>
+</ion-content>

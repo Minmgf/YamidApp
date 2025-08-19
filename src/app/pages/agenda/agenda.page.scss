@@ -1,0 +1,236 @@
+.page-header {
+  padding: 16px;
+  background: var(--ion-background-color);
+
+  ion-title {
+    color: var(--ion-color-primary);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    color: var(--ion-color-medium);
+    font-size: 0.9rem;
+    margin: 0;
+    font-weight: 500;
+  }
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+
+  ion-spinner {
+    margin-bottom: 16px;
+    --color: var(--ion-color-primary);
+  }
+
+  p {
+    color: var(--ion-color-medium);
+    font-size: 0.9rem;
+  }
+}
+
+.agenda-container {
+  padding: 0 16px 80px 16px;
+}
+
+.no-agendas {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--ion-color-medium);
+
+  ion-icon {
+    margin-bottom: 16px;
+    opacity: 0.5;
+    color: var(--ion-color-medium);
+  }
+
+  h3 {
+    margin: 16px 0 8px 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--ion-color-dark);
+  }
+
+  p {
+    font-size: 0.9rem;
+    margin: 8px 0;
+  }
+}
+
+.evento-card {
+  margin-bottom: 16px;
+
+  ion-card {
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin: 0;
+
+    .evento-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+
+      ion-card-title {
+        color: var(--ion-color-primary);
+        font-size: 1.1rem;
+        font-weight: 600;
+        flex: 1;
+        margin-right: 12px;
+      }
+
+      ion-chip {
+        font-size: 0.75rem;
+        height: 24px;
+        margin: 0;
+        white-space: nowrap;
+      }
+    }
+
+    .evento-details {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+
+      .evento-time, .evento-lugar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--ion-color-medium);
+        font-size: 0.9rem;
+
+        ion-icon {
+          font-size: 1rem;
+          color: var(--ion-color-primary);
+        }
+
+        span {
+          font-weight: 500;
+        }
+      }
+
+      .evento-time {
+        color: var(--ion-color-primary);
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+.eventos-list {
+  .evento-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--ion-color-light-shade);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .evento-time {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 80px;
+      color: var(--ion-color-primary);
+      font-weight: 600;
+      font-size: 0.9rem;
+
+      ion-icon {
+        font-size: 1rem;
+      }
+    }
+
+    .evento-details {
+      flex: 1;
+
+      h4 {
+        margin: 0 0 4px 0;
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--ion-color-dark);
+        line-height: 1.3;
+      }
+
+      p {
+        margin: 0;
+        font-size: 0.85rem;
+        color: var(--ion-color-medium);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        ion-icon {
+          font-size: 0.9rem;
+        }
+      }
+    }
+  }
+}
+
+.sin-eventos {
+  text-align: center;
+  padding: 24px 16px;
+  color: var(--ion-color-medium);
+
+  ion-icon {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+    opacity: 0.5;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+  }
+}
+
+// Botón flotante
+ion-fab {
+  ion-fab-button {
+    --background: var(--ion-color-primary);
+    --color: white;
+    --border-radius: 16px;
+    --box-shadow: 0 4px 12px rgba(var(--ion-color-primary-rgb), 0.3);
+
+    &:hover {
+      --background: var(--ion-color-primary-shade);
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .evento-card {
+    .evento-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+
+      ion-card-title {
+        margin-right: 0;
+        font-size: 1rem;
+      }
+
+      ion-chip {
+        align-self: flex-end;
+      }
+    }
+
+    .evento-details {
+      gap: 10px;
+
+      .evento-time, .evento-lugar {
+        font-size: 0.85rem;
+      }
+    }
+  }
+}
