@@ -9,18 +9,65 @@
 <ion-content [fullscreen]="true">
   <!-- Título -->
   <div class="page-header">
-    <ion-title size="large">Próximos Eventos - {{ currentUser?.municipio }}</ion-title>
+    <ion-title size="large">
+      <span *ngIf="isSuperAdmin">
+        {{ vistaActual === 'gestion' ? 'Gestión de Agendas' : 'Eventos' }} (Super Admin)
+      </span>
+      <span *ngIf="!isSuperAdmin">Próximos Eventos - {{ currentUser?.municipio }}</span>
+    </ion-title>
     <p class="subtitle">{{ formatDate(fechaActual.toISOString()) }}</p>
 
-    <!-- Botón de debug temporal -->
-    <ion-button size="small" fill="outline" color="warning" (click)="testEventosAPI()">
-      Debug Eventos API
-    </ion-button>
+    <!-- Controles para Super Admin -->
+    <div *ngIf="isSuperAdmin" class="admin-controls">
+      <!-- Botones de vista -->
+      <div class="view-buttons">
+        <ion-button
+          [fill]="vistaActual === 'eventos' ? 'solid' : 'outline'"
+          size="small"
+          color="primary"
+          (click)="cambiarVista('eventos')">
+          <ion-icon name="calendar" slot="start"></ion-icon>
+          Ver Eventos
+        </ion-button>
 
-    <!-- Botón para recargar eventos -->
-    <ion-button size="small" fill="outline" color="success" (click)="recargarEventos()">
-      Recargar Eventos
-    </ion-button>
+        <ion-button
+          [fill]="vistaActual === 'gestion' ? 'solid' : 'outline'"
+          size="small"
+          color="secondary"
+          (click)="cambiarVista('gestion')">
+          <ion-icon name="settings" slot="start"></ion-icon>
+          Gestionar
+        </ion-button>
+      </div>
+    </div>
+
+    <!-- Filtro por municipio (Para todos los usuarios) -->
+    <div class="filter-section">
+      <ion-item lines="none">
+        <ion-label>Filtrar por municipio:</ion-label>
+        <ion-select
+          [(ngModel)]="filtroMunicipio"
+          (ionChange)="aplicarFiltroMunicipio($event.detail.value)"
+          placeholder="Todos">
+          <ion-select-option value="todos">Todos los municipios</ion-select-option>
+          <ion-select-option
+            *ngFor="let municipio of municipios"
+            [value]="municipio.id">
+            {{ municipio.nombre }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+    </div>
+
+    <!-- Botones de debug (temporales) -->
+    <div class="debug-buttons" *ngIf="!isSuperAdmin">
+      <ion-button size="small" fill="outline" color="warning" (click)="testEventosAPI()">
+        Debug Eventos API
+      </ion-button>
+      <ion-button size="small" fill="outline" color="success" (click)="recargarEventos()">
+        Recargar Eventos
+      </ion-button>
+    </div>
   </div>
 
   <!-- Loading -->
@@ -36,38 +83,134 @@
       <ion-refresher-content></ion-refresher-content>
     </ion-refresher>
 
-    <!-- Sin eventos próximos -->
-    <div *ngIf="eventosProximos.length === 0" class="no-agendas">
-      <ion-icon name="calendar-outline" size="large"></ion-icon>
-      <h3>No hay eventos próximos</h3>
-      <p>No hay eventos programados en las próximas fechas</p>
+    <!-- VISTA DE GESTIÓN (Solo Super Admin) -->
+    <div *ngIf="isSuperAdmin && vistaActual === 'gestion'" class="gestion-view">
+      <div class="gestion-header">
+        <h2>Gestión de Agendas</h2>
+        <p>Total: {{ agendasFiltradas.length }} agenda{{ agendasFiltradas.length !== 1 ? 's' : '' }}</p>
+
+        <ion-button expand="block" color="primary" (click)="crearAgenda()">
+          <ion-icon name="add" slot="start"></ion-icon>
+          Crear Nueva Agenda
+        </ion-button>
+      </div>
+
+      <!-- Sin agendas -->
+      <div *ngIf="agendasFiltradas.length === 0" class="no-agendas">
+        <ion-icon name="folder-outline" size="large"></ion-icon>
+        <h3>No hay agendas</h3>
+        <p>{{ filtroMunicipio === 'todos' ? 'No hay agendas creadas' : 'No hay agendas para este municipio' }}</p>
+      </div>
+
+      <!-- Lista de agendas -->
+      <div *ngFor="let agenda of agendasFiltradas" class="agenda-management-card">
+        <ion-card>
+          <ion-card-header>
+            <div class="agenda-header">
+              <div class="agenda-info">
+                <ion-card-title>{{ agenda.titulo }}</ion-card-title>
+                <ion-card-subtitle>{{ getMesNombre(agenda.mes) }} {{ agenda.anio }}</ion-card-subtitle>
+              </div>
+              <div class="agenda-badges">
+                <ion-chip color="primary">
+                  <ion-label>{{ agenda.eventos?.length || 0 }} eventos</ion-label>
+                </ion-chip>
+                <ion-chip color="secondary">
+                  <ion-label>{{ getEventosPorMunicipios(agenda).length }} municipios</ion-label>
+                </ion-chip>
+              </div>
+            </div>
+          </ion-card-header>
+
+          <ion-card-content>
+            <!-- Descripción -->
+            <p *ngIf="agenda.descripcion" class="agenda-description">
+              <strong>Descripción:</strong> {{ agenda.descripcion }}
+            </p>
+            <p *ngIf="agenda.nota_asesor" class="agenda-description">
+              <strong>Nota del Asesor:</strong> {{ agenda.nota_asesor }}
+            </p>
+
+            <!-- Lista de eventos agrupados por municipio -->
+            <div *ngIf="agenda.eventos && agenda.eventos.length > 0" class="eventos-preview">
+              <h4>Eventos por municipio:</h4>
+              <div *ngFor="let grupoMunicipio of getEventosPorMunicipios(agenda)" class="municipio-eventos-grupo">
+                <h5 class="municipio-nombre">
+                  <ion-icon name="location"></ion-icon>
+                  {{ grupoMunicipio.municipio_nombre }}
+                  <ion-chip size="small" color="tertiary">
+                    <ion-label>{{ grupoMunicipio.eventos.length }}</ion-label>
+                  </ion-chip>
+                </h5>
+                <div *ngFor="let evento of grupoMunicipio.eventos" class="evento-preview">
+                  <div class="evento-info">
+                    <span class="evento-nombre">{{ evento.nombre_evento }}</span>
+                    <span class="evento-detalles">
+                      <ion-icon name="calendar"></ion-icon> {{ formatDate(evento.fecha) }}
+                      <ion-icon name="time"></ion-icon> {{ evento.hora }}
+                      <ion-icon name="location" *ngIf="evento.lugar"></ion-icon> {{ evento.lugar }}
+                    </span>
+                  </div>
+                  <div class="evento-actions">
+                    <ion-button fill="clear" size="small" color="primary" (click)="editarEvento(evento)">
+                      <ion-icon name="pencil"></ion-icon>
+                    </ion-button>
+                    <ion-button fill="clear" size="small" color="danger" (click)="eliminarEvento(evento)">
+                      <ion-icon name="trash"></ion-icon>
+                    </ion-button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Acciones de gestión -->
+            <div class="management-actions">
+              <ion-button size="small" fill="outline" color="primary" (click)="agregarEvento(agenda)">
+                <ion-icon name="add-circle" slot="start"></ion-icon>
+                Agregar Evento
+              </ion-button>
+              <ion-button size="small" fill="outline" color="warning" (click)="editarAgenda(agenda)">
+                <ion-icon name="create" slot="start"></ion-icon>
+                Editar
+              </ion-button>
+              <ion-button size="small" fill="outline" color="danger" (click)="eliminarAgenda(agenda)">
+                <ion-icon name="trash" slot="start"></ion-icon>
+                Eliminar
+              </ion-button>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </div>
     </div>
 
-    <!-- Lista de eventos próximos -->
-    <div *ngFor="let evento of eventosProximos" class="evento-card">
-      <ion-card>
-        <ion-card-header>
-          <div class="evento-header">
-            <ion-card-title>{{ evento.nombre_evento }}</ion-card-title>
-            <ion-chip color="primary">
-              <ion-label>{{ formatDate(evento.agenda_fecha) }}</ion-label>
-            </ion-chip>
-          </div>
-        </ion-card-header>
+    <!-- VISTA DE EVENTOS (Todos los usuarios) -->
+    <div *ngIf="vistaActual === 'eventos'" class="eventos-view">
+      <!-- Sin eventos próximos -->
+      <div *ngIf="eventosProximosFiltrados.length === 0" class="no-agendas">
+        <ion-icon name="calendar-outline" size="large"></ion-icon>
+        <h3>No hay eventos próximos</h3>
+        <p>{{ filtroMunicipio === 'todos' ? 'No hay eventos programados' : 'No hay eventos programados para este municipio' }}</p>
+      </div>
 
-        <ion-card-content>
-          <div class="evento-details">
-            <div class="evento-time">
-              <ion-icon name="time-outline"></ion-icon>
-              <span>{{ formatTime(evento.hora) }}</span>
-            </div>
-            <div class="evento-lugar" *ngIf="evento.lugar">
-              <ion-icon name="location-outline"></ion-icon>
-              <span>{{ evento.lugar }}</span>
-            </div>
-          </div>
-        </ion-card-content>
-      </ion-card>
+      <!-- Lista de eventos próximos -->
+      <div *ngFor="let evento of eventosProximosFiltrados" class="evento-preview-general">
+        <div class="evento-info">
+          <span class="evento-nombre">{{ evento.nombre_evento }}</span>
+          <span class="evento-detalles">
+            <ion-icon name="calendar"></ion-icon> {{ formatDate(evento.agenda_fecha || evento.fecha) }}
+            <ion-icon name="time"></ion-icon> {{ formatTime(evento.hora) }}
+            <ion-icon name="location" *ngIf="evento.lugar"></ion-icon> {{ evento.lugar }}
+            <ion-icon name="business"></ion-icon> {{ evento.municipio_nombre || getMunicipioNombrePorId(evento.municipio_id) }}
+          </span>
+        </div>
+
+        <!-- Acciones para super admin -->
+        <div *ngIf="isSuperAdmin" class="evento-actions">
+          <ion-button fill="clear" size="small" color="danger" (click)="eliminarEvento(evento)">
+            <ion-icon name="trash"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
     </div>
   </div>
 
