@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { MainHeaderComponent } from '../../shared/main-header/main-header.component';
 import { IonicModule, AlertController, ModalController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
@@ -33,6 +33,7 @@ export class AgendaPage implements OnInit {
 
   constructor(
     private router: Router,
+    private route: ActivatedRoute,
     private agendaService: AgendaService,
     private authService: AuthService,
     private userService: UserRegistrationService,
@@ -48,6 +49,13 @@ export class AgendaPage implements OnInit {
     console.log('Usuario actual:', this.currentUser);
     console.log('Es super admin:', this.isSuperAdmin);
     console.log('Municipio ID:', this.currentUser?.municipio_id);
+
+    // Verificar si hay parámetros de query para la vista
+    this.route.queryParams.subscribe(params => {
+      if (params['vista'] && (params['vista'] === 'eventos' || params['vista'] === 'gestion')) {
+        this.vistaActual = params['vista'];
+      }
+    });
 
     // Cargar municipios para todos los usuarios (para el filtro)
     this.loadMunicipios();
@@ -204,6 +212,12 @@ export class AgendaPage implements OnInit {
    */
   cambiarVista(vista: 'eventos' | 'gestion') {
     this.vistaActual = vista;
+    // Actualizar la URL con el parámetro de vista para preservar el estado
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { vista: vista },
+      queryParamsHandling: 'merge'
+    });
   }
 
   /**
@@ -795,9 +809,8 @@ export class AgendaPage implements OnInit {
           this.agendas = [];
         }
 
-        console.log('🔍 DEBUG - Todas las agendas cargadas para filtro:', this.todasLasAgendas);
-        console.log('🔍 DEBUG - Estructura de primera agenda:', this.todasLasAgendas[0]);
-        console.log('🔍 DEBUG - Municipios disponibles:', this.municipios);
+        // Debug info disponible si se necesita
+        // console.log('Todas las agendas cargadas para filtro:', this.todasLasAgendas);
 
         this.loadEventosParaTodasLasAgendas();
       },
@@ -830,16 +843,7 @@ export class AgendaPage implements OnInit {
             console.log(`Eventos para agenda ${agenda.id}:`, response);
             if (response.eventos && Array.isArray(response.eventos)) {
               agenda.eventos = response.eventos;
-              console.log(`📋 Eventos cargados para agenda ${agenda.id}:`, response.eventos);
-              // Verificar si los nombres de municipio están llegando
-              response.eventos.forEach((evento: any, index: number) => {
-                console.log(`Evento ${index + 1}:`, {
-                  id: evento.id,
-                  nombre: evento.nombre_evento,
-                  municipio_id: evento.municipio_id,
-                  municipio_nombre: evento.municipio_nombre
-                });
-              });
+              // Eventos cargados correctamente
             } else if (Array.isArray(response)) {
               agenda.eventos = response;
             } else {
@@ -897,10 +901,6 @@ export class AgendaPage implements OnInit {
 
       if (agenda.eventos && agenda.eventos.length > 0) {
         agenda.eventos.forEach((evento: any) => {
-          console.log('🔍 DEBUG - Estructura completa del evento:', evento);
-          console.log('🔍 DEBUG - evento.id_agenda:', evento.id_agenda);
-          console.log('🔍 DEBUG - agenda.id:', agenda.id);
-
           // Validar que tenemos los datos necesarios
           if (!evento.fecha || !evento.hora) {
             console.log('⚠️ Evento sin fecha o hora válida, omitiendo:', evento);
@@ -922,13 +922,7 @@ export class AgendaPage implements OnInit {
             fechaEvento = new Date(year, month - 1, day, hours, minutes);
             fechaParaMostrar = fechaEventoStr;
 
-            console.log(`📅 DEBUG - Fecha original: ${evento.fecha}`);
-            console.log(`📅 DEBUG - Hora original: ${evento.hora}`);
-            console.log(`📅 DEBUG - Fecha procesada: ${fechaEvento}`);
-            console.log(`📅 DEBUG - Fecha para mostrar: ${fechaParaMostrar}`);
-
-            console.log(`Fecha del evento: ${fechaEvento}, Ahora: ${ahora}`);
-            console.log(`¿Es futuro? ${fechaEvento > ahora}`);
+            // Fecha procesada correctamente
 
             // Incluir eventos futuros O eventos de hoy que aún no han pasado
             if (fechaEvento > ahora) {
@@ -937,7 +931,7 @@ export class AgendaPage implements OnInit {
               if (!municipioNombre && evento.municipio_id) {
                 const municipio = this.municipios.find(m => m.id === evento.municipio_id);
                 municipioNombre = municipio ? municipio.nombre : `Municipio ID: ${evento.municipio_id}`;
-                console.log(`🏘️ Fallback - Municipio ID ${evento.municipio_id} → ${municipioNombre}`);
+                // Municipio encontrado por fallback
               }
 
               const eventoProximo = {
@@ -952,8 +946,7 @@ export class AgendaPage implements OnInit {
                 municipio_id: evento.municipio_id,
                 municipio_nombre: municipioNombre || 'Sin municipio'
               };
-              console.log('Agregando evento próximo:', eventoProximo);
-              console.log('🏘️ Municipio ID:', evento.municipio_id, 'Nombre:', municipioNombre);
+              // Evento próximo agregado
               todosLosEventos.push(eventoProximo);
             } else {
               console.log('Evento pasado, no se incluye');
@@ -1135,13 +1128,9 @@ export class AgendaPage implements OnInit {
       fechaSolo = dateString.split('T')[0];
     }
 
-    console.log(`📅 Formateando fecha: "${dateString}" → "${fechaSolo}"`);
-
     // Crear fecha local sin conversión de zona horaria
     const [year, month, day] = fechaSolo.split('-').map(Number);
     const date = new Date(year, month - 1, day); // month - 1 porque los meses en JS van de 0-11
-
-    console.log(`📅 Fecha creada: ${date}`);
 
     return date.toLocaleDateString('es-ES', {
       year: 'numeric',

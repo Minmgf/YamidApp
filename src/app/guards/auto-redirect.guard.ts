@@ -11,14 +11,23 @@ export class AutoRedirectGuard implements CanActivate {
     private authService: AuthService,
     private router: Router
   ) {}
+  
   canActivate(): boolean {
     if (!this.authService.isAuthenticated()) {
       this.router.navigate(['/login']);
       return false;
     }
 
-    // Redirigir a la ruta por defecto del usuario
+    // Obtener la ruta por defecto del usuario
     const defaultRoute = this.authService.getDefaultRoute();
+    const currentUrl = this.router.url;
+    
+    // Evitar bucles infinitos: no redirigir si ya estamos en la ruta correcta
+    if (currentUrl.startsWith('/tabs/') && currentUrl !== '/tabs' && currentUrl !== '/tabs/') {
+      // El usuario ya está en una ruta válida dentro de tabs, permitir acceso
+      return true;
+    }
+    
     if (defaultRoute !== '/login') {
       this.router.navigate([defaultRoute]);
       return false; // No activar la ruta actual, redirigir
