@@ -140,8 +140,10 @@ export class AgendaPage implements OnInit {
           this.todasLasAgendas = response;
           this.agendas = response;
         } else {
+          console.log('No hay agendas disponibles');
           this.todasLasAgendas = [];
           this.agendas = [];
+          this.eventosProximos = [];
         }
 
         console.log('Todas las agendas cargadas:', this.todasLasAgendas);
@@ -151,6 +153,7 @@ export class AgendaPage implements OnInit {
         console.error('Error al cargar todas las agendas:', error);
         this.todasLasAgendas = [];
         this.agendas = [];
+        this.eventosProximos = [];
         this.isLoading = false;
       }
     });
@@ -164,7 +167,9 @@ export class AgendaPage implements OnInit {
     const totalAgendas = this.todasLasAgendas.length;
 
     if (totalAgendas === 0) {
-      this.getEventosProximos();
+      console.log('No hay agendas para cargar eventos');
+      this.eventosProximos = [];
+      this.isLoading = false;
       return;
     }
 
@@ -805,8 +810,10 @@ export class AgendaPage implements OnInit {
           this.agendas = response;
           this.filtroMunicipio = this.currentUser?.municipio_id || 'todos';
         } else {
+          console.log('No hay agendas disponibles para filtrado');
           this.todasLasAgendas = [];
           this.agendas = [];
+          this.eventosProximos = [];
         }
 
         // Debug info disponible si se necesita
@@ -818,6 +825,7 @@ export class AgendaPage implements OnInit {
         console.error('Error al cargar todas las agendas para filtro:', error);
         this.todasLasAgendas = [];
         this.agendas = [];
+        this.eventosProximos = [];
         this.isLoading = false;
       }
     });
@@ -831,7 +839,9 @@ export class AgendaPage implements OnInit {
     const totalAgendas = this.agendas.length;
 
     if (totalAgendas === 0) {
-      this.getEventosProximos();
+      console.log('No hay agendas para cargar eventos');
+      this.eventosProximos = [];
+      this.isLoading = false;
       return;
     }
 
@@ -856,6 +866,7 @@ export class AgendaPage implements OnInit {
             if (this.agendasCargadas === totalAgendas) {
               console.log('Todas las agendas cargadas, procesando eventos próximos...');
               this.getEventosProximos();
+              this.isLoading = false;
             }
           },
           error: (error) => {
@@ -866,6 +877,7 @@ export class AgendaPage implements OnInit {
             // Aún así, procesar cuando todas estén "procesadas" (aunque haya errores)
             if (this.agendasCargadas === totalAgendas) {
               this.getEventosProximos();
+              this.isLoading = false;
             }
           }
         });
@@ -873,6 +885,7 @@ export class AgendaPage implements OnInit {
         this.agendasCargadas++;
         if (this.agendasCargadas === totalAgendas) {
           this.getEventosProximos();
+          this.isLoading = false;
         }
       }
     });

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface HeatmapData {
   municipio_id: number;
@@ -31,7 +32,7 @@ export interface HeatmapFilters {
   providedIn: 'root'
 })
 export class HeatmapService {
-  private apiUrl = 'http://localhost:3000/api/heatmap';
+  private apiUrl = `${environment.apiUrl}/heatmap`;
 
   constructor(private http: HttpClient) { }
 

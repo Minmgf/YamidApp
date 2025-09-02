@@ -43,7 +43,7 @@
   </div> -->
 
   <!-- Información flotante -->
-  <div class="info-panel" ngIf="!isLoading">
+  <div class="info-panel" *ngIf="!isLoading">
     <div class="info-header">
       <h3>Departamento del Huila</h3>
       <p>{{ heatmapData.length }} municipios • {{ totalUsuarios }} usuarios totales</p>

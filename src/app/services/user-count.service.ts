@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 
 export class UserCountService {
-  private apiUrl = 'http://localhost:3000/api/usuarios/count';
+  private apiUrl = `${environment.apiUrl}/usuarios/count`;
 
   constructor(private http: HttpClient) { }
 

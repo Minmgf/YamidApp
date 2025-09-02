@@ -1,5 +1,6 @@
 import { Component, AfterViewInit, OnDestroy, OnInit } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
+import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import * as L from 'leaflet';
 import { HeatmapService, HeatmapData, HeatmapResponse } from '../../services/heatmap.service';
@@ -9,7 +10,7 @@ import { HeatmapService, HeatmapData, HeatmapResponse } from '../../services/hea
   templateUrl: './detailed-map.page.html',
   styleUrls: ['./detailed-map.page.scss'],
   standalone: true,
-  imports: [IonicModule]
+  imports: [IonicModule, CommonModule]
 })
 export class DetailedMapPage implements AfterViewInit, OnDestroy, OnInit {
   private map!: L.Map;
