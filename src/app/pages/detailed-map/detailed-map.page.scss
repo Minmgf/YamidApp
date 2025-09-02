@@ -1,0 +1,470 @@
+ion-content {
+  --background: #f8f9fa;
+}
+
+// Contenedor principal del mapa
+.detailed-map-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+// Loading container
+.loading-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 24px;
+  border-radius: 12px;
+  backdrop-filter: blur(5px);
+
+  p {
+    margin: 0;
+    color: var(--ion-color-medium);
+    font-size: 14px;
+  }
+}
+
+// Controles flotantes del mapa
+.map-controls {
+  position: absolute;
+  top: 80px;
+  right: 16px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  .zoom-controls,
+  .additional-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 8px;
+    padding: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(10px);
+
+    ion-button {
+      --width: 40px;
+      --height: 40px;
+      margin: 0;
+
+      ion-icon {
+        font-size: 20px;
+      }
+    }
+  }
+}
+
+// Panel de información flotante
+.info-panel {
+  position: absolute;
+  top: 80px;
+  left: 16px;
+  max-width: 280px;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(10px);
+
+  .info-header {
+    margin-bottom: 16px;
+
+    h3 {
+      margin: 0 0 4px 0;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--ion-color-dark);
+    }
+
+    p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--ion-color-medium);
+    }
+  }
+
+  .legend {
+    .legend-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ion-color-dark);
+      margin-bottom: 12px;
+    }
+
+    .legend-items {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--ion-color-medium);
+
+      .legend-color {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: 2px solid #fff;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+
+        &.high {
+          background-color: #f44336;
+        }
+
+        &.medium {
+          background-color: #ffeb3b;
+        }
+
+        &.low {
+          background-color: #8bc34a;
+        }
+      }
+    }
+  }
+}
+
+// Estilos para popups personalizados
+:global(.custom-popup-container) {
+  .leaflet-popup-content-wrapper {
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+
+  .leaflet-popup-content {
+    margin: 0;
+
+    .custom-popup {
+      padding: 16px;
+
+      h3 {
+        margin: 0 0 12px 0;
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--ion-color-dark);
+        text-align: center;
+      }
+
+      .popup-stats {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        .stat {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 13px;
+
+          ion-icon {
+            font-size: 16px;
+            color: var(--ion-color-primary);
+            min-width: 16px;
+          }
+
+          span {
+            color: var(--ion-color-medium);
+
+            strong {
+              color: var(--ion-color-dark);
+              font-weight: 600;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .leaflet-popup-tip {
+    background: white;
+  }
+}
+
+// FAB personalizado
+ion-fab {
+  ion-fab-button {
+    --box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    --border-radius: 16px;
+    --size: 56px;
+
+    ion-icon {
+      font-size: 24px;
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .info-panel {
+    position: relative;
+    top: auto;
+    left: auto;
+    max-width: none;
+    margin: 16px;
+    background: rgba(255, 255, 255, 0.98);
+  }
+
+  .map-controls {
+    top: 70px;
+    right: 12px;
+
+    .zoom-controls,
+    .additional-controls {
+      padding: 6px;
+
+      ion-button {
+        --width: 36px;
+        --height: 36px;
+
+        ion-icon {
+          font-size: 18px;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .info-panel {
+    margin: 12px;
+    padding: 12px;
+
+    .info-header h3 {
+      font-size: 16px;
+    }
+
+    .legend .legend-title {
+      font-size: 13px;
+    }
+
+    .legend .legend-item {
+      font-size: 11px;
+    }
+  }
+}
+
+// Configuración específica para Leaflet
+:global(.leaflet-container) {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+:global(.leaflet-tooltip) {
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+:global(.leaflet-tooltip:before) {
+  border-top-color: rgba(0, 0, 0, 0.8);
+}
+
+/* ===== ESTILOS HEATMAP (copiados del dashboard) ===== */
+
+/* Efectos de glow para círculos del heatmap */
+:global(.heatmap-glow-1), :global(.heatmap-glow-2), :global(.heatmap-glow-3) {
+  filter: blur(2px);
+  animation: gentle-pulse 3s ease-in-out infinite alternate;
+}
+
+:global(.heatmap-glow-2) {
+  animation-delay: 0.5s;
+}
+
+:global(.heatmap-glow-3) {
+  animation-delay: 1s;
+}
+
+/* Círculo principal del heatmap con transiciones suaves */
+:global(.heatmap-main-circle) {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
+  pointer-events: all !important;
+  z-index: 450;
+}
+
+:global(.heatmap-main-circle:hover) {
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3)) brightness(1.1);
+  transform: scale(1.05);
+}
+
+/* Efecto de pulso para valores altos */
+:global(.heatmap-pulse) {
+  animation: pulse-high-intensity 2s ease-in-out infinite;
+  pointer-events: none !important;
+  z-index: 400;
+}
+
+@keyframes pulse-high-intensity {
+  0% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+}
+
+@keyframes gentle-pulse {
+  0% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 0.3;
+  }
+}
+
+/* Número en el centro del círculo del heatmap */
+:global(.heatmap-center-number) {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  z-index: 500;
+  pointer-events: none !important;
+}
+
+:global(.center-number) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow:
+    1px 1px 2px rgba(0, 0, 0, 0.8),
+    -1px -1px 2px rgba(0, 0, 0, 0.8),
+    1px -1px 2px rgba(0, 0, 0, 0.8),
+    -1px 1px 2px rgba(0, 0, 0, 0.8);
+  text-align: center;
+  line-height: 1;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  pointer-events: none !important;
+  user-select: none;
+}
+
+:global(.center-number:hover) {
+  transform: scale(1.1);
+  font-size: 13px;
+}
+
+/* Popup del heatmap */
+:global(.enhanced-heatmap-popup) {
+  max-width: 300px;
+  padding: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  .popup-header {
+    margin-bottom: 12px;
+
+    .header-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+
+      h3 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--ion-color-dark);
+        flex: 1;
+      }
+
+      .density-badge {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 600;
+        color: white;
+        white-space: nowrap;
+      }
+    }
+  }
+
+  .popup-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .stat-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+
+      .stat-icon {
+        font-size: 16px;
+        color: var(--ion-color-primary);
+        min-width: 16px;
+
+        &.active {
+          color: #4CAF50;
+        }
+
+        &.inactive {
+          color: #FF9800;
+        }
+      }
+
+      .stat-value {
+        font-weight: 600;
+        color: var(--ion-color-dark);
+        min-width: 30px;
+      }
+
+      .stat-label {
+        color: var(--ion-color-medium);
+        flex: 1;
+      }
+
+      &.progress-row {
+        .progress-mini {
+          flex: 1;
+          height: 6px;
+          background: #e0e0e0;
+          border-radius: 3px;
+          overflow: hidden;
+          margin: 0 8px;
+
+          .progress-fill-mini {
+            height: 100%;
+            transition: width 0.3s ease;
+            border-radius: 3px;
+          }
+        }
+      }
+    }
+  }
+}

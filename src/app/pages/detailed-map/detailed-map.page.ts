@@ -1,104 +1,105 @@
-import { Component, AfterViewInit, OnInit } from '@angular/core';
-import { ViewDidEnter, IonicModule } from '@ionic/angular';
-import * as L from 'leaflet';
-import Chart from 'chart.js/auto';
+import { Component, AfterViewInit, OnDestroy, OnInit } from '@angular/core';
+import { IonicModule } from '@ionic/angular';
 import { Router } from '@angular/router';
-import { MainHeaderComponent } from '../../shared/main-header/main-header.component';
-import { UserCountService } from '../../services/user-count.service';
-import { HeatmapService, HeatmapData } from '../../services/heatmap.service';
+import * as L from 'leaflet';
+import { HeatmapService, HeatmapData, HeatmapResponse } from '../../services/heatmap.service';
 
 @Component({
-  selector: 'app-dashboard',
-  templateUrl: './dashboard.page.html',
-  styleUrls: ['./dashboard.page.scss'],
+  selector: 'app-detailed-map',
+  templateUrl: './detailed-map.page.html',
+  styleUrls: ['./detailed-map.page.scss'],
   standalone: true,
-  imports: [IonicModule, MainHeaderComponent]
+  imports: [IonicModule]
 })
-export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
-  userCount: number = 0; // Variable para almacenar el conteo
-  heatmapData: HeatmapData[] = [];
-  totalUsuariosSistema: number = 0;
-
+export class DetailedMapPage implements AfterViewInit, OnDestroy, OnInit {
   private map!: L.Map;
+  heatmapData: HeatmapData[] = [];
+  isLoading = true;
+  totalUsuarios = 0;
 
   constructor(
     private router: Router,
-    private userCountService: UserCountService,
     private heatmapService: HeatmapService
   ) {}
 
-  logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('currentUser');
-    this.router.navigate(['/login'], { replaceUrl: true });
-  }
-
-  openDetailedMap() {
-    this.router.navigate(['/tabs/detailed-map']);
-  }
-
   ngOnInit() {
-    this.loadUserCount();
     this.loadHeatmapData();
   }
 
-  loadUserCount() {
-    this.userCountService.getUserCount().subscribe({
-      next: (response) => {
-        this.userCount = response.count || response.total || response;
-        console.log('User count:', this.userCount);
-      },
-      error: (error) => {
-        console.error('Error loading user count:', error);
-        this.userCount = 0; // Valor por defecto en caso de error
-      }
-    });
+  ngAfterViewInit() {
+    // Inicializar el mapa con una pequeña demora para mejor renderizado
+    setTimeout(() => {
+      this.initializeMap();
+    }, 100);
+  }
+
+  ngOnDestroy() {
+    if (this.map) {
+      this.map.remove();
+    }
+  }
+
+  goBack() {
+    this.router.navigate(['/tabs/dashboard']);
   }
 
   loadHeatmapData() {
     this.heatmapService.getHeatmapData({ estado: 'todos' }).subscribe({
-      next: (response) => {
+      next: (response: HeatmapResponse) => {
+        console.log('📊 Datos del heatmap cargados:', response);
         if (response.success) {
           this.heatmapData = response.data;
-          this.totalUsuariosSistema = response.total_usuarios_sistema;
-          console.log('Heatmap data loaded:', this.heatmapData);
+          this.totalUsuarios = response.total_usuarios_sistema;
+          this.isLoading = false;
+
+          // Si el mapa ya está inicializado, cargar la visualización del heatmap
+          if (this.map) {
+            this.loadHeatmapVisualization();
+          }
         }
       },
       error: (error) => {
-        console.error('Error loading heatmap data:', error);
-        this.heatmapData = [];
+        console.error('❌ Error cargando datos del heatmap:', error);
+        this.isLoading = false;
       }
     });
   }
 
-  ngAfterViewInit(): void {
-    /** 1. Inicializar el mapa */
-    this.map = L.map('map', { attributionControl: false });
+  private initializeMap() {
+    // Inicializar el mapa centrado específicamente en Neiva, Huila
+    this.map = L.map('detailed-map', {
+      center: [2.9273, -75.2819], // Coordenadas exactas de Neiva, Huila
+      zoom: 8,  // Zoom más cercano para enfocar mejor el Huila
+      zoomControl: true,
+      attributionControl: false,
+      minZoom: 7,  // Zoom mínimo para no alejarse demasiado
+      maxZoom: 16  // Zoom máximo para mantener calidad
+    });
 
     /** Pane para controlar superposición */
     this.map.createPane('croquis');
     this.map.getPane('croquis')!.style.zIndex = '450';
 
-    /** 2. Agregar tile layer (mapa base) */
-    // Opción 1: Mapa satelital de Esri
+    /** Agregar capas base igual que en dashboard */
+    // Mapa satelital de Esri
     const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
       attribution: '© Esri, Maxar, GeoEye, Earthstar Geographics, CNES/Airbus DS, USDA, USGS, AeroGRID, IGN, and the GIS User Community',
       maxZoom: 18
     });
 
-    // Opción 2: Mapa de calles de OpenStreetMap
+    // Mapa de calles de OpenStreetMap
     const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors',
       maxZoom: 19
     });
 
-    // Opción 3: Mapa híbrido (satelital + etiquetas)
+    // Mapa híbrido (satelital + etiquetas)
     const hybridLabels = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
       attribution: '© Esri',
       maxZoom: 18
     });
 
-    // Agregar el mapa satelital por defecto
+    // Agregar el mapa de calles por defecto
     streetLayer.addTo(this.map);
 
     // Control de capas para cambiar entre tipos de mapa
@@ -110,71 +111,17 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
 
     L.control.layers(baseMaps).addTo(this.map);
 
-    /** 3. Dibujar el mapa del Huila */
-    this.map.setView([2.9273, -75.2819], 9); // Centrar en Neiva, Huila
-
-    // Cargar el mapa base del Huila
+    // Cargar el mapa del Huila con límites municipales
     this.loadHuilaMap();
 
-    /** 5. Cargar gráfica blog */
-    const ctx = (document.getElementById('blogChart') as HTMLCanvasElement)?.getContext('2d');
-    if (ctx) {
-      new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: ['Semana pasada', 'Esta semana'],
-          datasets: [{
-            label: 'Artículos',
-            data: [5, 7],
-            backgroundColor: ['#ccc', '#cbd501'],
-            borderRadius: 4
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: { display: false } },
-          scales: {
-            x: { display: false },
-            y: { display: false }
-          }
-        }
-      });
-    }
-    /** 6. Gráfica de líderes */
-    const liderCtx = (document.getElementById('liderChart') as HTMLCanvasElement)?.getContext('2d');
-    if (liderCtx) {
-      new Chart(liderCtx, {
-        type: 'bar',
-        data: {
-          labels: ['Semana pasada', 'Esta semana'],
-          datasets: [{
-            label: 'Líderes',
-            data: [8, 14],
-            backgroundColor: ['#ccc', '#28a745'],
-            borderRadius: 4
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: { display: false } },
-          scales: {
-            x: { display: false },
-            y: { display: false }
-          }
-        }
-      });
-    }
-
-
-
-  }
-
-  ionViewDidEnter() {
-    this.map?.invalidateSize();
+    // Hacer el mapa responsivo
+    setTimeout(() => {
+      this.map.invalidateSize();
+    }, 100);
   }
 
   /**
-   * Carga el mapa del Huila con municipios delimitados
+   * Carga el mapa del Huila con municipios delimitados (copiado del dashboard)
    */
   private loadHuilaMap(): void {
     console.log('🗺️ Cargando mapa del Huila con límites municipales...');
@@ -237,10 +184,12 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
           }
         }).addTo(this.map);
 
-        // Ajustar vista al departamento completo
+        // Ajustar vista al departamento del Huila con límites optimizados
         this.map.fitBounds(municipiosLayer.getBounds(), {
-          padding: [20, 20],
-          maxZoom: 10,
+          padding: [30, 30],
+          maxZoom: 9,  // Mantener un zoom más cercano
+          animate: true,
+          duration: 1.0
         });
 
         console.log('✅ Mapa del Huila cargado correctamente con límites municipales');
@@ -256,7 +205,7 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
   }
 
   /**
-   * Carga la visualización del mapa de calor con datos reales - VERSIÓN MEJORADA
+   * Carga la visualización del mapa de calor con datos reales (copiado del dashboard)
    */
   private loadHeatmapVisualization(): void {
     if (!this.map || this.heatmapData.length === 0) {
@@ -264,7 +213,7 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
       return;
     }
 
-    // Mapeo de coordenadas por ID de municipio
+    // Mapeo de coordenadas por ID de municipio (igual que dashboard)
     const coordenadasPorId: { [key: number]: [number, number] } = {
       1: [2.9273, -75.2819], 2: [1.8000, -75.8833], 3: [2.4167, -75.6833], 4: [3.2167, -75.2333],
       5: [2.5167, -75.3167], 6: [2.0667, -75.7833], 7: [3.1500, -75.0500], 8: [2.6833, -75.3333],
@@ -281,15 +230,9 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
     // Calcular estadísticas para normalización
     const maxUsuarios = Math.max(...this.heatmapData.map(d => d.total_usuarios));
     const minUsuarios = Math.min(...this.heatmapData.map(d => d.total_usuarios));
-    const avgUsuarios = this.heatmapData.reduce((sum, d) => sum + d.total_usuarios, 0) / this.heatmapData.length;
-
-    // Crear leyenda del heatmap
-    this.createHeatmapLegend(minUsuarios, maxUsuarios, avgUsuarios);
-
-    // Ya no necesitamos listener del mapa para badges
 
     // Crear visualización mejorada para cada municipio
-    this.heatmapData.forEach((data, index) => {
+    this.heatmapData.forEach((data) => {
       const coordenadas = coordenadasPorId[data.municipio_id] || [2.9273, -75.2819];
 
       // Calcular intensidad normalizada (0-1)
@@ -311,7 +254,7 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
       this.createCenterNumber(coordenadas, data);
     });
 
-    console.log(`✅ Heatmap mejorado cargado: ${this.heatmapData.length} municipios visualizados`);
+    console.log(`✅ Heatmap detallado cargado: ${this.heatmapData.length} municipios visualizados`);
   }
 
   /**
@@ -350,11 +293,11 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
       fillColor: colors.fill,
       fillOpacity: 0.8,
       className: 'heatmap-main-circle',
-      interactive: true,  // Asegurar que sea interactivo
-      bubblingMouseEvents: false  // Evitar que los eventos se propaguen
+      interactive: true,
+      bubblingMouseEvents: false
     }).addTo(this.map);
 
-    // Efectos hover simples
+    // Efectos hover
     mainCircle.on('mouseover', () => {
       mainCircle.setStyle({
         radius: radius + 3,
@@ -371,7 +314,7 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
       });
     });
 
-    // Popup opcional con información detallada
+    // Popup con información detallada
     const popupContent = this.createEnhancedPopup(data, intensidad);
     mainCircle.bindPopup(popupContent);
   }
@@ -386,11 +329,9 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
       weight: 2,
       fillColor: 'transparent',
       className: 'heatmap-pulse',
-      interactive: false,  // CRÍTICO: No debe capturar eventos
-      bubblingMouseEvents: false  // Evitar propagación de eventos
+      interactive: false,
+      bubblingMouseEvents: false
     }).addTo(this.map);
-
-    // Animación CSS será manejada por las clases
   }
 
   /**
@@ -404,49 +345,23 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
         iconSize: [30, 30],
         iconAnchor: [15, 15]
       }),
-      interactive: false,  // El número no debe ser interactivo
-      keyboard: false,     // No responder a eventos de teclado
+      interactive: false,
+      keyboard: false,
     }).addTo(this.map);
 
-    // Opcional: agregar tooltip con nombre del municipio
+    // Tooltip con nombre del municipio
     numberMarker.bindTooltip(data.municipio, {
       permanent: false,
       direction: 'top',
       offset: [0, -10],
-      interactive: false  // El tooltip tampoco debe interferir
+      interactive: false
     });
   }
 
-  // Funciones de badges clickeables eliminadas - ahora usamos números centrados
-
   /**
-   * Crear leyenda interactiva del heatmap
-   */
-  private createHeatmapLegend(min: number, max: number, avg: number): void {
-    const legend = new (L.Control.extend({
-      options: {
-        position: 'bottomright'
-      },
-
-      onAdd: function(map: any) {
-        const div = L.DomUtil.create('div', 'heatmap-legend');
-        div.innerHTML = `
-          <div class="legend-container">
-            <h4>Usuarios por municipio</h4>
-          </div>
-        `;
-        return div;
-      }
-    }))();
-
-    legend.addTo(this.map);
-  }
-
-  /**
-   * Obtiene color gradiente para el heatmap mejorado
+   * Obtiene color del gradiente para el heatmap
    */
   private getHeatmapGradientColor(intensidad: number): string {
-    // Gradiente suave de verde a rojo pasando por amarillo/naranja
     if (intensidad >= 0.8) return '#FF1744'; // Rojo intenso
     if (intensidad >= 0.6) return '#FF6D00'; // Naranja intenso
     if (intensidad >= 0.4) return '#FFD600'; // Amarillo
@@ -481,28 +396,7 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
   }
 
   /**
-   * Obtiene colores para badges informativos
-   */
-  private getBadgeColor(intensidad: number): {bg: string, text: string, border: string} {
-    if (intensidad >= 0.7) return {
-      bg: 'linear-gradient(135deg, #FF5722, #D32F2F)',
-      text: '#FFFFFF',
-      border: '#FF5722'
-    };
-    if (intensidad >= 0.4) return {
-      bg: 'linear-gradient(135deg, #FF9800, #F57C00)',
-      text: '#FFFFFF',
-      border: '#FF9800'
-    };
-    return {
-      bg: 'linear-gradient(135deg, #4CAF50, #388E3C)',
-      text: '#FFFFFF',
-      border: '#4CAF50'
-    };
-  }
-
-  /**
-   * Crear popup mejorado con mejor diseño usando Flexbox e Ionicons
+   * Crear popup mejorado con información detallada
    */
   private createEnhancedPopup(data: any, intensidad: number): string {
     const intensityLabel = intensidad >= 0.7 ? 'Alta' : intensidad >= 0.4 ? 'Media' : 'Baja';
@@ -548,22 +442,22 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
     `;
   }
 
-  /**
-   * Funciones legacy mantenidas para compatibilidad
-   */
-  private getHeatmapColor(intensidad: number): string {
-    return this.getHeatmapGradientColor(intensidad);
+  // Métodos para controles del mapa
+  zoomIn() {
+    this.map.zoomIn();
   }
 
-  private getHeatmapFillColor(intensidad: number): string {
-    const colors = this.getHeatmapGradientColors(intensidad);
-    return colors.fill;
+  zoomOut() {
+    this.map.zoomOut();
   }
 
-  /**
-   * Función legacy para compatibilidad
-   */
-  private getColor(estado = '') {
-    return { rojo: '#ff4d4d', amarillo: '#ffeb3b', verde: '#35c84a' }[estado] ?? '#333';
+  resetView() {
+    this.map.setView([2.9273, -75.2819], 8); // Volver a vista centrada del Huila
+  }
+
+  toggleSatellite() {
+    // Implementar cambio entre vista satelital y mapa normal
+    // Por ahora solo un placeholder
+    console.log('Cambiar vista satelital');
   }
 }

@@ -1,6 +1,9 @@
 /* Importing @ngxpert/hot-toast SCSS file. */
 @use '@ngxpert/hot-toast/styles';
 
+/* Importing Leaflet CSS */
+@import 'leaflet/dist/leaflet.css';
+
 /*
  * App Global CSS
  * ----------------------------------------------------------------------------

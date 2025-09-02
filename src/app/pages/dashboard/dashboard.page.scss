@@ -11,6 +11,77 @@ ion-header {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
+#map-wrapper {
+  position: relative;
+  margin: 16px 12px;
+}
+
+// Overlay clickeable para el mapa
+.map-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.1);
+
+    .map-expand-hint {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .map-expand-hint {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 12px 20px;
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(10px);
+
+    ion-icon {
+      font-size: 20px;
+      color: var(--ion-color-primary);
+    }
+
+    span {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--ion-color-dark);
+      white-space: nowrap;
+    }
+  }
+}
+
+// Mostrar hint al tocar en móvil
+@media (max-width: 768px) {
+  .map-overlay {
+    &:active {
+      background: rgba(0, 0, 0, 0.1);
+
+      .map-expand-hint {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+  }
+}
+
 .dashboard-toolbar {
   --background: #d9d9d9;
   display: flex;
@@ -42,10 +113,20 @@ ion-avatar {
 .leyenda {
   display: flex;
   justify-content: space-between;
-  margin: 16px 12px;
-  // margin-top: 10px;
+  margin: 16px 0;
   font-size: 12px;
   color: #444;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  .leyenda-title {
+    width: 100%;
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 8px;
+    color: #2c3e50;
+    text-align: center;
+  }
 }
 
 .color {
@@ -162,5 +243,550 @@ ion-avatar {
   height: 38px;
   display: block;
   text-align: center;
+}
+
+/* Estilos para el mapa de calor */
+.label-municipio-heatmap {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.municipio-label {
+  text-align: center;
+  font-size: 10px;
+  font-weight: 600;
+  color: #2c3e50;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+
+  .municipio-name {
+    margin-bottom: 2px;
+    font-size: 9px;
+  }
+
+  .municipio-count {
+    background: rgba(44, 62, 80, 0.9);
+    color: white;
+    padding: 1px 4px;
+    border-radius: 8px;
+    font-size: 8px;
+    font-weight: 700;
+    display: inline-block;
+    min-width: 16px;
+  }
+}
+
+/* Badge de contador de usuarios del mapa de calor */
+.municipio-count-badge {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  border: 2px solid white;
+  min-width: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Estilos para círculos del mapa de calor */
+.heatmap-circle {
+  transition: all 0.3s ease;
+  cursor: pointer;
+
+  &:hover {
+    transform: scale(1.1);
+    filter: brightness(1.2);
+  }
+}
+
+/* Estilos para el popup del mapa de calor */
+.leaflet-popup-content-wrapper {
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.heatmap-popup {
+  padding: 8px;
+  min-width: 200px;
+
+  h4 {
+    margin: 0 0 12px 0;
+    color: #2c3e50;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 6px;
+  }
+
+  .popup-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+
+    .stat-label {
+      font-size: 13px;
+      color: #6c757d;
+      font-weight: 500;
+    }
+
+    .stat-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: #2c3e50;
+
+      &.active {
+        color: #28a745;
+      }
+
+      &.inactive {
+        color: #dc3545;
+      }
+    }
+  }
+}
+
+/* Estilos para popups de información de municipios */
+.municipio-info-popup {
+  padding: 12px;
+  min-width: 220px;
+
+  h4 {
+    margin: 0 0 12px 0;
+    color: #2c3e50;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 6px;
+  }
+
+  .municipio-details {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    div {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 3px 0;
+      font-size: 13px;
+
+      strong {
+        color: #34495e;
+        font-weight: 600;
+        margin-right: 8px;
+      }
+    }
+  }
+}
+
+/* ===== ESTILOS HEATMAP MEJORADO ===== */
+
+/* Efectos de glow para círculos del heatmap */
+.heatmap-glow-1, .heatmap-glow-2, .heatmap-glow-3 {
+  filter: blur(2px);
+  animation: gentle-pulse 3s ease-in-out infinite alternate;
+}
+
+.heatmap-glow-2 {
+  animation-delay: 0.5s;
+}
+
+.heatmap-glow-3 {
+  animation-delay: 1s;
+}
+
+/* Círculo principal del heatmap con transiciones suaves */
+.heatmap-main-circle {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
+  pointer-events: all !important; /* Asegurar que toda el área sea clickeable */
+  z-index: 450; /* Por encima del efecto de pulso */
+}
+
+.heatmap-main-circle:hover {
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3)) brightness(1.1);
+  transform: scale(1.05);
+}
+
+/* Efecto de pulso para valores altos */
+.heatmap-pulse {
+  animation: pulse-high-intensity 2s ease-in-out infinite;
+  pointer-events: none !important; /* CRÍTICO: No debe capturar clicks */
+  z-index: 400; /* Debajo del círculo principal */
+}
+
+@keyframes pulse-high-intensity {
+  0% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+}
+
+@keyframes gentle-pulse {
+  0% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 0.3;
+  }
+}
+
+/* Número en el centro del círculo del heatmap */
+.heatmap-center-number {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  z-index: 500;
+  pointer-events: none !important; /* CRÍTICO: Permite que los clicks pasen al círculo debajo */
+}
+
+.center-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow:
+    1px 1px 2px rgba(0, 0, 0, 0.8),
+    -1px -1px 2px rgba(0, 0, 0, 0.8),
+    1px -1px 2px rgba(0, 0, 0, 0.8),
+    -1px 1px 2px rgba(0, 0, 0, 0.8);
+  text-align: center;
+  line-height: 1;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  pointer-events: none !important; /* CRÍTICO: El número nunca debe capturar clicks */
+  user-select: none; /* Evitar selección de texto */
+}
+
+.center-number:hover {
+  transform: scale(1.1);
+  font-size: 13px;
+}
+
+/* Asegurar que los tooltips no interfieran */
+.leaflet-tooltip {
+  pointer-events: none !important;
+}
+
+/* Badges informativos clickeables */
+.clickable-info-badge {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  z-index: 1000;
+}
+
+.clickable-badge-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: badge-appear 0.3s ease-out;
+  cursor: pointer;
+}
+
+.clickable-badge {
+  padding: 8px 12px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(15px);
+  transition: all 0.3s ease;
+  min-width: 80px;
+  position: relative;
+  cursor: pointer;
+}
+
+.clickable-badge:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.badge-number {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.badge-municipio {
+  font-size: 11px;
+  font-weight: 600;
+  opacity: 0.95;
+  text-transform: capitalize;
+  letter-spacing: 0.3px;
+  max-width: 100px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.badge-close {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 18px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #333;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.badge-close:hover {
+  background: #ff4444;
+  color: white;
+  transform: scale(1.1);
+}
+
+.badge-arrow {
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid rgba(255, 255, 255, 0.9);
+  margin-top: 2px;
+}
+
+@keyframes badge-appear {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0px) scale(1);
+  }
+}
+
+/* Leyenda del heatmap mejorada */
+.heatmap-legend {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.legend-container {
+  padding-left: 16px;
+  padding-right: 16px;
+
+
+  h4 {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+    text-align: center;
+  }
+}
+
+.legend-gradient {
+  height: 12px;
+  background: linear-gradient(to right,
+    #00E676 0%,
+    #76FF03 25%,
+    #FFD600 50%,
+    #FF6D00 75%,
+    #FF1744 100%);
+  border-radius: 6px;
+  margin-bottom: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.legend-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: #666;
+  margin-bottom: 12px;
+
+  span {
+    font-weight: 500;
+  }
+}
+
+.legend-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 11px;
+  color: #555;
+
+  .stat-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 8px;
+
+    &.high {
+      background: #FF1744;
+    }
+
+    &.medium {
+      background: #FF6D00;
+    }
+
+    &.low {
+      background: #00E676;
+    }
+  }
+}
+
+/* Popup compacto del heatmap estilo horizontal */
+.enhanced-heatmap-popup {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  min-width: 200px;
+  max-width: 250px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  background: #ffffff;
+}
+
+.popup-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+
+  .header-icon {
+    font-size: 16px;
+    color: #6c757d;
+    flex-shrink: 0;
+    display: block !important; /* Asegurar que el icono se muestre */
+  }
+
+  .header-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    h3 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: #2c3e50;
+      line-height: 1.2;
+    }
+
+    .density-badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 10px;
+      font-size: 10px;
+      font-weight: 600;
+      color: white;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      align-self: flex-start;
+    }
+  }
+}
+
+.popup-stats {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stat-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background: #f8f9fa;
+  }
+
+  &.progress-row {
+    .progress-mini {
+      flex: 1;
+      height: 4px;
+      background: #e9ecef;
+      border-radius: 2px;
+      overflow: hidden;
+      margin: 0 4px;
+
+      .progress-fill-mini {
+        height: 100%;
+        border-radius: 2px;
+        transition: width 0.6s ease;
+      }
+    }
+  }
+
+  .stat-icon {
+    font-size: 14px;
+    color: #6c757d;
+    flex-shrink: 0;
+    width: 16px;
+    text-align: center;
+
+    &.active {
+      color: #28a745;
+    }
+
+    &.inactive {
+      color: #dc3545;
+    }
+  }
+
+  .stat-value {
+    font-size: 13px;
+    font-weight: 700;
+    color: #2c3e50;
+    min-width: 20px;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: #6c757d;
+    font-weight: 500;
+    flex: 1;
+  }
 }
 

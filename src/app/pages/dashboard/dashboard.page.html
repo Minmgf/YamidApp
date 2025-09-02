@@ -13,11 +13,19 @@
   <div id="map-wrapper">
     <div id="map"></div>
 
+    <!-- Overlay clickeable para abrir mapa detallado -->
+    <div class="map-overlay" (click)="openDetailedMap()">
+      <div class="map-expand-hint">
+        <!-- <ion-icon name="expand-outline"></ion-icon>
+        <span>Ver mapa completo</span> -->
+      </div>
+    </div>
 
     <div class="leyenda">
-      <div><span class="color rojo"></span> Mayor</div>
-      <div><span class="color amarillo"></span> 10–20 días</div>
-      <div><span class="color verde"></span> Menos de 10</div>
+      <div class="leyenda-title">Votantes por Municipio</div>
+      <div><span class="color rojo"></span> Alta densidad (70%+)</div>
+      <div><span class="color amarillo"></span> Media densidad (40-70%)</div>
+      <div><span class="color verde"></span> Baja densidad (&lt;40%)</div>
     </div>
   </div>
 

@@ -1,0 +1,76 @@
+<ion-header [translucent]="false">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()" fill="clear">
+        <ion-icon name="arrow-back" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Mapa Votantes por Municipio Detallado</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="resetView()" fill="clear">
+        <ion-icon name="locate" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <!-- Loading spinner -->
+  <div *ngIf="isLoading" class="loading-container">
+    <ion-spinner name="circular" color="primary"></ion-spinner>
+    <p>Cargando datos del mapa...</p>
+  </div>
+
+  <!-- Mapa principal que ocupa toda la pantalla -->
+  <div id="detailed-map" class="detailed-map-container"></div>
+
+  <!-- Controles flotantes del mapa -->
+  <!-- <div class="map-controls">
+    <div class="zoom-controls">
+      <ion-button (click)="zoomIn()" fill="solid" shape="round" size="small">
+        <ion-icon name="add" slot="icon-only"></ion-icon>
+      </ion-button>
+      <ion-button (click)="zoomOut()" fill="solid" shape="round" size="small">
+        <ion-icon name="remove" slot="icon-only"></ion-icon>
+      </ion-button>
+    </div>
+
+    <div class="additional-controls">
+      <ion-button (click)="toggleSatellite()" fill="solid" shape="round" size="small">
+        <ion-icon name="layers" slot="icon-only"></ion-icon>
+      </ion-button>
+    </div>
+  </div> -->
+
+  <!-- Información flotante -->
+  <div class="info-panel" ngIf="!isLoading">
+    <div class="info-header">
+      <h3>Departamento del Huila</h3>
+      <p>{{ heatmapData.length }} municipios • {{ totalUsuarios }} usuarios totales</p>
+    </div>
+
+    <!-- Leyenda -->
+    <div class="legend">
+      <div class="legend-title">Densidad de Usuarios</div>
+      <div class="legend-items">
+        <div class="legend-item">
+          <span class="legend-color high"></span>
+          <span>Alta (70%+)</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color medium"></span>
+          <span>Media (40-70%)</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color low"></span>
+          <span>Baja (&lt;40%)</span>
+        </div>
+      </div>
+    </div>
+  </div>  <!-- FAB para volver al dashboard -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="goBack()" color="primary">
+      <ion-icon name="home"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

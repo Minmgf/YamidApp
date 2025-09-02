@@ -20,6 +20,16 @@ const routes: Routes = [
         }
       },
       {
+        path: 'detailed-map',
+        loadComponent: () => import('../detailed-map/detailed-map.page').then(m => m.DetailedMapPage),
+        canActivate: [RoleGuard],
+        data: {
+          roles: ['super_admin'],
+          permission: 'dashboard',
+          title: 'Mapa Detallado'
+        }
+      },
+      {
         path: 'municipios',
         loadChildren: () => import('../municipios/municipios.module').then(m => m.MunicipiosPageModule),
         canActivate: [RoleGuard],
