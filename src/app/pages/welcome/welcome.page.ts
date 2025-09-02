@@ -23,6 +23,7 @@ import { AuthService } from '../../services/auth.service';
 })
 export class WelcomePage implements OnInit {
   user: any = null;
+  registers: number = 0;
   createdByName: string = 'Cargando...';
 
   // Precargar modales para evitar delays
@@ -40,7 +41,14 @@ export class WelcomePage implements OnInit {
   ngOnInit() {
     // Usar el AuthService para obtener el usuario
     this.user = this.authService.getCurrentUser();
+    console.log('👤 Usuario completo en Welcome:', this.user);
+    console.log('📊 Registers del usuario:', this.user?.registers);
+    console.log('⭐ Rating del usuario:', this.user?.rating);
+
     if (this.user) {
+      // Cargar la información completa del usuario (incluyendo registers)
+      this.loadUserRegisters();
+
       // Cargar el nombre del usuario que registró
       if (this.user.created_by) {
         this.loadCreatedByName();
@@ -51,6 +59,49 @@ export class WelcomePage implements OnInit {
     } else {
       this.router.navigate(['/login']);
     }
+  }
+
+  /**
+   * Carga la información completa del usuario desde el endpoint
+   */
+  private loadUserRegisters(): void {
+    // Llamar al endpoint usuarios/{id} que retorna la información completa
+    this.userService.getUserById(this.user.id).subscribe({
+      next: (response: any) => {
+        console.log('📊 Respuesta completa del usuario:', response);
+
+        if (response && this.user) {
+          // Actualizar solo las propiedades que nos interesan, manteniendo las existentes
+          if (response.registers !== undefined) {
+            this.user.registers = response.registers;
+          }
+
+          // Agregar la propiedad rating
+          if (response.rating !== undefined) {
+            this.user.rating = response.rating;
+          }
+
+          // También podemos actualizar otras propiedades que puedan haber cambiado
+          if (response.nombre_completo) this.user.nombre_completo = response.nombre_completo;
+          if (response.correo) this.user.correo = response.correo;
+          if (response.celular) this.user.celular = response.celular;
+          if (response.municipio) this.user.municipio = response.municipio;
+          if (response.lugar_votacion !== undefined) this.user.lugar_votacion = response.lugar_votacion;
+
+          // Actualizar en localStorage
+          this.authService.updateUser(this.user);
+
+        }
+      },
+      error: (err: any) => {
+        console.error('Error al cargar información del usuario:', err);
+        // Si hay error, establecer valores por defecto
+        if (this.user) {
+          this.user.registers = 0;
+          this.user.rating = 0;
+        }
+      }
+    });
   }
 
   /**
@@ -197,5 +248,143 @@ export class WelcomePage implements OnInit {
       buttons: ['OK']
     });
     await alert.present();
+  }
+
+  // =================== MÉTODOS PARA CARDS DE ESTADÍSTICAS ===================
+
+  /**
+   * Obtiene el total de votantes registrados
+   * TODO: Conectar con endpoint real
+   */
+  getTotalVotantes(): number {
+    // Simulación - reemplazar con llamada al API
+    return 15420;
+  }
+
+  /**
+   * Obtiene el porcentaje de crecimiento de votantes
+   * TODO: Conectar con endpoint real
+   */
+  getVotantesGrowth(): number {
+    // Simulación - reemplazar con llamada al API
+    return 12.5;
+  }
+
+  /**
+   * Obtiene el porcentaje de votantes activos
+   * TODO: Conectar con endpoint real
+   */
+  getActiveVotantesPercentage(): number {
+    // Simulación - reemplazar con llamada al API
+    return 78;
+  }
+
+  /**
+   * Obtiene el número de nuevos votantes registrados hoy
+   * TODO: Conectar con endpoint real
+   */
+  getNewVotantesToday(): number {
+    // Simulación - reemplazar con llamada al API
+    return 23;
+  }
+
+  /**
+   * Obtiene el número de votantes verificados
+   * TODO: Conectar con endpoint real
+   */
+  getVerifiedVotantes(): number {
+    // Simulación - reemplazar con llamada al API
+    return 14891;
+  }
+
+  /**
+   * Obtiene la calificación promedio del servicio
+   * TODO: Conectar con endpoint real
+   */
+  getAverageRating(): number {
+    // Simulación - reemplazar con llamada al API
+    return 4.3;
+  }
+
+  /**
+   * Obtiene el número de estrellas a mostrar
+   */
+  getStarCount(): number {
+    // Usar el rating real del usuario si está disponible
+    if (this.user?.rating !== undefined) {
+      return Math.round(this.user.rating);
+    }
+    // Fallback al método anterior si no hay rating
+    return Math.round(this.getAverageRating());
+  }
+
+  /**
+   * Obtiene el porcentaje de calificaciones excelentes
+   * TODO: Conectar con endpoint real
+   */
+  getExcellentRating(): number {
+    // Simulación - reemplazar con llamada al API
+    return 65;
+  }
+
+  /**
+   * Obtiene el porcentaje de calificaciones buenas
+   * TODO: Conectar con endpoint real
+   */
+  getGoodRating(): number {
+    // Simulación - reemplazar con llamada al API
+    return 28;
+  }
+
+  /**
+   * Obtiene el porcentaje de calificaciones regulares
+   * TODO: Conectar con endpoint real
+   */
+  getRegularRating(): number {
+    // Simulación - reemplazar con llamada al API
+    return 7;
+  }
+
+  /**
+   * Obtiene el total de reseñas
+   * TODO: Conectar con endpoint real
+   */
+  getTotalReviews(): number {
+    // Simulación - reemplazar con llamada al API
+    return 1247;
+  }
+
+  /**
+   * Obtiene el tiempo de la última actualización
+   * TODO: Conectar con endpoint real
+   */
+  getLastUpdateTime(): string {
+    // Simulación - reemplazar con llamada al API
+    return '5 min';
+  }
+
+  /**
+   * Verifica si el usuario tiene alguna acción disponible
+   */
+  hasAnyActions(): boolean {
+    const hasRegisterPermission = this.user?.permisos?.puede_registrar_usuarios;
+    const hasEvaluateOption = this.user?.created_by && this.createdByName !== 'Sistema';
+    return hasRegisterPermission || hasEvaluateOption;
+  }
+
+  // =================== MÉTODOS DE DEBUG ===================
+
+  /**
+   * Obtiene el tipo de la propiedad registers para debug
+   */
+  getRegisterType(): string {
+    return typeof this.user?.registers;
+  }
+
+  /**
+   * Obtiene las claves del objeto user para debug
+   */
+  getUserKeys(): string {
+    return this.user ? Object.keys(this.user).join(', ') : 'no user';
   }
 }

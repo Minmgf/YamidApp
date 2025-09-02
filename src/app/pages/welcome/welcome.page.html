@@ -6,49 +6,81 @@
   ></app-main-header>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <ion-card *ngIf="user">
-    <ion-card-header>
-      <ion-card-title>Hola {{ user.nombre_completo }}</ion-card-title>
-      <ion-card-subtitle>Rol: {{ user.rol }}</ion-card-subtitle>
-    </ion-card-header>
-    <ion-card-content>
-      <p><strong>Email:</strong> {{ user.correo }}</p>
-      <p><strong>Cédula:</strong> {{ user.cedula }}</p>
-      <p><strong>Celular:</strong> {{ user.celular || 'No disponible' }}</p>
-      <p><strong>Municipio:</strong> {{ user.municipio || 'ID: ' + user.municipio_id }}</p>
-      <p><strong>Lugar de votación:</strong> {{ user.lugar_votacion || 'No disponible' }}</p>
-      <p><strong>Registrado por:</strong> {{ getCreatedByName() }}</p>
-      <div *ngIf="user.permisos">
-        <strong>Permisos:</strong>
-        <ion-chip *ngFor="let permiso of getPermissionsList()" color="success">
+<ion-content class="simple-welcome">
+  <!-- Header del perfil minimalista -->
+  <div class="profile-section" *ngIf="user">
+    <div class="profile-avatar">
+      <img [src]="user?.foto || 'assets/img/user.svg'" alt="Avatar" class="avatar-image">
+    </div>
+    <div class="profile-info">
+      <!-- <h2 class="title">Usuario:</h2> -->
+      <h1 class="user-name">Hola, {{ user.nombre_completo }} </h1>
+      <p class="user-email">Correo: {{ user.correo }}</p>
+      <p class="user-phone">Cedula: {{ user.cedula  }}</p>
+      <p class="user-phone">Celular: {{ user.celular || 'No disponible' }}</p>
+      <p class="user-location">Municipio: {{ user.municipio || 'Municipio ID: ' + user.municipio_id }}</p>
+      <p class="user-phone">Registrado por: {{ createdByName }}</p>
+      <p class="user-role">Rol: {{ user.rol }}</p>
+      <p class="user-role">Permisos:</p>
+       <ion-chip *ngFor="let permiso of getPermissionsList()" color="success">
+          <ion-icon name="checkmark-circle" class="check-icon"></ion-icon>
           <ion-label>{{ permiso }}</ion-label>
         </ion-chip>
-      </div>
-    </ion-card-content>
-  </ion-card>
 
-  <!-- Botón para registrar usuarios (solo si tiene permisos) -->
-  <ion-card *ngIf="user?.permisos?.puede_registrar_usuarios" button (click)="openRegisterModal()" class="register-card">
-    <ion-card-content class="register-card-content">
-      <ion-icon name="person-add-outline" class="register-icon"></ion-icon>
-      <div class="register-text">
-        <h3>Registrar Usuario</h3>
-        <p>Agregar un nuevo usuario al sistema</p>
-      </div>
-      <ion-icon name="chevron-forward-outline" class="chevron-icon"></ion-icon>
-    </ion-card-content>
-  </ion-card>
 
-  <!-- Card para evaluar líder (solo para usuarios registrados por otros usuarios) -->
-  <ion-card *ngIf="user?.created_by && createdByName !== 'Sistema'" button (click)="openEvaluateModal()" class="evaluate-card">
-    <ion-card-content class="evaluate-card-content">
-      <ion-icon name="star-outline" class="evaluate-icon"></ion-icon>
-      <div class="evaluate-text">
-        <h3>Evaluar Líder</h3>
-        <p>Califica a {{ createdByName }}</p>
+
+    </div>
+  </div>
+
+  <!-- Cards de métricas simplificadas -->
+  <div class="metrics-container">
+    <!-- Card de Votantes -->
+    <div class="metric-card votantes-card">
+      <div class="metric-header">
+        <span class="metric-title">Votantes Registrados</span>
       </div>
-      <ion-icon name="chevron-forward-outline" class="chevron-icon"></ion-icon>
-    </ion-card-content>
-  </ion-card>
+      <div class="metric-value">{{ user?.registers || 0 }}</div>
+    </div>
+
+    <!-- Card de Calificación -->
+    <div class="metric-card rating-card">
+      <div class="metric-header">
+        <span class="metric-title">Calificación</span>
+      </div>
+      <div class="rating-display">
+        <div class="rating-stars">
+          <ion-icon
+          *ngFor="let star of [1,2,3,4,5]; let i = index"
+          [name]="i < getStarCount() ? 'star' : 'star-outline'"
+          [class]="i < getStarCount() ? 'star-filled' : 'star-empty'">
+        </ion-icon>
+      </div>
+      <!-- <div class="rating-number">{{ user?.rating || 0 }}</div> -->
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <!-- Acciones rápidas simplificadas -->
+  <div class="quick-actions" *ngIf="hasAnyActions()">
+    <!-- Botón para registrar usuarios (solo si tiene permisos) -->
+    <button
+      *ngIf="user?.permisos?.puede_registrar_usuarios"
+      (click)="openRegisterModal()"
+      class="action-button register-btn">
+      <ion-icon name="person-add" class="action-icon"></ion-icon>
+      <span>Registrar Usuario</span>
+    </button>
+
+    <!-- Botón para evaluar líder (solo para usuarios registrados por otros usuarios) -->
+    <button
+      *ngIf="user?.created_by && createdByName !== 'Sistema'"
+      (click)="openEvaluateModal()"
+      class="action-button evaluate-btn">
+      <ion-icon name="star" class="action-icon"></ion-icon>
+      <span>Evaluar a {{ createdByName }}</span>
+    </button>
+  </div>
 </ion-content>

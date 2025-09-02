@@ -103,9 +103,9 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
 
     // Control de capas para cambiar entre tipos de mapa
     const baseMaps = {
-      "🛰️ Satelital": satelliteLayer,
-      "🗺️ Calles": streetLayer,
-      "🔀 Híbrido": L.layerGroup([satelliteLayer, hybridLabels])
+      "Satelital": satelliteLayer,
+      "Calles": streetLayer,
+      "Híbrido": L.layerGroup([satelliteLayer, hybridLabels])
     };
 
     L.control.layers(baseMaps).addTo(this.map);

@@ -1,234 +1,351 @@
-.welcome-content {
+// =================== DISEÑO MINIMALISTA WELCOME PAGE ===================
+
+.simple-welcome {
+  background: #e2e1e1;
+  min-height: 100vh;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+// =================== SECCIÓN DEL PERFIL ===================
+.profile-section {
+  text-align: center;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px #0000000d;
+
+  .profile-avatar {
+
+    .avatar-image {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #e9ecef;
+    }
+  }
+
+  .profile-info {
+
+    .title{
+      font-size: 1.5rem;
+
+    }
+
+    .user-name {
+      margin: 0 0 8px 0;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #212529;
+      line-height: 1.2;
+    }
+
+    .user-email {
+      margin: 0 0 6px 0;
+      font-size: 1rem;
+      color: #6c757d;
+      font-weight: 500;
+    }
+
+    .user-role {
+      margin: 0 0 6px 0;
+      font-size: 0.95rem;
+      color: #6c757d;
+      font-weight: 500;
+    }
+
+    .user-location {
+      margin: 0 0 6px 0;
+      font-size: 0.9rem;
+      color: #6c757d;
+    }
+
+    .user-phone {
+      margin: 0 0 6px 0;
+      font-size: 0.9rem;
+      color: #6c757d;
+    }
+  }
+}
+
+// =================== CARDS DE MÉTRICAS ===================
+.metrics-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: 32px;
+
+  .metric-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    border: 1px solid #e9ecef;
+
+    .metric-header {
+      margin-bottom: 12px;
+
+      .metric-title {
+        font-size: 0.9rem;
+        color: #6c757d;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+    }
+
+    .metric-value {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #212529;
+      line-height: 1;
+    }
+
+    .rating-display {
+      text-align: center;
+
+      .rating-number {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #212529;
+        margin-bottom: 8px;
+        line-height: 1;
+      }
+    }
+
+    .rating-stars {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+
+      ion-icon {
+        font-size: 1.4rem;
+
+        &.star-filled {
+          color: #28a745;
+        }
+
+        &.star-empty {
+          color: #dee2e6;
+        }
+      }
+    }
+
+    &.votantes-card {
+      border-left: 4px solid #28a745;
+    }
+
+    &.rating-card {
+      border-left: 4px solid #28a745;
+    }
+  }
+}
+
+// =================== INFORMACIÓN ADICIONAL ===================
+.additional-info {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e9ecef;
+
+  .info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #f1f3f4;
+
+    &:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    &:first-child {
+      padding-top: 0;
+    }
+
+    .info-label {
+      font-size: 0.9rem;
+      color: #6c757d;
+      font-weight: 500;
+    }
+
+    .info-value {
+      font-size: 0.9rem;
+      color: #212529;
+      font-weight: 600;
+      text-align: right;
+      max-width: 60%;
+    }
+  }
+}
+
+// =================== PERMISOS SIMPLIFICADOS ===================
+.permissions-simple {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e9ecef;
+
+  h3 {
+    margin: 0 0 16px 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #212529;
+  }
+
+  .permissions-list {
+    .permission-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+
+      .check-icon {
+        font-size: 1.1rem;
+        color: #28a745;
+        min-width: 16px;
+      }
+
+      span {
+        font-size: 0.9rem;
+        color: #495057;
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+// =================== ACCIONES RÁPIDAS ===================
+.quick-actions {
+  margin: 20px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  background: var(--ion-background-color);
-}
+  gap: 12px;
 
-.profile-card {
-  width: 100%;
-  max-width: 400px;
-  background: var(--ion-card-background);
-  border-radius: 18px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  margin: 16px 0 24px 0;
-  padding: 20px 18px 10px 18px;
-}
-.profile-header {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-.profile-avatar {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  border: 2px solid #e0e0e0;
-}
-.profile-info h2 {
-  margin: 0;
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: var(--ion-color-dark);
-}
-.profile-rol {
-  color: var(--ion-color-medium);
-  font-size: 1rem;
-}
-.profile-status-row {
-  display: flex;
-  gap: 10px;
-  margin-top: 12px;
-}
-.profile-status {
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: var(--ion-color-dark);
-}
-.profile-date {
-  font-size: 0.95rem;
-  background: var(--ion-color-light);
-  color: var(--ion-color-dark);
-}
-.section {
-  width: 100%;
-  max-width: 400px;
-  margin-bottom: 18px;
-}
-.agenda-section h3,
-.publicaciones-section h3 {
-  margin: 0 0 8px 0;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #222;
-}
-.agenda-card {
-  border-radius: 14px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-}
-.publicacion-card {
-  border-radius: 14px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-}
-.publicacion-fecha {
-  color: #888;
-  font-size: 0.95rem;
-  margin: 2px 0 4px 0;
-}
-.publicacion-desc {
-  color: #444;
-  font-size: 1rem;
-}
-
-// Estilos para la tarjeta de registro de usuario
-.register-card {
-  margin-top: 16px;
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  will-change: transform;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
-
-  &:active {
-    transform: translateY(0);
-    transition: transform 0.1s ease;
-  }
-}
-
-.register-card-content {
-  display: flex;
-  align-items: center;
-  padding: 20px;
-  gap: 16px;
-
-  .register-icon {
-    font-size: 32px;
-    color: var(--ion-color-primary);
-    min-width: 32px;
-  }
-
-  .register-text {
-    flex: 1;
-
-    h3 {
-      margin: 0 0 4px 0;
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: var(--ion-color-dark);
-    }
-
-    p {
-      margin: 0;
-      font-size: 0.9rem;
-      color: var(--ion-color-medium);
-    }
-  }
-
-  .chevron-icon {
-    font-size: 20px;
-    color: var(--ion-color-medium);
-  }
-}
-
-// Responsive
-@media (max-width: 768px) {
-  .register-card-content {
-    padding: 16px;
+  .action-button {
+    display: flex;
+    align-items: center;
     gap: 12px;
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 16px 20px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #495057;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
 
-    .register-icon {
-      font-size: 28px;
+    &:hover {
+      background: #f8f9fa;
+      border-color: #dee2e6;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
     }
 
-    .register-text {
-      h3 {
-        font-size: 1.1rem;
-      }
-
-      p {
-        font-size: 0.85rem;
-      }
+    &:active {
+      transform: translateY(0);
     }
-  }
-}
 
-// Estilos para la card de evaluación de líder
-.evaluate-card {
-  margin-top: 16px;
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  will-change: transform;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
-
-  &:active {
-    transform: translateY(0);
-    transition: transform 0.1s ease;
-  }
-}
-
-.evaluate-card-content {
-  display: flex;
-  align-items: center;
-  padding: 20px;
-  gap: 16px;
-
-  .evaluate-icon {
-    font-size: 32px;
-    color: #2ec421ff;
-    min-width: 32px;
-  }
-
-  .evaluate-text {
-    flex: 1;
-
-    h3 {
-      margin: 0 0 4px 0;
+    .action-icon {
       font-size: 1.2rem;
-      font-weight: 600;
-      color: var(--ion-color-dark);
+      min-width: 20px;
     }
 
-    p {
-      margin: 0;
-      font-size: 0.9rem;
-      color: var(--ion-color-medium);
-    }
-  }
+    &.register-btn {
+      border-left: 4px solid #007bff;
 
-  .chevron-icon {
-    font-size: 20px;
-    color: var(--ion-color-medium);
+      .action-icon {
+        color: #007bff;
+      }
+    }
+
+    &.evaluate-btn {
+      border-left: 4px solid #ffc107;
+
+      .action-icon {
+        color: #ffc107;
+      }
+    }
   }
 }
 
-// Responsive
+// =================== RESPONSIVE DESIGN ===================
 @media (max-width: 768px) {
-  .register-card-content,
-  .evaluate-card-content {
+  .simple-welcome {
     padding: 16px;
-    gap: 12px;
+  }
 
-    .register-icon,
-    .evaluate-icon {
-      font-size: 28px;
+  .profile-section {
+    padding: 24px 20px;
+    display: grid ;
+    grid-template-columns: 100px  1fr;
+    margin: 20px;
+    gap: 20px;
+
+    .profile-info {
+      text-align: start;
+      .user-name {
+        font-size: 1.5rem;
+      }
+    }
+  }
+
+  .metrics-container {
+    grid-template-columns: 1fr,1fr;
+    gap: 12px;
+    margin: 20px;
+
+    .metric-card {
+      padding: 16px;
+
+      .metric-value {
+        font-size: 1.6rem;
+      }
+    }
+  }
+
+  .additional-info,
+  .permissions-simple {
+    padding: 16px;
+  }
+
+  .info-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+
+    .info-value {
+      text-align: left;
+      max-width: 100%;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-section {
+    .profile-avatar .avatar-image {
+      width: 64px;
+      height: 64px;
     }
 
-    .register-text,
-    .evaluate-text {
-      h3 {
-        font-size: 1.1rem;
-      }
+    .profile-info .user-name {
+      font-size: 1.3rem;
+    }
+  }
 
-      p {
-        font-size: 0.85rem;
-      }
+  .metrics-container .metric-card {
+    .metric-value {
+      font-size: 1.4rem;
+    }
+
+    .rating-stars ion-icon {
+      font-size: 1.2rem;
     }
   }
 }
