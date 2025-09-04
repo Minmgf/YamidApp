@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -15,6 +15,7 @@ import { SplashPage } from './splash.page';
     IonicModule,
     SplashPageRoutingModule
   ],
-  declarations: [SplashPage]
+  declarations: [SplashPage],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA] // 👈 Permite custom elements como dotlottie-wc
 })
 export class SplashPageModule {}

@@ -1,6 +1,17 @@
 <ion-content class="splash-screen" fullscreen>
-  <div class="splash-text-container">
-    <h1 class="typing-line first-line" style="margin-bottom: 0;line-height: 1;">Yamid</h1>
-    <h1 class="typing-line second-line" style="margin-top: 0;line-height: 1;">Sanabria</h1>
+  <div class="video-background">
+    <!-- Video de fondo -->
+    <video
+      #splashVideo
+      class="splash-video"
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="auto">
+      <source src="assets/videos/splash.mp4" type="video/mp4">
+      <!-- Fallback si no carga el video -->
+      <div class="video-fallback"></div>
+    </video>
   </div>
 </ion-content>
