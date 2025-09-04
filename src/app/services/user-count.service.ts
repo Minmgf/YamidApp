@@ -26,3 +26,25 @@ export class UserCountService {
   }
 }
 
+@Injectable({
+  providedIn: 'root'
+})
+export class UserLeadersCountService {
+  private apiUrl = `${environment.apiUrl}/usuarios/count/lider`;
+
+  constructor(private http: HttpClient) { }
+
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    })
+  }
+
+  getUserLeadersCount(): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.get(`${this.apiUrl}`, {headers})
+  }
+}
+

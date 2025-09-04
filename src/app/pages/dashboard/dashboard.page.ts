@@ -4,7 +4,7 @@ import * as L from 'leaflet';
 import Chart from 'chart.js/auto';
 import { Router } from '@angular/router';
 import { MainHeaderComponent } from '../../shared/main-header/main-header.component';
-import { UserCountService } from '../../services/user-count.service';
+import { UserCountService, UserLeadersCountService } from '../../services/user-count.service';
 import { HeatmapService, HeatmapData } from '../../services/heatmap.service';
 
 @Component({
@@ -16,6 +16,7 @@ import { HeatmapService, HeatmapData } from '../../services/heatmap.service';
 })
 export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
   userCount: number = 0; // Variable para almacenar el conteo
+  userLeadersCount: number = 0; // Variable para almacenar el conteo de lideres
   heatmapData: HeatmapData[] = [];
   totalUsuariosSistema: number = 0;
 
@@ -24,6 +25,7 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
   constructor(
     private router: Router,
     private userCountService: UserCountService,
+    private userLeadersCountService: UserLeadersCountService,
     private heatmapService: HeatmapService
   ) {}
 
@@ -40,6 +42,20 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
   ngOnInit() {
     this.loadUserCount();
     this.loadHeatmapData();
+    this.loadUserLeadersCount();
+  }
+
+  loadUserLeadersCount() {
+    this.userLeadersCountService.getUserLeadersCount().subscribe({
+      next: (response) => {
+        this.userLeadersCount = response.count || response.total || response;
+        console.log('User leaders count:', this.userLeadersCount);
+      },
+      error: (error) => {
+        console.error('Error loading user leaders count:', error);
+        this.userLeadersCount = 0; // Valor por defecto en caso de error
+      }
+    });
   }
 
   loadUserCount() {
