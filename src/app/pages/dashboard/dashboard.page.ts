@@ -73,7 +73,7 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
 
   ngAfterViewInit(): void {
     /** 1. Inicializar el mapa */
-    this.map = L.map('map', { attributionControl: false });
+    this.map = L.map('map', { attributionControl: false, zoomControl: false });
 
     /** Pane para controlar superposición */
     this.map.createPane('croquis');
@@ -108,7 +108,7 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
       "Híbrido": L.layerGroup([satelliteLayer, hybridLabels])
     };
 
-    L.control.layers(baseMaps).addTo(this.map);
+    // L.control.layers(baseMaps).addTo(this.map);
 
     /** 3. Dibujar el mapa del Huila */
     this.map.setView([2.9273, -75.2819], 9); // Centrar en Neiva, Huila

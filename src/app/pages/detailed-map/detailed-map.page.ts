@@ -71,7 +71,7 @@ export class DetailedMapPage implements AfterViewInit, OnDestroy, OnInit {
     this.map = L.map('detailed-map', {
       center: [2.9273, -75.2819], // Coordenadas exactas de Neiva, Huila
       zoom: 8,  // Zoom más cercano para enfocar mejor el Huila
-      zoomControl: true,
+      zoomControl: false,
       attributionControl: false,
       minZoom: 7,  // Zoom mínimo para no alejarse demasiado
       maxZoom: 16  // Zoom máximo para mantener calidad
@@ -110,7 +110,7 @@ export class DetailedMapPage implements AfterViewInit, OnDestroy, OnInit {
       "🔀 Híbrido": L.layerGroup([satelliteLayer, hybridLabels])
     };
 
-    L.control.layers(baseMaps).addTo(this.map);
+    // L.control.layers(baseMaps).addTo(this.map);
 
     // Cargar el mapa del Huila con límites municipales
     this.loadHuilaMap();

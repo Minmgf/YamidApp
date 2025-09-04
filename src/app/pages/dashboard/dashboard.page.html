@@ -1,9 +1,5 @@
 <ion-header>
-  <app-main-header
-    [nombre]="'Yamid Sanabria'"
-    [avatar]="'assets/img/foto.png'"
-    (logout)="logout()"
-  ></app-main-header>
+  <app-main-header [nombre]="'Yamid Sanabria'" [avatar]="'assets/img/foto.png'" (logout)="logout()"></app-main-header>
 </ion-header>
 
 <ion-content class="dash" [scrollY]="true" fullscreen>
@@ -16,8 +12,6 @@
     <!-- Overlay clickeable para abrir mapa detallado -->
     <div class="map-overlay" (click)="openDetailedMap()">
       <div class="map-expand-hint">
-        <!-- <ion-icon name="expand-outline"></ion-icon>
-        <span>Ver mapa completo</span> -->
       </div>
     </div>
 
@@ -49,7 +43,7 @@
   </div>
 
   <!-- 🔽 TARJETAS INFERIORES -->
-  <div class="dashboard-subgrid">
+  <!-- <div class="dashboard-subgrid">
     <div class="card-info lider-card">
       <h3>Líderes</h3>
       <canvas id="liderChart" width="100" height="40"></canvas>
@@ -60,18 +54,16 @@
 
 
 
-    <!-- Blog -->
     <div class="card-info blog-card">
-  <h3>Blog</h3>
-  <canvas id="blogChart" width="100" height="40"></canvas>
-  <p>7 artículos esta semana (vs 5 semana pasada)</p>
-  <ion-button size="small" expand="block" class="boton-neutro">Ver más</ion-button>
-</div>
+      <h3>Blog</h3>
+      <canvas id="blogChart" width="100" height="40"></canvas>
+      <p>7 artículos esta semana (vs 5 semana pasada)</p>
+      <ion-button size="small" expand="block" class="boton-neutro">Ver más</ion-button>
+    </div>
 
 
-  </div>
+  </div> -->
 
-  <!-- 🔚 CTA Final -->
   <ion-item button lines="none" class="casta-item">
     <ion-label>Casta</ion-label>
     <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
