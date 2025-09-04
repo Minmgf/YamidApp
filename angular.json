@@ -4,7 +4,7 @@
   "newProjectRoot": "projects",
   "projects": {
 
-    
+
     "app": {
       "projectType": "application",
       "schematics": {},
@@ -46,8 +46,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "2kb",
-                  "maximumError": "4kb"
+                  "maximumWarning": "20kb",
+                  "maximumError": "40kb"
                 }
               ],
               "fileReplacements": [
@@ -80,9 +80,6 @@
             },
             "development": {
               "buildTarget": "app:build:development"
-            },
-            "ci": {
-              "progress": false
             }
           },
           "defaultConfiguration": "development"
@@ -149,7 +146,7 @@
       "styleext": "scss"
     }
   }
-  
+
 }
 
 

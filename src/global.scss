@@ -43,6 +43,42 @@
 }
 
 /**
+ * Safe Area Support - Respeta el notch y barra de estado
+ */
+:root {
+  --ion-safe-area-top: env(safe-area-inset-top);
+  --ion-safe-area-bottom: env(safe-area-inset-bottom);
+  --ion-safe-area-left: env(safe-area-inset-left);
+  --ion-safe-area-right: env(safe-area-inset-right);
+}
+
+/* Asegurar que el contenido respete el área segura */
+ion-app {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Fix para iOS - evitar que el header se superponga */
+ion-header {
+  position: relative;
+  z-index: 10;
+}
+
+/* En dispositivos móviles, asegurar padding superior */
+@media screen and (max-width: 768px) {
+  ion-app {
+    padding-top: max(env(safe-area-inset-top), 20px);
+  }
+
+  ion-content {
+    --padding-top: env(safe-area-inset-top);
+    --padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/**
  * Ionic Dark Mode
  * -----------------------------------------------------
  * For more info, please see:

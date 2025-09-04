@@ -2,7 +2,6 @@
 
 .simple-welcome {
   background: #e2e1e1;
-  min-height: 100vh;
   padding-left: 20px;
   padding-right: 20px;
 }
@@ -297,7 +296,7 @@
   }
 
   .metrics-container {
-    grid-template-columns: 1fr,1fr;
+    grid-template-columns: 1fr 1fr;
     gap: 12px;
     margin: 20px;
 
@@ -348,4 +347,15 @@
       font-size: 1.2rem;
     }
   }
+}
+
+// =================== FIX MÍNIMO PARA SCROLL ===================
+// Solo para solucionar el problema de rebote en móvil
+ion-content.simple-welcome {
+  --padding-bottom: 60px;
+}
+
+// Asegurar espacio suficiente en el contenido
+.simple-welcome {
+  padding-bottom: 60px;
 }

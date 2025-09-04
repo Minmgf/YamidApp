@@ -26,6 +26,10 @@ ion-buttons[slot="end"] {
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   border-radius: 0 0 18px 18px;
   padding: 0 8px;
+  // Respetar el área segura en la parte superior
+  padding-top: max(env(safe-area-inset-top), 8px);
+  position: relative;
+  z-index: 10;
 }
 
 .main-header-row {
