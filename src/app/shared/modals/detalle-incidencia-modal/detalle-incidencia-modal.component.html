@@ -1,0 +1,111 @@
+<ion-header>
+  <ion-toolbar>
+    <h1 class="detalle-titulo">{{incidencia.titulo}}</h1>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrarModal()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="detalle-container" *ngIf="incidencia; else noData">
+    <!-- Título principal -->
+
+    <!-- Badges de categoría y estado -->
+    <div class="badges-container">
+      <ion-badge [color]="getCategoriaColor(incidencia.categoria)">
+        {{getCategoriaLabel(incidencia.categoria)}}
+      </ion-badge>
+      <!-- <ion-badge [color]="incidencia.estado === 'publicada' ? 'success' : incidencia.estado === 'pendiente' ? 'warning' : 'danger'">
+        {{incidencia.estado?.toUpperCase() || 'PENDIENTE'}}
+      </ion-badge> -->
+    </div>
+
+    <!-- Descripción -->
+    <div class="detalle-section">
+      <h3>
+        <ion-icon name="document-text-outline"></ion-icon>
+        Descripción
+      </h3>
+      <p class="detalle-descripcion">{{incidencia.descripcion}}</p>
+    </div>
+
+    <!-- Información del reporte -->
+    <div class="detalle-section">
+      <h3>Información del reporte</h3>
+
+      <div class="badges">
+        <div class="info-item">
+          <ion-icon name="location-outline" class="badgeicon1" color="primary"></ion-icon>
+          <div class="info-content">
+            <div class="info-label">Ubicación</div>
+            <div class="info-value">{{getMunicipioNombre(incidencia.ciudad_id, incidencia.ciudad_nombre)}}</div>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <ion-icon name="calendar-outline" class="badgeicon2" color="success"></ion-icon>
+          <div class="info-content">
+            <div class="info-label">Fecha de reporte</div>
+            <div class="info-value">{{incidencia.fecha_creacion ? formatearFecha(incidencia.fecha_creacion) : 'Sin fecha'}}</div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- <div class="info-item" *ngIf="incidencia.fecha_actualizacion && incidencia.fecha_actualizacion !== incidencia.fecha_creacion">
+        <ion-icon name="time-outline" color="warning"></ion-icon>
+        <div class="info-content">
+          <div class="info-label">Última actualización</div>
+          <div class="info-value">{{formatearFecha(incidencia.fecha_actualizacion)}}</div>
+        </div>
+      </div> -->
+    </div>
+
+    <!-- Reportado por -->
+    <div class="detalle-section">
+      <h3>Reportado por</h3>
+      <div class="reporter-info">
+        <div class="reporter-avatar">
+          <span>{{getInitials(incidencia.usuario_nombre)}}</span>
+        </div>
+        <div class="reporter-details">
+          <div class="reporter-name">{{incidencia.usuario_nombre || 'Usuario desconocido'}}</div>
+          <div class="reporter-type">Ciudadano verificado</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Acciones de administrador -->
+    <div class="detalle-section" *ngIf="esAdmin && incidencia.estado === 'pendiente'">
+      <h3>
+        <ion-icon name="settings-outline"></ion-icon>
+        Acciones de Administrador
+      </h3>
+      <div class="admin-actions">
+        <ion-button expand="block" color="success" (click)="accionAprobar()">
+          <ion-icon name="checkmark-outline" slot="start"></ion-icon>
+          Aprobar Incidencia
+        </ion-button>
+        <ion-button expand="block" color="danger" (click)="accionRechazar()">
+          <ion-icon name="close-outline" slot="start"></ion-icon>
+          Rechazar Incidencia
+        </ion-button>
+        <ion-button expand="block" fill="outline" color="primary" (click)="accionEditar()">
+          <ion-icon name="create-outline" slot="start"></ion-icon>
+          Editar Incidencia
+        </ion-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Template de no datos -->
+  <ng-template #noData>
+    <div class="loading-container">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      <p>No se pudo cargar la información de la incidencia</p>
+    </div>
+  </ng-template>
+</ion-content>

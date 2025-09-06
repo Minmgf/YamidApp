@@ -1,0 +1,313 @@
+// Estilos para que coincida con el diseño de la imagen
+.detalle-container {
+  padding-left: 20px;
+  padding-right: 20px;
+  // padding-top: 20px;
+  padding-bottom: 20px;
+  background: white;
+}
+
+.badges{
+  display: flex;
+  justify-content: space-between;
+  margin-right: 10px;
+  margin-left: 10px;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.badgeicon1{
+  padding: 8px;
+  border-radius: 100%;
+  background-color: #397adb25;
+  -webkit-border-radius: 100%;
+  -moz-border-radius: 100%;
+  -ms-border-radius: 100%;
+  -o-border-radius: 100%;
+}
+
+.badgeicon2{
+  padding: 8px;
+  border-radius: 100%;
+  background-color: #1ae75848;
+  -webkit-border-radius: 100%;
+  -moz-border-radius: 100%;
+  -ms-border-radius: 100%;
+  -o-border-radius: 100%;
+}
+
+.detalle-titulo {
+  color: #1a1a1a;
+  font-size: 1.2rem; // Igual que ion-card-title
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.badges-container {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+
+  ion-badge {
+    font-size: 0.8rem; // Igual que metadatos de cards
+    font-weight: 500;
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+}
+
+.detalle-section {
+  margin-bottom: 24px;
+
+  h3 {
+    color: #1a1a1a;
+    font-size: 1.1rem; // Más grande para secciones
+    font-weight: 600;
+    margin: 0 0 12px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    ion-icon {
+      font-size: 1.2rem;
+      color: var(--ion-color-primary);
+    }
+  }
+}
+
+.detalle-descripcion {
+  color: #4a4a4a;
+  font-size: 1rem; // Igual que descripción de cards
+  line-height: 1.5;
+  margin: 0;
+  padding: 8px;
+  background: #FFFAFF;
+  border-radius: 25px;
+  -webkit-border-radius: 25px;
+  -moz-border-radius: 25px;
+  -ms-border-radius: 25px;
+  -o-border-radius: 25px;
+}
+
+.info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+
+  ion-icon {
+    font-size: 1.1rem;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+
+  .info-content {
+    flex: 1;
+
+    .info-label {
+      color: #1a1a1a;
+      font-size: 0.9rem; // Igual que ion-card-subtitle
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+
+    .info-value {
+      color: #6b7280;
+      font-size: 0.9rem; // Igual que ion-card-subtitle
+      line-height: 1.4;
+    }
+  }
+}
+
+.reporter-info {
+
+  margin-right: 10px;
+  margin-left: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  .reporter-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    background: var(--ion-color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    span {
+      color: white;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+  }
+
+  .reporter-details {
+    flex: 1;
+
+    .reporter-name {
+      color: #1a1a1a;
+      font-size: 0.9rem; // Igual que ion-card-subtitle
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .reporter-type {
+      color: #6b7280;
+      font-size: 0.8rem; // Igual que metadatos de cards
+    }
+  }
+}
+
+.admin-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  ion-button {
+    --padding-top: 10px;
+    --padding-bottom: 10px;
+    font-size: 0.9rem; // Igual que ion-card-subtitle
+    font-weight: 500;
+  }
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--ion-color-medium);
+
+  ion-icon {
+    font-size: 3rem;
+    margin-bottom: 16px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.9rem; // Más grande para mejor legibilidad
+  }
+}
+
+// Header del modal - limpio y sin sombra
+ion-header {
+  border-bottom: none !important;
+  box-shadow: none !important;
+
+  ion-toolbar {
+    --background: white;
+    --color: #1a1a1a;
+    --border-width: 0 !important;
+    --border-color: transparent !important;
+    --box-shadow: none !important;
+    --padding-start: 16px;
+    --padding-end: 16px;
+    box-shadow: none !important;
+    border-bottom: none !important;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    ion-button {
+      --padding-start: 8px;
+      --padding-end: 8px;
+      --color: #6b7280;
+
+      ion-icon {
+        font-size: 1.5rem;
+      }
+    }
+  }
+}
+
+// Contenido principal
+ion-content {
+  --background: white;
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  border-top: none !important;
+}
+
+// Estilos adicionales para eliminar cualquier sombra
+:host {
+  ion-header {
+    box-shadow: none !important;
+    border-bottom: none !important;
+
+    ion-toolbar {
+      box-shadow: none !important;
+      border-bottom: none !important;
+      --box-shadow: none !important;
+      --border-style: none !important;
+    }
+  }
+
+  ion-content {
+    --border-style: none !important;
+    border-top: none !important;
+  }
+}
+
+// Responsive para móviles
+@media (max-width: 768px) {
+  .detalle-container {
+    padding-left: 16px;
+    padding-right: 16px;
+    // padding-top: 16px;
+    padding-bottom: 16px;
+  }
+
+  .detalle-titulo {
+    font-size: 1.1rem; // Proporcionalmente más grande
+  }
+
+  .detalle-section {
+    margin-bottom: 20px;
+
+    h3 {
+      font-size: 1rem; // Proporcionalmente más grande
+    }
+  }
+
+  .detalle-descripcion {
+    font-size: 0.95rem; // Proporcionalmente más grande
+  }
+
+  .info-item {
+    .info-content {
+      .info-label, .info-value {
+        font-size: 0.85rem; // Proporcionalmente más grande
+      }
+    }
+  }
+
+  .reporter-info {
+    .reporter-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 18px;
+
+      span {
+        font-size: 0.85rem; // Proporcionalmente más grande
+      }
+    }
+
+    .reporter-details {
+      .reporter-name {
+        font-size: 0.85rem; // Proporcionalmente más grande
+      }
+
+      .reporter-type {
+        font-size: 0.75rem; // Proporcionalmente más grande
+      }
+    }
+  }
+}

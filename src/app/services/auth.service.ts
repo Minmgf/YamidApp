@@ -179,6 +179,17 @@ export class AuthService {
   }
 
   /**
+   * Verifica si el usuario actual es administrador
+   */
+  isAdmin(): boolean {
+    const user = this.currentUserSubject.value;
+    if (!user) return false;
+
+    // Verificar por rol
+    return user.rol === 'super_admin' || user.rol === 'admin';
+  }
+
+  /**
    * Cierra la sesión del usuario
    */
   logout(): void {

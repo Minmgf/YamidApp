@@ -9,7 +9,343 @@
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">blog</ion-title>
+      <ion-title size="large">Incidencias Comunitarias</ion-title>
     </ion-toolbar>
   </ion-header>
+
+  <!-- Navigation Tabs -->
+  <div class="tabs-container">
+    <ion-segment [(ngModel)]="tabActivo" (ionChange)="cambiarTab($event.detail.value)">
+      <ion-segment-button value="incidencias">
+        <ion-icon name="newspaper-outline"></ion-icon>
+        <ion-label>Ver Incidencias</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="gestionar" *ngIf="esAdmin()">
+        <ion-icon name="settings-outline"></ion-icon>
+        <ion-label>Gestionar</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </div>
+
+  <!-- TAB: VER INCIDENCIAS (PÚBLICO) -->
+  <div *ngIf="tabActivo === 'incidencias'" class="tab-content">
+    <!-- Filtros -->
+    <div class="filtros-container">
+      <ion-card>
+        <ion-card-content>
+          <ion-row>
+            <ion-col size="6">
+              <ion-select [(ngModel)]="filtroCategoria" placeholder="Seleccionar categoría" (ionChange)="aplicarFiltros()">
+                <ion-select-option value="">Todas las categorías</ion-select-option>
+                <ion-select-option value="infraestructura">Infraestructura</ion-select-option>
+                <ion-select-option value="servicios_publicos">Servicios Públicos</ion-select-option>
+                <ion-select-option value="seguridad">Seguridad</ion-select-option>
+                <ion-select-option value="medio_ambiente">Medio Ambiente</ion-select-option>
+                <ion-select-option value="transporte">Transporte</ion-select-option>
+                <ion-select-option value="otros">Otros</ion-select-option>
+              </ion-select>
+            </ion-col>
+            <ion-col size="6">
+              <ion-select [(ngModel)]="filtroMunicipio" placeholder="Seleccionar municipio" (ionChange)="aplicarFiltros()">
+                <ion-select-option value="">Todos los municipios</ion-select-option>
+                <ion-select-option *ngFor="let municipio of municipios" [value]="municipio.id">
+                  {{municipio.nombre}}
+                </ion-select-option>
+              </ion-select>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col size="12">
+              <ion-button expand="block" fill="clear" (click)="limpiarFiltros()">
+                <ion-icon name="refresh-outline" slot="start"></ion-icon>
+                Limpiar Filtros
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- Lista de Incidencias Públicas -->
+    <div class="incidencias-container">
+      <div class="section-header">
+        <h3>Incidencias Reportadas</h3>
+        <div class="header-actions">
+          <p>Total: {{totalIncidencias}} incidencias</p>
+          <ion-button fill="solid" (click)="abrirModalCrear()">
+            <ion-icon name="add-outline" slot="start"></ion-icon>
+            Nueva Incidencia
+          </ion-button>
+        </div>
+      </div>
+
+      <div *ngIf="loading" class="loading-container">
+        <ion-spinner></ion-spinner>
+        <p>Cargando incidencias...</p>
+      </div>
+
+      <div *ngIf="!loading && incidenciasPublicas.length === 0" class="empty-state">
+        <ion-icon name="document-outline"></ion-icon>
+        <h4>No hay incidencias</h4>
+        <p>No se encontraron incidencias con los filtros seleccionados.</p>
+      </div>
+
+      <ion-card *ngFor="let incidencia of incidenciasPublicas" class="incidencia-card" (click)="abrirDetalleIncidencia(incidencia)">
+        <ion-card-header>
+          <ion-card-subtitle>
+            <ion-badge [color]="getCategoriaColor(incidencia.categoria)">
+              {{getCategoriaLabel(incidencia.categoria)}}
+            </ion-badge>
+            <span class="fecha">{{incidencia.fecha_creacion ? formatearFecha(incidencia.fecha_creacion) : 'Sin fecha'}}</span>
+          </ion-card-subtitle>
+          <ion-card-title>{{incidencia.titulo}}</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <p>{{incidencia.descripcion}}</p>
+          <div class="incidencia-meta">
+            <ion-chip>
+              <ion-icon name="location-outline"></ion-icon>
+              <ion-label>{{getMunicipioNombre(incidencia.ciudad_id, incidencia.ciudad_nombre)}}</ion-label>
+            </ion-chip>
+            <ion-chip>
+              <ion-icon name="person-outline"></ion-icon>
+              <ion-label>{{incidencia.usuario_nombre || 'Usuario desconocido'}}</ion-label>
+            </ion-chip>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Paginación -->
+      <div class="pagination-container" *ngIf="!loading && totalPages > 1">
+        <ion-button fill="clear" [disabled]="currentPage === 1" (click)="irPagina(currentPage - 1)">
+          <ion-icon name="chevron-back-outline"></ion-icon>
+          Anterior
+        </ion-button>
+        <span class="page-info">Página {{currentPage}} de {{totalPages}}</span>
+        <ion-button fill="clear" [disabled]="currentPage === totalPages" (click)="irPagina(currentPage + 1)">
+          Siguiente
+          <ion-icon name="chevron-forward-outline"></ion-icon>
+        </ion-button>
+      </div>
+    </div>
+
+    <!-- Botón flotante para crear incidencia -->
+    <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+      <ion-fab-button (click)="abrirModalCrear()">
+        <ion-icon name="add"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
+  </div>
+
+  <!-- TAB: GESTIONAR (ADMIN) -->
+  <div *ngIf="tabActivo === 'gestionar' && esAdmin()" class="tab-content">
+    <div class="admin-header">
+      <h3>Gestión de Incidencias</h3>
+      <p>Panel de administración para revisar y gestionar incidencias</p>
+    </div>
+
+    <div *ngIf="loadingGestion" class="loading-container">
+      <ion-spinner></ion-spinner>
+      <p>Cargando datos de gestión...</p>
+    </div>
+
+    <!-- Sección Pendientes -->
+    <ion-card class="admin-section">
+      <ion-card-header (click)="toggleSection('pendientes')" class="section-toggle">
+        <ion-card-title>
+          <ion-icon [name]="expandedSection === 'pendientes' ? 'chevron-down-outline' : 'chevron-forward-outline'"></ion-icon>
+          Incidencias Pendientes ({{incidenciasPendientes.length}})
+        </ion-card-title>
+        <ion-card-subtitle>Requieren revisión y aprobación</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content *ngIf="expandedSection === 'pendientes'">
+        <div *ngIf="incidenciasPendientes.length === 0" class="empty-admin">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+          <p>No hay incidencias pendientes</p>
+        </div>
+
+        <div *ngFor="let incidencia of incidenciasPendientes" class="admin-incidencia">
+          <div class="incidencia-info">
+            <h4>{{incidencia.titulo}}</h4>
+            <p>{{incidencia.descripcion}}</p>
+            <div class="incidencia-details">
+              <ion-chip color="warning">{{getCategoriaLabel(incidencia.categoria)}}</ion-chip>
+              <ion-chip color="medium">{{getMunicipioNombre(incidencia.ciudad_id, incidencia.ciudad_nombre)}}</ion-chip>
+              <ion-chip color="light">{{incidencia.usuario_nombre || 'Usuario desconocido'}}</ion-chip>
+              <ion-chip color="light">{{incidencia.fecha_creacion ? formatearFecha(incidencia.fecha_creacion) : 'Sin fecha'}}</ion-chip>
+            </div>
+          </div>
+          <div class="incidencia-actions">
+            <ion-button color="success" size="small" (click)="incidencia.id && aprobarIncidencia(incidencia.id)">
+              <ion-icon name="checkmark-outline"></ion-icon>
+              Aprobar
+            </ion-button>
+            <ion-button color="danger" size="small" (click)="incidencia.id && rechazarIncidencia(incidencia.id)">
+              <ion-icon name="close-outline"></ion-icon>
+              Rechazar
+            </ion-button>
+            <ion-button color="primary" size="small" (click)="editarIncidencia(incidencia)">
+              <ion-icon name="create-outline"></ion-icon>
+              Editar
+            </ion-button>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Sección Publicadas -->
+    <ion-card class="admin-section">
+      <ion-card-header (click)="toggleSection('publicadas')" class="section-toggle">
+        <ion-card-title>
+          <ion-icon [name]="expandedSection === 'publicadas' ? 'chevron-down-outline' : 'chevron-forward-outline'"></ion-icon>
+          Incidencias Publicadas ({{incidenciasPublicas.length}})
+        </ion-card-title>
+        <ion-card-subtitle>Incidencias aprobadas y visibles públicamente</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content *ngIf="expandedSection === 'publicadas'">
+        <div *ngIf="incidenciasPublicas.length === 0" class="empty-admin">
+          <ion-icon name="document-outline"></ion-icon>
+          <p>No hay incidencias publicadas</p>
+        </div>
+
+        <div *ngFor="let incidencia of incidenciasPublicas" class="admin-incidencia">
+          <div class="incidencia-info">
+            <h4>{{incidencia.titulo}}</h4>
+            <p>{{incidencia.descripcion}}</p>
+            <div class="incidencia-details">
+              <ion-chip color="success">{{getCategoriaLabel(incidencia.categoria)}}</ion-chip>
+              <ion-chip color="medium">{{getMunicipioNombre(incidencia.ciudad_id, incidencia.ciudad_nombre)}}</ion-chip>
+              <ion-chip color="light">{{incidencia.usuario_nombre || 'Usuario desconocido'}}</ion-chip>
+              <ion-chip color="light">{{incidencia.fecha_creacion ? formatearFecha(incidencia.fecha_creacion) : 'Sin fecha'}}</ion-chip>
+            </div>
+          </div>
+          <div class="incidencia-actions">
+            <ion-button color="primary" size="small" (click)="editarIncidencia(incidencia)">
+              <ion-icon name="create-outline"></ion-icon>
+              Editar
+            </ion-button>
+            <ion-button color="danger" size="small" (click)="incidencia.id && eliminarIncidencia(incidencia.id)">
+              <ion-icon name="trash-outline"></ion-icon>
+              Eliminar
+            </ion-button>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Sección Rechazadas -->
+    <ion-card class="admin-section">
+      <ion-card-header (click)="toggleSection('rechazadas')" class="section-toggle">
+        <ion-card-title>
+          <ion-icon [name]="expandedSection === 'rechazadas' ? 'chevron-down-outline' : 'chevron-forward-outline'"></ion-icon>
+          Incidencias Rechazadas ({{incidenciasRechazadas.length}})
+        </ion-card-title>
+        <ion-card-subtitle>Incidencias que no fueron aprobadas</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content *ngIf="expandedSection === 'rechazadas'">
+        <div *ngIf="incidenciasRechazadas.length === 0" class="empty-admin">
+          <ion-icon name="ban-outline"></ion-icon>
+          <p>No hay incidencias rechazadas</p>
+        </div>
+
+        <div *ngFor="let incidencia of incidenciasRechazadas" class="admin-incidencia">
+          <div class="incidencia-info">
+            <h4>{{incidencia.titulo}}</h4>
+            <p>{{incidencia.descripcion}}</p>
+            <div class="incidencia-details">
+              <ion-chip color="danger">{{getCategoriaLabel(incidencia.categoria)}}</ion-chip>
+              <ion-chip color="medium">{{getMunicipioNombre(incidencia.ciudad_id, incidencia.ciudad_nombre)}}</ion-chip>
+              <ion-chip color="light">{{incidencia.usuario_nombre || 'Usuario desconocido'}}</ion-chip>
+              <ion-chip color="light">{{incidencia.fecha_creacion ? formatearFecha(incidencia.fecha_creacion) : 'Sin fecha'}}</ion-chip>
+            </div>
+          </div>
+          <div class="incidencia-actions">
+            <ion-button color="success" size="small" (click)="incidencia.id && aprobarIncidencia(incidencia.id)">
+              <ion-icon name="checkmark-outline"></ion-icon>
+              Aprobar
+            </ion-button>
+            <ion-button color="primary" size="small" (click)="editarIncidencia(incidencia)">
+              <ion-icon name="create-outline"></ion-icon>
+              Editar
+            </ion-button>
+            <ion-button color="danger" size="small" (click)="incidencia.id && eliminarIncidencia(incidencia.id)">
+              <ion-icon name="trash-outline"></ion-icon>
+              Eliminar
+            </ion-button>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Modal para crear/editar incidencia -->
+  <ion-modal #modalIncidencia class="crear-modal" [backdropDismiss]="true">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>{{modoEdicion ? 'Editar' : 'Nueva'}} Incidencia</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarModal()">
+              <ion-icon name="close"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content>
+        <form (ngSubmit)="guardarIncidencia()">
+          <ion-item>
+            <ion-label position="stacked">Título *</ion-label>
+            <ion-input
+              [(ngModel)]="nuevaIncidencia.titulo"
+              name="titulo"
+              placeholder="Describe brevemente la incidencia"
+              required>
+            </ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Categoría *</ion-label>
+            <ion-select [(ngModel)]="nuevaIncidencia.categoria" name="categoria" required>
+              <ion-select-option value="infraestructura">Infraestructura</ion-select-option>
+              <ion-select-option value="servicios_publicos">Servicios Públicos</ion-select-option>
+              <ion-select-option value="seguridad">Seguridad</ion-select-option>
+              <ion-select-option value="medio_ambiente">Medio Ambiente</ion-select-option>
+              <ion-select-option value="transporte">Transporte</ion-select-option>
+              <ion-select-option value="otros">Otros</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Municipio *</ion-label>
+            <ion-select [(ngModel)]="nuevaIncidencia.ciudad_id" name="ciudad_id" required>
+              <ion-select-option *ngFor="let municipio of municipios" [value]="municipio.id">
+                {{municipio.nombre}}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Descripción *</ion-label>
+            <ion-textarea
+              [(ngModel)]="nuevaIncidencia.descripcion"
+              name="descripcion"
+              placeholder="Describe detalladamente la incidencia"
+              rows="4"
+              required>
+            </ion-textarea>
+          </ion-item>
+
+          <div class="modal-actions">
+            <ion-button expand="block" type="submit" [disabled]="!validarFormulario()">
+              <ion-icon name="save-outline" slot="start"></ion-icon>
+              {{modoEdicion ? 'Actualizar' : 'Crear'}} Incidencia
+            </ion-button>
+            <ion-button expand="block" fill="clear" (click)="cerrarModal()">
+              Cancelar
+            </ion-button>
+          </div>
+        </form>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>

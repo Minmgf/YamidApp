@@ -139,3 +139,52 @@ ion-header {
     --max-height: 75vh;
   }
 }
+
+// Estilos para el modal de detalle de incidencia
+.detalle-incidencia-modal {
+  --width: 90%;
+  --max-width: 600px;
+  --height: 80vh;
+  --min-height: 500px;
+  --max-height: 85vh;
+  --border-radius: 16px;
+
+  .modal-wrapper {
+    height: 100%;
+    will-change: transform, opacity;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  ion-content {
+    --overflow: auto;
+    height: 100% !important;
+    --border-radius: 0 0 16px 16px;
+  }
+
+  ion-header {
+    --border-radius: 16px 16px 0 0;
+    border-radius: 16px 16px 0 0;
+  }
+
+  @media (max-width: 768px) {
+    --width: 95%;
+    --height: 85vh;
+    --min-height: 450px;
+    --max-height: 90vh;
+    --border-radius: 12px;
+
+    .modal-wrapper {
+      border-radius: 12px;
+    }
+
+    ion-header {
+      --border-radius: 12px 12px 0 0;
+      border-radius: 12px 12px 0 0;
+    }
+
+    ion-content {
+      --border-radius: 0 0 12px 12px;
+    }
+  }
+}
