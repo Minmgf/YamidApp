@@ -43,33 +43,154 @@
   padding: 16px;
   padding-bottom: 0;
 
-  ion-card {
-    --background: #f8f9fa;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  }
+  .seccion-card {
+    margin-bottom: 20px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.05);
 
-  ion-select {
-    --placeholder-color: #6c757d;
-    --color: #495057;
-    font-weight: 500;
-    min-height: 48px;
-    background: white;
-    border-radius: 8px;
-    border: 1px solid #dee2e6;
-    padding: 0 12px;
+    .seccion-header {
+      padding: 18px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: linear-gradient(135deg, #f8f9fa, #ffffff);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 
-    &::part(icon) {
-      color: var(--ion-color-primary);
+      &:hover {
+        background: linear-gradient(135deg, #e9ecef, #f8f9fa);
+        transform: translateY(-1px);
+      }
+
+      .seccion-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex: 1;
+
+        ion-icon {
+          font-size: 26px;
+          color: var(--ion-color-primary);
+        }
+
+        ion-card-title {
+          margin: 0;
+          font-weight: 700;
+          font-size: 1.2rem;
+          color: var(--ion-color-dark);
+        }
+
+        ion-badge {
+          border-radius: 16px;
+          font-weight: 700;
+          font-size: 0.85rem;
+          padding: 4px 10px;
+          min-width: 24px;
+          text-align: center;
+        }
+      }
+
+      ion-icon[name="chevron-down-outline"] {
+        font-size: 20px;
+        color: var(--ion-color-medium);
+        transition: transform 0.3s ease;
+      }
+
+      &.expanded ion-icon[name="chevron-down-outline"] {
+        transform: rotate(180deg);
+      }
+    }
+
+    ion-card-content {
+      padding: 20px;
+      background: white;
+
+      // Estilos para el nuevo layout de filtros
+      ion-row {
+        margin-bottom: 16px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+
+      // Primera fila: Búsqueda y limpiar
+      ion-row:first-child {
+        ion-searchbar {
+          --background: #f8f9fa;
+          --border-radius: 8px;
+          --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          --color: var(--ion-color-dark);
+          --placeholder-color: var(--ion-color-medium);
+          --icon-color: var(--ion-color-primary);
+          --clear-button-color: var(--ion-color-medium);
+          margin: 0;
+        }
+
+        .limpiar-btn {
+          --border-radius: 8px;
+          --color: var(--ion-color-medium);
+          --border-color: var(--ion-color-light);
+          border: 1px solid var(--ion-color-light);
+          height: 44px;
+          font-weight: 600;
+          font-size: 0.85rem;
+
+          ion-icon {
+            margin-right: 4px;
+          }
+        }
+      }
+
+      // Segunda fila: Filtros y botón buscar
+      ion-row:last-child {
+        .filter-select {
+          --placeholder-color: var(--ion-color-medium);
+          --color: var(--ion-color-dark);
+          background: #f8f9fa;
+          border-radius: 8px;
+          border: 1px solid rgba(0, 0, 0, 0.1);
+          padding: 12px;
+          height: 44px;
+        }
+
+        .search-btn {
+          --border-radius: 8px;
+          --background: var(--ion-color-primary);
+          height: 44px;
+
+          ion-icon {
+            font-size: 20px;
+          }
+        }
+      }
     }
   }
 
-  ion-button {
-    --border-radius: 10px;
-    font-weight: 500;
+  // Estilos específicos para elementos individuales
+  ion-item {
+    --background: transparent;
+    --border-radius: 8px;
+    --padding-start: 0;
+    --padding-end: 0;
+    margin-bottom: 12px;
 
-    ion-icon {
-      margin-right: 8px;
+    ion-label {
+      font-weight: 600;
+      color: var(--ion-color-dark);
+      margin-bottom: 8px;
+    }
+
+    ion-select {
+      --placeholder-color: var(--ion-color-medium);
+      --color: var(--ion-color-dark);
+      background: #f8f9fa;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      padding: 12px;
     }
   }
 }
@@ -288,10 +409,12 @@
   ion-card {
     background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-secondary));
     color: white;
+    margin-bottom: 20px;
 
     ion-card-title {
       color: white;
       font-weight: 600;
+      font-size: 1.3rem;
 
       ion-icon {
         margin-right: 8px;
@@ -300,7 +423,9 @@
     }
 
     ion-card-subtitle {
-      color: rgba(255, 255, 255, 0.8);
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 1rem;
+      margin-top: 4px;
     }
   }
 }
@@ -310,20 +435,25 @@
 }
 
 .seccion-card {
-  margin-bottom: 16px;
-  border-radius: 12px;
+  margin-bottom: 20px;
+  border-radius: 16px;
   overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
 
   .seccion-header {
-    padding: 16px;
+    padding: 18px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, #f8f9fa, #ffffff);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 
     &:hover {
-      background-color: var(--ion-color-light);
+      background: linear-gradient(135deg, #e9ecef, #f8f9fa);
+      transform: translateY(-1px);
     }
 
     .seccion-title {
@@ -333,61 +463,200 @@
       flex: 1;
 
       ion-icon {
-        font-size: 24px;
+        font-size: 26px;
+        color: var(--ion-color-primary);
       }
 
       ion-card-title {
         margin: 0;
-        font-weight: 600;
+        font-weight: 700;
+        font-size: 1.2rem;
+        color: var(--ion-color-dark);
       }
 
       ion-badge {
-        border-radius: 12px;
-        font-weight: 600;
+        border-radius: 16px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        padding: 4px 10px;
+        min-width: 24px;
+        text-align: center;
       }
+    }
+
+    ion-icon[name="chevron-down-outline"] {
+      font-size: 20px;
+      color: var(--ion-color-medium);
+      transition: transform 0.3s ease;
+    }
+
+    &.expanded ion-icon[name="chevron-down-outline"] {
+      transform: rotate(180deg);
     }
   }
 
   ion-card-content {
-    padding-top: 0;
+    padding: 0;
+    background: white;
+  }
+}
+
+// Estilos específicos para las incidencias en el panel admin
+.admin-incidencias-container {
+  max-height: 400px;
+  overflow-y: auto;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.admin-incidencia {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 16px 20px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  display: flex;
+  gap: 16px;
+  background: white;
+
+  &:hover {
+    background: #f8f9fa;
+    transform: translateX(4px);
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .incidencia-info {
+    flex: 1;
+    min-width: 0;
+
+    h4 {
+      margin: 0 0 8px 0;
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: var(--ion-color-dark);
+      line-height: 1.3;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    p {
+      margin: 0 0 12px 0;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      color: var(--ion-color-medium-shade);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .incidencia-details {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+
+      ion-chip {
+        font-size: 0.75rem;
+        height: 24px;
+        border-radius: 12px;
+        font-weight: 500;
+
+        &[color="success"] {
+          --background: rgba(45, 211, 111, 0.1);
+          --color: #2dd36f;
+        }
+
+        &[color="medium"] {
+          --background: rgba(146, 148, 156, 0.1);
+          --color: #92949c;
+        }
+
+        &[color="light"] {
+          --background: rgba(244, 245, 248, 0.8);
+          --color: #495057;
+          border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+      }
+    }
+  }
+
+  .incidencia-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 100px;
+    align-items: flex-end;
+
+    ion-button {
+      --border-radius: 8px;
+      height: 32px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      min-width: 90px;
+
+      ion-icon {
+        font-size: 16px;
+        margin-right: 4px;
+      }
+    }
   }
 }
 
 .no-items {
   text-align: center;
-  padding: 32px 16px;
+  padding: 40px 20px;
   color: var(--ion-color-medium);
+  background: white;
 
   ion-icon {
-    font-size: 48px;
+    font-size: 64px;
     margin-bottom: 16px;
+    color: var(--ion-color-light-shade);
+  }
+
+  h4 {
+    margin: 0 0 8px 0;
+    font-weight: 600;
+    color: var(--ion-color-medium);
   }
 
   p {
     margin: 0;
     font-style: italic;
+    font-size: 0.9rem;
   }
 }
 
 .item-gestion {
   border: 1px solid var(--ion-color-light);
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 16px;
   margin-bottom: 12px;
   background: var(--ion-color-step-50);
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
 
   .item-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     gap: 12px;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
 
     h4 {
       margin: 0;
       font-weight: 600;
       flex: 1;
       line-height: 1.3;
+      font-size: 1.1rem;
     }
 
     .item-badges {
@@ -651,7 +920,84 @@ ion-button {
 // RESPONSIVE
 // ==========================================
 
+// ==========================================
+// RESPONSIVE PARA GESTIÓN Y FILTROS
+// ==========================================
+
 @media (max-width: 768px) {
+  .admin-incidencia {
+    flex-direction: column;
+    gap: 12px;
+
+    .incidencia-actions {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-around;
+      min-width: auto;
+
+      ion-button {
+        flex: 1;
+        margin: 0 2px;
+        min-width: auto;
+
+        ion-icon {
+          display: none;
+        }
+      }
+    }
+  }
+
+  .seccion-title {
+    flex-wrap: wrap;
+    gap: 8px !important;
+
+    ion-card-title {
+      font-size: 1.1rem !important;
+    }
+  }
+
+  .admin-incidencias-container {
+    max-height: 300px;
+  }
+
+  // Responsive para filtros
+  .filtros-container {
+    .seccion-card {
+      ion-card-content {
+        // En móviles, cambiar a layout vertical
+        ion-row:first-child {
+          ion-col:first-child {
+            size: 12;
+          }
+          ion-col:last-child {
+            size: 12;
+            margin-top: 8px;
+          }
+        }
+
+        ion-row:last-child {
+          ion-col {
+            size: 12;
+            margin-bottom: 8px;
+
+            &:last-child {
+              margin-bottom: 0;
+            }
+          }
+        }
+
+        .limpiar-btn {
+          width: 100%;
+          justify-content: center;
+        }
+
+        .search-btn {
+          width: 100%;
+        }
+      }
+    }
+  }
+
   .incidencia-header {
     flex-direction: column;
     align-items: flex-start !important;
@@ -675,36 +1021,6 @@ ion-button {
     }
   }
 
-  .info-row {
-    flex-direction: column;
-    align-items: flex-start !important;
-    gap: 8px !important;
-
-    strong {
-      min-width: auto !important;
-    }
-  }
-
-  .item-gestion {
-    .item-header {
-      flex-direction: column;
-      align-items: flex-start !important;
-
-      .item-badges {
-        align-self: flex-end;
-      }
-    }
-
-    .item-acciones {
-      justify-content: center;
-    }
-  }
-
-  .seccion-title {
-    flex-wrap: wrap;
-    gap: 8px !important;
-  }
-
   .tabs-container {
     ion-segment {
       ion-segment-button {
@@ -717,10 +1033,102 @@ ion-button {
       }
     }
   }
+}// ==========================================
+// ESTADOS VACÍOS MEJORADOS
+// ==========================================
+
+.no-items {
+  text-align: center;
+  padding: 50px 20px;
+  color: var(--ion-color-medium);
+  background: linear-gradient(135deg, #fafbfc, #ffffff);
+
+  ion-icon {
+    font-size: 72px;
+    margin-bottom: 20px;
+    color: var(--ion-color-light-shade);
+    opacity: 0.7;
+  }
+
+  h4 {
+    margin: 0 0 12px 0;
+    font-weight: 600;
+    color: var(--ion-color-medium);
+    font-size: 1.1rem;
+  }
+
+  p {
+    margin: 0;
+    font-style: italic;
+    font-size: 0.9rem;
+    opacity: 0.8;
+  }
 }
 
 // ==========================================
-// ANIMACIONES
+// ANIMACIONES MEJORADAS
+// ==========================================
+
+.admin-incidencia {
+  animation: slideInLeft 0.3s ease-out;
+
+  &:hover {
+    animation: none;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.seccion-card {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ==========================================
+// MEJORAS DE ACCESIBILIDAD
+// ==========================================
+
+.seccion-header {
+  &:focus {
+    outline: 2px solid var(--ion-color-primary);
+    outline-offset: 2px;
+  }
+}
+
+.admin-incidencia {
+  &:focus {
+    outline: 2px solid var(--ion-color-primary);
+    outline-offset: 2px;
+  }
+}
+
+ion-button[size="small"] {
+  &:focus {
+    box-shadow: 0 0 0 2px var(--ion-color-primary-tint);
+  }
+}
+
+// ==========================================
+// ANIMACIONES Y TRANSICIONES
 // ==========================================
 
 @keyframes slideIn {
@@ -734,12 +1142,42 @@ ion-button {
   }
 }
 
-.item-gestion {
-  animation: slideIn 0.3s ease-out;
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .incidencia-card {
   animation: slideIn 0.3s ease-out;
+}
+
+.admin-incidencia {
+  animation: slideInLeft 0.3s ease-out;
+
+  &:hover {
+    animation: none;
+  }
+}
+
+.seccion-card {
+  animation: fadeInUp 0.4s ease-out;
 }
 
 // ==========================================

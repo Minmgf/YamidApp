@@ -34,6 +34,7 @@ export class BlogPage implements OnInit, AfterViewInit {
   // Variables para filtros (tab público)
   filtroCategoria = '';
   filtroMunicipio = '';
+  textoBusqueda = '';
 
   // Variables para paginación (tab público)
   currentPage = 1;
@@ -42,7 +43,7 @@ export class BlogPage implements OnInit, AfterViewInit {
   limit = 10;
 
   // Variables para gestión (tab admin)
-  expandedSection: 'pendientes' | 'publicadas' | 'rechazadas' | null = null;
+  expandedSection: 'pendientes' | 'publicadas' | 'rechazadas' | 'filtros' | null = null;
 
   // Variables para nueva incidencia
   nuevaIncidencia: Partial<Incidencia> = {
@@ -164,6 +165,10 @@ export class BlogPage implements OnInit, AfterViewInit {
 
       if (this.filtroMunicipio) {
         filtros.ciudad_id = parseInt(this.filtroMunicipio.toString());
+      }
+
+      if (this.textoBusqueda && this.textoBusqueda.trim()) {
+        filtros.busqueda = this.textoBusqueda.trim();
       }
 
       console.log('🔍 Iniciando carga de incidencias...');
@@ -310,6 +315,7 @@ export class BlogPage implements OnInit, AfterViewInit {
   limpiarFiltros() {
     this.filtroCategoria = '';
     this.filtroMunicipio = '';
+    this.textoBusqueda = '';
     this.aplicarFiltros();
   }
 
@@ -324,10 +330,33 @@ export class BlogPage implements OnInit, AfterViewInit {
   }
 
   /**
-   * Toggle sección expandida en admin
+   * Toggle sección expandida en admin y filtros
    */
-  toggleSection(section: 'pendientes' | 'publicadas' | 'rechazadas') {
+  toggleSection(section: 'pendientes' | 'publicadas' | 'rechazadas' | 'filtros') {
     this.expandedSection = this.expandedSection === section ? null : section;
+  }
+
+  /**
+   * Verificar si hay filtros activos
+   */
+  tieneFiltrosActivos(): boolean {
+    return !!(this.filtroCategoria || this.filtroMunicipio || this.textoBusqueda);
+  }
+
+  /**
+   * Buscar incidencias por texto
+   */
+  buscarIncidencias(event: any) {
+    this.textoBusqueda = event.target.value || '';
+    this.aplicarFiltros();
+  }
+
+  /**
+   * Limpiar búsqueda de texto
+   */
+  limpiarBusqueda() {
+    this.textoBusqueda = '';
+    this.aplicarFiltros();
   }
 
   /**
