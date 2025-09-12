@@ -17,11 +17,11 @@
   <div class="tabs-container">
     <ion-segment [(ngModel)]="tabActivo" (ionChange)="cambiarTab($event.detail.value)">
       <ion-segment-button value="incidencias">
-        <ion-icon name="newspaper-outline"></ion-icon>
+        <!-- <ion-icon name="newspaper-outline"></ion-icon> -->
         <ion-label>Ver Incidencias</ion-label>
       </ion-segment-button>
       <ion-segment-button value="gestionar" *ngIf="esAdmin()">
-        <ion-icon name="settings-outline"></ion-icon>
+        <!-- <ion-icon name="settings-outline"></ion-icon> -->
         <ion-label>Gestionar</ion-label>
       </ion-segment-button>
     </ion-segment>

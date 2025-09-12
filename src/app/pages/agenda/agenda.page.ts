@@ -29,6 +29,8 @@ export class AgendaPage implements OnInit {
   // Controles de vista y filtros
   vistaActual: 'eventos' | 'gestion' = 'eventos';
   filtroMunicipio: number | 'todos' = 'todos';
+  filtroMes: string = '';
+  expandedSection: 'filtros' | null = null;
   isSuperAdmin: boolean = false;
 
   constructor(
@@ -215,14 +217,49 @@ export class AgendaPage implements OnInit {
   /**
    * Cambia la vista actual
    */
-  cambiarVista(vista: 'eventos' | 'gestion') {
-    this.vistaActual = vista;
-    // Actualizar la URL con el parámetro de vista para preservar el estado
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: { vista: vista },
-      queryParamsHandling: 'merge'
-    });
+  cambiarVista(vista: 'eventos' | 'gestion' | any) {
+    // Validar que sea un valor válido
+    if (vista === 'eventos' || vista === 'gestion') {
+      this.vistaActual = vista;
+      // Actualizar la URL con el parámetro de vista para preservar el estado
+      this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { vista: vista },
+        queryParamsHandling: 'merge'
+      });
+    }
+  }
+
+  /**
+   * Toggle sección expandida en filtros
+   */
+  toggleSection(section: 'filtros') {
+    this.expandedSection = this.expandedSection === section ? null : section;
+  }
+
+  /**
+   * Verificar si hay filtros activos
+   */
+  tieneFiltrosActivos(): boolean {
+    return !!(this.filtroMunicipio !== 'todos' || this.filtroMes);
+  }
+
+  /**
+   * Aplicar filtros de eventos
+   */
+  aplicarFiltros() {
+    this.aplicarFiltroMunicipio(this.filtroMunicipio);
+    // Aquí puedes agregar lógica adicional para el filtro de mes
+    console.log('Aplicando filtros:', { municipio: this.filtroMunicipio, mes: this.filtroMes });
+  }
+
+  /**
+   * Limpiar todos los filtros
+   */
+  limpiarFiltros() {
+    this.filtroMunicipio = 'todos';
+    this.filtroMes = '';
+    this.aplicarFiltros();
   }
 
   /**

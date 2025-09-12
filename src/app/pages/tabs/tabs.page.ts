@@ -45,13 +45,13 @@ export class TabsPage implements OnInit, OnDestroy {
         href: '/tabs/dashboard',
         visible: (user) => this.authService.hasPermission('dashboard')
       },
-      {
-        label: 'Municipios',
-        icon: 'map-outline',
-        tab: 'municipios',
-        href: '/tabs/municipios',
-        visible: (user) => this.authService.hasPermission('municipios')
-      },
+      // {
+      //   label: 'Municipios',
+      //   icon: 'map-outline',
+      //   tab: 'municipios',
+      //   href: '/tabs/municipios',
+      //   visible: (user) => this.authService.hasPermission('municipios')
+      // },
       {
         label: 'Agenda',
         icon: 'calendar-outline',

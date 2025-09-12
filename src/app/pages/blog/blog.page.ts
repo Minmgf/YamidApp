@@ -195,7 +195,7 @@ export class BlogPage implements OnInit, AfterViewInit {
       }      // Si no hay datos del servidor, mostrar datos de prueba
       if (this.incidenciasPublicas.length === 0) {
         console.log('🔄 No hay incidencias del servidor, mostrando datos de prueba');
-        this.mostrarDatosPrueba();
+        // this.mostrarDatosPrueba();
       }
 
     } catch (error) {
@@ -208,7 +208,7 @@ export class BlogPage implements OnInit, AfterViewInit {
       }
 
       await this.mostrarToast('Error al cargar incidencias, mostrando datos de prueba', 'warning');
-      this.mostrarDatosPrueba();
+      // this.mostrarDatosPrueba();
     } finally {
       this.loading = false;
     }
@@ -217,61 +217,61 @@ export class BlogPage implements OnInit, AfterViewInit {
   /**
    * Mostrar datos de prueba
    */
-  mostrarDatosPrueba() {
-    this.incidenciasPublicas = [
-      {
-        id: 1,
-        titulo: 'Semáforo dañado en el centro',
-        categoria: 'infraestructura',
-        descripcion: 'El semáforo de la intersección principal está intermitente desde hace 3 días, causando problemas de tráfico.',
-        ciudad_id: 1,
-        ciudad_nombre: 'Bogotá',
-        usuario_id: 1,
-        fecha_creacion: '2025-09-05T10:30:00Z',
-        estado: 'publicada',
-        autor: 'Juan Pérez'
-      },
-      {
-        id: 2,
-        titulo: 'Falta de alumbrado público',
-        categoria: 'servicios_publicos',
-        descripcion: 'La calle 15 con carrera 20 no tiene alumbrado público desde hace una semana.',
-        ciudad_id: 2,
-        ciudad_nombre: 'Medellín',
-        usuario_id: 2,
-        fecha_creacion: '2025-09-04T15:45:00Z',
-        estado: 'publicada',
-        autor: 'María García'
-      },
-      {
-        id: 3,
-        titulo: 'Hueco en la vía principal',
-        categoria: 'infraestructura',
-        descripcion: 'Hay un hueco grande en la carrera 30 que está afectando el tránsito vehicular.',
-        ciudad_id: 1,
-        ciudad_nombre: 'Bogotá',
-        usuario_id: 3,
-        fecha_creacion: '2025-09-03T08:20:00Z',
-        estado: 'publicada',
-        autor: 'Carlos Rodríguez'
-      },
-      {
-        id: 4,
-        titulo: 'Contaminación del río',
-        categoria: 'medio_ambiente',
-        descripcion: 'Se observa contaminación del río con residuos industriales en el sector norte.',
-        ciudad_id: 3,
-        ciudad_nombre: 'Cali',
-        usuario_id: 4,
-        fecha_creacion: '2025-09-02T12:10:00Z',
-        estado: 'publicada',
-        autor: 'Ana López'
-      }
-    ];
-    this.totalIncidencias = this.incidenciasPublicas.length;
-    this.totalPages = 1;
-    console.log('Datos de prueba cargados:', this.incidenciasPublicas);
-  }
+  // mostrarDatosPrueba() {
+  //   this.incidenciasPublicas = [
+  //     {
+  //       id: 1,
+  //       titulo: 'Semáforo dañado en el centro',
+  //       categoria: 'infraestructura',
+  //       descripcion: 'El semáforo de la intersección principal está intermitente desde hace 3 días, causando problemas de tráfico.',
+  //       ciudad_id: 1,
+  //       ciudad_nombre: 'Bogotá',
+  //       usuario_id: 1,
+  //       fecha_creacion: '2025-09-05T10:30:00Z',
+  //       estado: 'publicada',
+  //       autor: 'Juan Pérez'
+  //     },
+  //     {
+  //       id: 2,
+  //       titulo: 'Falta de alumbrado público',
+  //       categoria: 'servicios_publicos',
+  //       descripcion: 'La calle 15 con carrera 20 no tiene alumbrado público desde hace una semana.',
+  //       ciudad_id: 2,
+  //       ciudad_nombre: 'Medellín',
+  //       usuario_id: 2,
+  //       fecha_creacion: '2025-09-04T15:45:00Z',
+  //       estado: 'publicada',
+  //       autor: 'María García'
+  //     },
+  //     {
+  //       id: 3,
+  //       titulo: 'Hueco en la vía principal',
+  //       categoria: 'infraestructura',
+  //       descripcion: 'Hay un hueco grande en la carrera 30 que está afectando el tránsito vehicular.',
+  //       ciudad_id: 1,
+  //       ciudad_nombre: 'Bogotá',
+  //       usuario_id: 3,
+  //       fecha_creacion: '2025-09-03T08:20:00Z',
+  //       estado: 'publicada',
+  //       autor: 'Carlos Rodríguez'
+  //     },
+  //     {
+  //       id: 4,
+  //       titulo: 'Contaminación del río',
+  //       categoria: 'medio_ambiente',
+  //       descripcion: 'Se observa contaminación del río con residuos industriales en el sector norte.',
+  //       ciudad_id: 3,
+  //       ciudad_nombre: 'Cali',
+  //       usuario_id: 4,
+  //       fecha_creacion: '2025-09-02T12:10:00Z',
+  //       estado: 'publicada',
+  //       autor: 'Ana López'
+  //     }
+  //   ];
+  //   this.totalIncidencias = this.incidenciasPublicas.length;
+  //   this.totalPages = 1;
+  //   console.log('Datos de prueba cargados:', this.incidenciasPublicas);
+  // }
 
   /**
    * Cargar datos para gestión (admin)

@@ -7,6 +7,18 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
+  <!-- Navigation Tabs (Solo para Super Admin) -->
+  <div class="tabs-container" *ngIf="isSuperAdmin">
+    <ion-segment [(ngModel)]="vistaActual" (ionChange)="cambiarVista($event.detail.value)">
+      <ion-segment-button value="eventos">
+        <ion-label>Ver Eventos</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="gestion">
+        <ion-label>Gestionar</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </div>
+
   <!-- Título -->
   <div class="page-header">
     <ion-title size="large">
@@ -16,58 +28,78 @@
       <span *ngIf="!isSuperAdmin">Próximos Eventos - {{ currentUser?.municipio }}</span>
     </ion-title>
     <p class="subtitle">{{ formatDate(fechaActual.toISOString()) }}</p>
+  </div>
 
-    <!-- Controles para Super Admin -->
-    <div *ngIf="isSuperAdmin" class="admin-controls">
-      <!-- Botones de vista -->
-      <div class="view-buttons">
-        <ion-button
-          [fill]="vistaActual === 'eventos' ? 'solid' : 'outline'"
-          size="small"
-          color="primary"
-          (click)="cambiarVista('eventos')">
-          <ion-icon name="calendar" slot="start"></ion-icon>
-          Ver Eventos
-        </ion-button>
-
-        <ion-button
-          [fill]="vistaActual === 'gestion' ? 'solid' : 'outline'"
-          size="small"
-          color="secondary"
-          (click)="cambiarVista('gestion')">
-          <ion-icon name="settings" slot="start"></ion-icon>
-          Gestionar
-        </ion-button>
+  <!-- Filtros y Búsqueda -->
+  <div class="filtros-container">
+    <ion-card class="seccion-card">
+      <div class="seccion-header" (click)="toggleSection('filtros')" [class.expanded]="expandedSection === 'filtros'">
+        <div class="seccion-title">
+          <ion-icon name="options-outline"></ion-icon>
+          <ion-card-title>Filtros</ion-card-title>
+          <ion-badge color="primary" *ngIf="tieneFiltrosActivos()">Activos</ion-badge>
+        </div>
+        <ion-icon name="chevron-down-outline"></ion-icon>
       </div>
-    </div>
+      <ion-card-content *ngIf="expandedSection === 'filtros'">
+        <!-- Filtros en una sola fila -->
+        <ion-row>
+          <ion-col size="6">
+            <ion-item>
+              <!-- <ion-label>Municipio</ion-label> -->
+              <ion-select [(ngModel)]="filtroMunicipio" placeholder="Todos los municipios" (ionChange)="aplicarFiltroMunicipio($event.detail.value)">
+                <ion-select-option value="todos">Todos los municipios</ion-select-option>
+                <ion-select-option *ngFor="let municipio of municipios" [value]="municipio.id">
+                  {{municipio.nombre}}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+          </ion-col>
+          <ion-col size="6">
+            <ion-item>
+              <!-- <ion-label>Mes</ion-label> -->
+              <ion-select [(ngModel)]="filtroMes" placeholder="Todos los meses" (ionChange)="aplicarFiltros()">
+                <ion-select-option value="">Todos los meses</ion-select-option>
+                <ion-select-option value="1">Enero</ion-select-option>
+                <ion-select-option value="2">Febrero</ion-select-option>
+                <ion-select-option value="3">Marzo</ion-select-option>
+                <ion-select-option value="4">Abril</ion-select-option>
+                <ion-select-option value="5">Mayo</ion-select-option>
+                <ion-select-option value="6">Junio</ion-select-option>
+                <ion-select-option value="7">Julio</ion-select-option>
+                <ion-select-option value="8">Agosto</ion-select-option>
+                <ion-select-option value="9">Septiembre</ion-select-option>
+                <ion-select-option value="10">Octubre</ion-select-option>
+                <ion-select-option value="11">Noviembre</ion-select-option>
+                <ion-select-option value="12">Diciembre</ion-select-option>
+              </ion-select>
+            </ion-item>
+          </ion-col>
+        </ion-row>
 
-    <!-- Filtro por municipio (Para todos los usuarios) -->
-    <div class="filter-section">
-      <ion-item lines="none">
-        <ion-label>Filtrar por municipio:</ion-label>
-        <ion-select
-          [(ngModel)]="filtroMunicipio"
-          (ionChange)="aplicarFiltroMunicipio($event.detail.value)"
-          placeholder="Todos">
-          <ion-select-option value="todos">Todos los municipios</ion-select-option>
-          <ion-select-option
-            *ngFor="let municipio of municipios"
-            [value]="municipio.id">
-            {{ municipio.nombre }}
-          </ion-select-option>
-        </ion-select>
-      </ion-item>
-    </div>
+        <!-- Botones de acción -->
+        <div class="filter-actions">
+          <ion-button expand="block" fill="clear" (click)="limpiarFiltros()">
+            <ion-icon name="refresh-outline" slot="start"></ion-icon>
+            Limpiar Filtros
+          </ion-button>
+          <ion-button expand="block" fill="solid" (click)="aplicarFiltros()">
+            <ion-icon name="search-outline" slot="start"></ion-icon>
+            Aplicar Filtros
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
 
-    <!-- Botones de debug (temporales) -->
-    <div class="debug-buttons" *ngIf="!isSuperAdmin">
-      <ion-button size="small" fill="outline" color="warning" (click)="testEventosAPI()">
-        Debug Eventos API
-      </ion-button>
-      <ion-button size="small" fill="outline" color="success" (click)="recargarEventos()">
-        Recargar Eventos
-      </ion-button>
-    </div>
+  <!-- Botones de debug (temporales) -->
+  <div class="debug-buttons" *ngIf="!isSuperAdmin">
+    <ion-button size="small" fill="outline" color="warning" (click)="testEventosAPI()">
+      Debug Eventos API
+    </ion-button>
+    <ion-button size="small" fill="outline" color="success" (click)="recargarEventos()">
+      Recargar Eventos
+    </ion-button>
   </div>
 
   <!-- Loading -->

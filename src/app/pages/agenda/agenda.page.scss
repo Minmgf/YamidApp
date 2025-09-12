@@ -1,3 +1,43 @@
+// ==========================================
+// ESTILOS GENERALES Y TABS
+// ==========================================
+
+.tabs-container {
+  padding: 16px;
+  padding-bottom: 0;
+
+  ion-segment {
+    border-radius: 12px;
+    background: var(--ion-color-light);
+    --background: var(--ion-color-light);
+    --indicator-color: transparent;
+    --indicator-height: 0;
+
+    ion-segment-button {
+      border-radius: 10px;
+      margin: 2px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      --border-width: 0;
+      --border-style: none;
+
+      &.segment-button-checked {
+        background: var(--ion-color-primary);
+        color: white;
+        box-shadow: 0 2px 8px rgba(var(--ion-color-primary-rgb), 0.3);
+        --border-width: 0;
+        --border-style: none;
+        --indicator-color: transparent;
+      }
+
+      ion-label {
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
 .page-header {
   padding: 16px;
   background: var(--ion-background-color);
@@ -14,47 +54,132 @@
     margin: 0 0 16px 0;
     font-weight: 500;
   }
+}
 
-  // Controles para Super Admin
-  .admin-controls {
-    margin: 16px 0;
+// ==========================================
+// FILTROS (ESTILO BLOG)
+// ==========================================
 
-    .view-buttons {
+.filtros-container {
+  padding: 16px;
+  padding-bottom: 0;
+
+  .seccion-card {
+    margin-bottom: 20px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+
+    .seccion-header {
+      padding: 18px 20px;
       display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: linear-gradient(135deg, #f8f9fa, #ffffff);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 
-      ion-button {
-        flex: 1;
+      &:hover {
+        background: linear-gradient(135deg, #e9ecef, #f8f9fa);
+        transform: translateY(-1px);
       }
-    }
 
-    .filter-section {
-      ion-item {
-        --background: var(--ion-color-light);
-        --border-radius: 8px;
-        --padding-start: 16px;
-        --padding-end: 16px;
+      .seccion-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex: 1;
 
-        ion-label {
-          font-weight: 500;
+        ion-icon {
+          font-size: 26px;
+          color: var(--ion-color-primary);
+        }
+
+        ion-card-title {
+          margin: 0;
+          font-weight: 700;
+          font-size: 1.2rem;
           color: var(--ion-color-dark);
         }
 
-        ion-select {
-          --placeholder-color: var(--ion-color-medium);
+        ion-badge {
+          border-radius: 16px;
+          font-weight: 700;
+          font-size: 0.85rem;
+          padding: 4px 10px;
+          min-width: 24px;
+          text-align: center;
         }
+      }
+
+      ion-icon[name="chevron-down-outline"] {
+        font-size: 20px;
+        color: var(--ion-color-medium);
+        transition: transform 0.3s ease;
+      }
+
+      &.expanded ion-icon[name="chevron-down-outline"] {
+        transform: rotate(180deg);
+      }
+    }
+
+    ion-card-content {
+      padding: 20px;
+      background: white;
+    }
+  }
+
+  // Estilos para filtros
+  .filter-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 4px;
+
+    ion-button {
+      --border-radius: 12px;
+      font-weight: 600;
+      flex: 1;
+
+      &[fill="clear"] {
+        --color: var(--ion-color-medium);
+        --border-color: var(--ion-color-light);
+        border: 1px solid var(--ion-color-light);
+      }
+
+      &[fill="solid"] {
+        --background: var(--ion-color-primary);
       }
     }
   }
 
-  .debug-buttons {
-    display: flex;
-    gap: 8px;
-    margin-top: 16px;
+  ion-item {
+    --background: transparent;
+    --border-radius: 8px;
+    --padding-start: 0;
+    --padding-end: 0;
+    --inner-padding-end: 0;
+    // margin-bottom: 12px;
 
-    ion-button {
-      flex: 1;
+    ion-label {
+      font-weight: 600;
+      color: var(--ion-color-dark);
+      margin-bottom: 8px;
+    }
+
+    ion-select {
+      --placeholder-color: var(--ion-color-medium);
+      --color: var(--ion-color-dark);
+      --padding-end: 0;
+      --inner-padding-end: 0;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      padding: 0px 12px;
+      padding-right: 8px !important;
+      width: 100%;
+      margin-right: 0 !important;
     }
   }
 }
@@ -402,6 +527,19 @@ ion-fab {
 
 // Responsive design
 @media (max-width: 768px) {
+  .tabs-container {
+    ion-segment {
+      ion-segment-button {
+        flex-direction: column;
+        // padding: 8px 4px;
+
+        ion-label {
+          font-size: 0.8rem;
+        }
+      }
+    }
+  }
+
   .evento-card {
     .evento-header {
       flex-direction: column;
