@@ -5,21 +5,34 @@
 <ion-content class="dash" [scrollY]="true" fullscreen>
 
 
+  <!-- Navigation Tabs para el mapa -->
+  <div class="map-tabs-container">
+    <ion-segment [(ngModel)]="tabMapaActivo" (ionChange)="cambiarTabMapa($event.detail.value)">
+      <ion-segment-button value="votantes">
+        <ion-label>Mapa x Votantes</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="incidencias">
+        <ion-label>Mapa x Incidencias</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </div>
+
   <!-- 🗺️ MAPA -->
   <div id="map-wrapper">
     <div id="map"></div>
 
-    <!-- Overlay clickeable para abrir mapa detallado -->
-    <div class="map-overlay" (click)="openDetailedMap()">
+    <!-- Overlay clickeable para abrir mapa detallado correspondiente -->
+    <div class="map-overlay" (click)="abrirMapaDetallado()">
       <div class="map-expand-hint">
       </div>
     </div>
 
     <div class="leyenda">
-      <div class="leyenda-title">Votantes por Municipio</div>
-      <div><span class="color rojo"></span> Alta densidad (70%+)</div>
+      <div class="leyenda-title" *ngIf="tabMapaActivo === 'votantes'">Votantes por Municipio</div>
+      <div class="leyenda-title" *ngIf="tabMapaActivo === 'incidencias'">Incidencias por Municipio</div>
+      <!-- <div><span class="color rojo"></span> Alta densidad (70%+)</div>
       <div><span class="color amarillo"></span> Media densidad (40-70%)</div>
-      <div><span class="color verde"></span> Baja densidad (&lt;40%)</div>
+      <div><span class="color verde"></span> Baja densidad (&lt;40%)</div> -->
     </div>
   </div>
 

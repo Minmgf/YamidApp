@@ -21,6 +21,106 @@
     <p>Cargando datos del mapa...</p>
   </div>
 
+  <!-- Botón de ayuda flotante en esquina superior derecha -->
+  <ion-button
+    (click)="toggleLegend()"
+    class="help-button"
+    fill="clear"
+    shape="round">
+    <ion-icon name="help-circle" slot="icon-only"></ion-icon>
+  </ion-button>
+
+  <!-- Leyenda desplegable -->
+  <div class="legend-backdrop" [class.show]="showLegend" (click)="closeLegend()"></div>
+  <div class="legend-panel" [class.show]="showLegend" (click)="$event.stopPropagation()">
+    <div class="legend-header">
+      <h4>Leyenda del Mapa</h4>
+      <ion-button (click)="toggleLegend()" fill="clear" size="small">
+        <ion-icon name="close" slot="icon-only"></ion-icon>
+      </ion-button>
+    </div>
+
+    <div class="legend-content">
+      <!-- Explicación de densidad -->
+      <div class="legend-section">
+        <h5>Densidad de Usuarios</h5>
+        <div class="legend-items">
+          <div class="legend-item">
+            <span class="legend-circle high-density"></span>
+            <span class="legend-text">
+              <strong>Alta:</strong> 70%+ usuarios activos<br>
+              <small>Zonas con mayor participación</small>
+            </span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-circle medium-density"></span>
+            <span class="legend-text">
+              <strong>Media:</strong> 40-70% usuarios activos<br>
+              <small>Zonas con participación moderada</small>
+            </span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-circle low-density"></span>
+            <span class="legend-text">
+              <strong>Baja:</strong> Menos del 40% activos<br>
+              <small>Zonas con poca participación</small>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Explicación de los círculos -->
+      <div class="legend-section">
+        <h5>Elementos del Mapa</h5>
+        <div class="legend-items">
+          <div class="legend-item">
+            <span class="legend-circle heat-circle"></span>
+            <span class="legend-text">
+              <strong>Círculos de Calor:</strong><br>
+              <small>El tamaño indica la cantidad total de usuarios</small>
+            </span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-number">123</span>
+            <span class="legend-text">
+              <strong>Número Central:</strong><br>
+              <small>Cantidad exacta de usuarios en el municipio</small>
+            </span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-border"></span>
+            <span class="legend-text">
+              <strong>Límites Municipales:</strong><br>
+              <small>Bordes punteados definen cada municipio</small>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Explicación de estados -->
+      <div class="legend-section">
+        <h5>Estados de Usuarios</h5>
+        <div class="status-legends">
+          <div class="status-item">
+            <ion-icon name="checkmark-circle-outline" class="status-icon active"></ion-icon>
+            <span>Usuario Activo</span>
+          </div>
+          <div class="status-item">
+            <ion-icon name="pause-circle-outline" class="status-icon inactive"></ion-icon>
+            <span>Usuario Inactivo</span>
+          </div>
+          <div class="status-item">
+            <ion-icon name="bar-chart-outline" class="status-icon progress"></ion-icon>
+            <span>Porcentaje de Actividad</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Instrucciones de uso -->
+
+    </div>
+  </div>
+
   <!-- Mapa principal que ocupa toda la pantalla -->
   <div id="detailed-map" class="detailed-map-container"></div>
 
@@ -42,32 +142,7 @@
     </div>
   </div> -->
 
-  <!-- Información flotante -->
-  <div class="info-panel" *ngIf="!isLoading">
-    <div class="info-header">
-      <h3>Departamento del Huila</h3>
-      <p>{{ heatmapData.length }} municipios • {{ totalUsuarios }} usuarios totales</p>
-    </div>
-
-    <!-- Leyenda -->
-    <div class="legend">
-      <div class="legend-title">Densidad de Usuarios</div>
-      <div class="legend-items">
-        <div class="legend-item">
-          <span class="legend-color high"></span>
-          <span>Alta (70%+)</span>
-        </div>
-        <div class="legend-item">
-          <span class="legend-color medium"></span>
-          <span>Media (40-70%)</span>
-        </div>
-        <div class="legend-item">
-          <span class="legend-color low"></span>
-          <span>Baja (&lt;40%)</span>
-        </div>
-      </div>
-    </div>
-  </div>  <!-- FAB para volver al dashboard -->
+  <!-- FAB para volver al dashboard -->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button (click)="goBack()" color="primary">
       <ion-icon name="home"></ion-icon>

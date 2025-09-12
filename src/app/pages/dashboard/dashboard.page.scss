@@ -13,7 +13,37 @@ ion-header {
 
 #map-wrapper {
   position: relative;
-  margin: 16px 12px;
+  margin: 0 12px 16px 12px; // Quitar margen top ya que los tabs están arriba
+}
+
+// Tabs container para el mapa
+.map-tabs-container {
+  margin: 16px 12px 12px 12px; // Añadir margen horizontal para alinear con el mapa
+
+  ion-segment {
+    --background: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(10px);
+
+    ion-segment-button {
+      --background-checked: var(--ion-color-primary);
+      --color-checked: white;
+      --color: var(--ion-color-medium);
+      --border-radius: 6px;
+      margin: 4px;
+      transition: all 0.3s ease;
+
+      ion-label {
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      &:hover {
+        --color: var(--ion-color-primary);
+      }
+    }
+  }
 }
 
 // Overlay clickeable para el mapa
@@ -126,6 +156,12 @@ ion-avatar {
     margin-bottom: 8px;
     color: #2c3e50;
     text-align: center;
+    transition: all 0.3s ease;
+
+    // Animación suave al cambiar entre títulos
+    &:hover {
+      color: var(--ion-color-primary);
+    }
   }
 }
 
@@ -788,5 +824,59 @@ ion-avatar {
     font-weight: 500;
     flex: 1;
   }
+}
+
+/* ===== ESTILOS ESPECÍFICOS PARA INCIDENCIAS ===== */
+
+/* Círculo principal de incidencias */
+:global(.incidencias-main-circle) {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  filter: drop-shadow(0 2px 8px rgba(255, 87, 34, 0.3));
+  pointer-events: all !important;
+  z-index: 450;
+}
+
+:global(.incidencias-main-circle:hover) {
+  filter: drop-shadow(0 4px 12px rgba(255, 87, 34, 0.5)) brightness(1.1);
+  transform: scale(1.05);
+}
+
+/* Número en el centro del círculo de incidencias */
+:global(.incidencias-center-number) {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  z-index: 500;
+  pointer-events: none !important;
+}
+
+:global(.incidencias-number) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow:
+    1px 1px 2px rgba(244, 67, 54, 0.8),
+    -1px -1px 2px rgba(244, 67, 54, 0.8),
+    1px -1px 2px rgba(244, 67, 54, 0.8),
+    -1px 1px 2px rgba(244, 67, 54, 0.8);
+  text-align: center;
+  line-height: 1;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  pointer-events: none !important;
+  user-select: none;
+  background: rgba(244, 67, 54, 0.2);
+  border: 2px solid rgba(244, 67, 54, 0.6);
+}
+
+:global(.incidencias-number:hover) {
+  transform: scale(1.1);
+  font-size: 13px;
 }
 

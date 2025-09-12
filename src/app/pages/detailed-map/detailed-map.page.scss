@@ -224,6 +224,19 @@ ion-fab {
     background: rgba(255, 255, 255, 0.98);
   }
 
+  .legend-panel {
+    top: 120px;
+    right: 12px;
+    left: 12px;
+    max-width: none;
+    max-height: calc(100vh - 180px);
+  }
+
+  .filters-panel {
+    bottom: 80px;
+    right: 12px;
+    max-width: 280px;
+  }
   .map-controls {
     top: 70px;
     right: 12px;
@@ -261,6 +274,7 @@ ion-fab {
       font-size: 11px;
     }
   }
+
 }
 
 // Configuración específica para Leaflet
@@ -462,6 +476,357 @@ ion-fab {
             height: 100%;
             transition: width 0.3s ease;
             border-radius: 3px;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Botón de ayuda flotante
+.help-button {
+  position: absolute;
+  top: 80px;
+  right: 16px;
+  z-index: 1000;
+  --background: rgba(255, 255, 255, 0.95);
+  --color: var(--ion-color-primary);
+  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --border-radius: 50%;
+  --padding-start: 12px;
+  --padding-end: 12px;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+
+  ion-icon {
+    font-size: 24px;
+  }
+
+  &:hover {
+    --background: rgba(255, 255, 255, 1);
+    transform: scale(1.05);
+  }
+}
+
+// Backdrop para cerrar la leyenda
+.legend-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999;
+  background: rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+
+  &.show {
+    opacity: 1;
+    pointer-events: all;
+  }
+}
+
+// Panel de leyenda desplegable
+.legend-panel {
+  position: absolute;
+  top: 70px;
+  left: 16px; // Cambiado para alinearse a la izquierda como incidencias-heatmap
+  max-width: 320px; // Ajustado para coincidir con incidencias-heatmap
+  max-height: calc(100vh - 160px); // Ajustado para coincidir con incidencias-heatmap
+  overflow-y: auto;
+  z-index: 1001;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(10px);
+  transform: translateY(-20px) scale(0.95); // Cambiado para animación vertical como incidencias-heatmap
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0;
+  pointer-events: none;
+
+  &.show {
+    transform: translateY(0) scale(1); // Animación vertical como incidencias-heatmap
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .legend-header {
+    position: sticky;
+    top: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px; // Ajustado para coincidir con incidencias-heatmap
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px 12px 0 0;
+    z-index: 99999;
+
+    h4 {
+      margin: 0;
+      font-size: 16px; // Ajustado para coincidir con incidencias-heatmap
+      font-weight: 600;
+      color: var(--ion-color-dark);
+      flex: 1;
+    }
+
+    ion-button {
+      --color: var(--ion-color-dark);
+      --background: rgba(0, 0, 0, 0.05);
+      --box-shadow: none;
+      --border-radius: 8px;
+      margin: 0;
+      min-width: 32px; // Ajustado para coincidir con incidencias-heatmap
+      height: 32px; // Ajustado para coincidir con incidencias-heatmap
+
+      &:hover {
+        --color: var(--ion-color-danger);
+        --background: rgba(244, 67, 54, 0.1);
+      }
+
+      ion-icon {
+        font-size: 18px; // Ajustado para coincidir con incidencias-heatmap
+      }
+    }
+  }
+
+  .legend-content {
+    padding: 16px; // Ajustado para coincidir con incidencias-heatmap
+
+    .legend-section {
+      margin-bottom: 20px; // Ajustado para coincidir con incidencias-heatmap
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      h5 {
+        margin: 0 0 12px 0; // Ajustado para coincidir con incidencias-heatmap
+        font-size: 14px; // Ajustado para coincidir con incidencias-heatmap
+        font-weight: 600;
+        color: var(--ion-color-dark);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        padding-bottom: 6px; // Ajustado para coincidir con incidencias-heatmap
+      }
+
+      .legend-items {
+        display: flex;
+        flex-direction: column;
+        gap: 12px; // Ajustado para coincidir con incidencias-heatmap
+
+        .legend-item {
+          display: flex;
+          align-items: flex-start;
+          gap: 12px; // Ajustado para coincidir con incidencias-heatmap
+
+          .legend-circle {
+            width: 20px; // Ajustado para coincidir con incidencias-heatmap
+            height: 20px; // Ajustado para coincidir con incidencias-heatmap
+            border-radius: 50%;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            flex-shrink: 0;
+            margin-top: 2px;
+
+            &.high-density {
+              background: linear-gradient(135deg, #FF1744, #D32F2F);
+            }
+
+            &.medium-density {
+              background: linear-gradient(135deg, #FF9800, #F57C00);
+            }
+
+            &.low-density {
+              background: linear-gradient(135deg, #4CAF50, #388E3C);
+            }
+
+            &.heat-circle {
+              background: linear-gradient(135deg, #2196F3, #03A9F4);
+              position: relative;
+
+              &::after {
+                content: '';
+                position: absolute;
+                top: -4px;
+                left: -4px;
+                right: -4px;
+                bottom: -4px;
+                border: 2px solid rgba(33, 150, 243, 0.3);
+                border-radius: 50%;
+                animation: gentle-pulse 2s ease-in-out infinite;
+              }
+            }
+          }
+
+          .legend-number {
+            width: 20px; // Ajustado para coincidir con incidencias-heatmap
+            height: 20px; // Ajustado para coincidir con incidencias-heatmap
+            background: var(--ion-color-primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px; // Ajustado para coincidir con incidencias-heatmap
+            font-weight: 700;
+            margin-top: 2px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            flex-shrink: 0;
+          }
+
+          .legend-border {
+            width: 20px; // Ajustado para coincidir con incidencias-heatmap
+            height: 20px; // Ajustado para coincidir con incidencias-heatmap
+            border: 2px dashed #ffffff;
+            border-radius: 2px;
+            background: rgba(52, 152, 219, 0.2);
+            margin-top: 2px;
+            flex-shrink: 0;
+          }
+
+          .legend-text {
+            flex: 1;
+            font-size: 13px; // Ajustado para coincidir con incidencias-heatmap
+            line-height: 1.4; // Ajustado para coincidir con incidencias-heatmap
+
+            strong {
+              color: var(--ion-color-dark);
+              font-weight: 600;
+            }
+
+            small {
+              color: var(--ion-color-medium);
+              font-size: 11px; // Ajustado para coincidir con incidencias-heatmap
+              display: block;
+              margin-top: 2px; // Ajustado para coincidir con incidencias-heatmap
+            }
+          }
+        }
+      }
+
+      .status-legends {
+        display: flex;
+        flex-direction: column;
+        gap: 8px; // Ajustado para coincidir con incidencias-heatmap
+
+        .status-item {
+          display: flex;
+          align-items: center;
+          gap: 8px; // Ajustado para coincidir con incidencias-heatmap
+          font-size: 13px; // Ajustado para coincidir con incidencias-heatmap
+
+          .status-icon {
+            font-size: 16px; // Ajustado para coincidir con incidencias-heatmap
+
+            &.active {
+              color: #4CAF50;
+            }
+
+            &.inactive {
+              color: #FF9800;
+            }
+
+            &.progress {
+              color: var(--ion-color-primary);
+            }
+          }
+
+          span {
+            color: var(--ion-color-dark);
+            font-weight: 500;
+          }
+        }
+      }
+
+      .instructions {
+        p {
+          margin: 0 0 8px 0; // Ajustado para coincidir con incidencias-heatmap
+          font-size: 12px; // Ajustado para coincidir con incidencias-heatmap
+          line-height: 1.4; // Ajustado para coincidir con incidencias-heatmap
+          color: var(--ion-color-medium);
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+
+          strong {
+            color: var(--ion-color-dark);
+            font-weight: 600;
+          }
+        }
+      }
+    }
+  }
+}
+
+@keyframes gentle-pulse {
+  0% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+}
+
+// Responsive design para la leyenda
+@media (max-width: 768px) {
+  .help-button {
+    top: 70px;
+    right: 12px;
+  }
+
+  .legend-panel {
+    top: 70px;
+    left: 12px; // Solo left, sin right para mantener ancho fijo
+    max-width: 320px; // Mantener ancho fijo como incidencias-heatmap
+    max-height: calc(100vh - 180px);
+    transform: translateY(-20px) scale(0.95);
+
+    &.show {
+      transform: translateY(0) scale(1);
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .help-button {
+    top: 60px;
+    right: 8px;
+  }
+
+  .legend-panel {
+    top: 110px;
+    left: 8px; // Solo left, sin right para mantener ancho fijo
+    max-width: calc(100vw - 16px); // Máximo el ancho de la pantalla menos márgenes
+    max-height: calc(100vh - 160px);
+    transform: translateY(-20px) scale(0.95);
+
+    &.show {
+      transform: translateY(0) scale(1);
+    }
+
+    .legend-content {
+      padding: 16px; // Mantener padding estándar de incidencias-heatmap
+
+      .legend-section {
+        margin-bottom: 20px; // Mantener spacing estándar de incidencias-heatmap
+
+        .legend-items .legend-item {
+          gap: 12px; // Mantener gap estándar de incidencias-heatmap
+
+          .legend-text {
+            font-size: 13px; // Mantener tamaño estándar de incidencias-heatmap
+
+            small {
+              font-size: 11px; // Mantener tamaño estándar de incidencias-heatmap
+            }
           }
         }
       }

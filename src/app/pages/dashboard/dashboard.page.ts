@@ -1,18 +1,59 @@
 import { Component, AfterViewInit, OnInit } from '@angular/core';
-import { ViewDidEnter, IonicModule } from '@ionic/angular';
+import { ViewDidEnter, IonicModule, SegmentValue } from '@ionic/angular';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import * as L from 'leaflet';
 import Chart from 'chart.js/auto';
 import { Router } from '@angular/router';
 import { MainHeaderComponent } from '../../shared/main-header/main-header.component';
 import { UserCountService, UserLeadersCountService } from '../../services/user-count.service';
 import { HeatmapService, HeatmapData } from '../../services/heatmap.service';
+import { environment } from '../../../environments/environment';
+
+interface IncidenciaData {
+  id: number;
+  titulo: string;
+  categoria: string;
+  descripcion: string;
+  ciudad_id: number;
+  ciudad_nombre: string;
+  usuario_id: number;
+  usuario_nombre: string;
+  fecha_creacion: string;
+  estado: string;
+}
+
+interface IncidenciasResponse {
+  success: boolean;
+  data: IncidenciaData[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+interface IncidenciasByMunicipio {
+  municipio_id: number;
+  municipio: string;
+  total_incidencias: number;
+  incidencias_pendientes: number;
+  incidencias_publicadas: number;
+  incidencias_rechazadas: number;
+  incidencias_por_categoria: {
+    social: number;
+    seguridad: number;
+    ambiental: number;
+    salud: number;
+    otros: number;
+  };
+}
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.page.html',
   styleUrls: ['./dashboard.page.scss'],
   standalone: true,
-  imports: [IonicModule, MainHeaderComponent]
+  imports: [IonicModule, MainHeaderComponent, CommonModule, FormsModule]
 })
 export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
   userCount: number = 0; // Variable para almacenar el conteo
@@ -20,19 +61,217 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
   heatmapData: HeatmapData[] = [];
   totalUsuariosSistema: number = 0;
 
-  private map!: L.Map;
+  // Propiedades para la funcionalidad de tabs del mapa
+  tabMapaActivo: string = 'votantes'; // Tab activo por defecto
 
-  constructor(
+  // Propiedad para controlar la leyenda y evitar duplicados
+  private currentLegend: L.Control | null = null;
+
+  // Propiedades para datos de incidencias reales
+  incidenciasData: IncidenciasByMunicipio[] = [];
+  allIncidenciasData: IncidenciaData[] = [];
+
+  private map!: L.Map;  constructor(
     private router: Router,
     private userCountService: UserCountService,
     private userLeadersCountService: UserLeadersCountService,
-    private heatmapService: HeatmapService
+    private heatmapService: HeatmapService,
+    private http: HttpClient
   ) {}
 
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('currentUser');
     this.router.navigate(['/login'], { replaceUrl: true });
+  }
+
+  /**
+   * Método para cambiar entre tabs del mapa
+   */
+  cambiarTabMapa(tab: SegmentValue | undefined) {
+    if (!tab || typeof tab !== 'string') return;
+
+    console.log('Cambiando tab del mapa a:', tab);
+    this.tabMapaActivo = tab;
+
+    // Aquí puedes agregar lógica adicional para cambiar la visualización del mapa
+    // por ejemplo, cargar diferentes datasets según el tab seleccionado
+    this.actualizarVisualizacionMapa();
+  }
+
+  /**
+   * Método para abrir el mapa detallado correspondiente según el tab activo
+   */
+  abrirMapaDetallado() {
+    if (this.tabMapaActivo === 'votantes') {
+      this.router.navigate(['/tabs/detailed-map']);
+    } else if (this.tabMapaActivo === 'incidencias') {
+      this.router.navigate(['/tabs/incidencias-heatmap']);
+    }
+  }
+
+  /**
+   * Método para actualizar la visualización del mapa según el tab activo
+   */
+  private actualizarVisualizacionMapa() {
+    if (!this.map) return;
+
+    // Limpiar leyenda anterior si existe
+    if (this.currentLegend) {
+      this.map.removeControl(this.currentLegend);
+      this.currentLegend = null;
+    }
+
+    // Limpiar capas existentes (excepto el mapa base y los límites municipales)
+    this.map.eachLayer((layer) => {
+      // Solo remover marcadores y círculos, mantener tiles y GeoJSON
+      if (layer instanceof L.CircleMarker || layer instanceof L.Marker) {
+        this.map.removeLayer(layer);
+      }
+    });
+
+    // Cargar visualización correspondiente
+    if (this.tabMapaActivo === 'votantes') {
+      this.loadHeatmapVisualization(); // Datos de votantes existentes
+    } else if (this.tabMapaActivo === 'incidencias') {
+      this.loadIncidenciasVisualization(); // Función para incidencias
+    }
+  }
+
+  /**
+   * Cargar datos reales de incidencias desde la API
+   */
+  private loadIncidenciasDataFromAPI() {
+    const params = {
+      limit: '1000', // Obtener todas las incidencias
+      page: '1'
+    };
+
+    const queryString = new URLSearchParams(params).toString();
+    const url = `${environment.apiUrl}/incidencias?${queryString}`;
+
+    this.http.get<IncidenciasResponse>(url).subscribe({
+      next: (response: IncidenciasResponse) => {
+        console.log('📊 Datos de incidencias cargados en dashboard:', response);
+        if (response.success) {
+          this.allIncidenciasData = response.data;
+          this.processIncidenciasData();
+        }
+      },
+      error: (error) => {
+        console.error('❌ Error cargando datos de incidencias en dashboard:', error);
+        this.incidenciasData = [];
+      }
+    });
+  }
+
+  /**
+   * Procesar datos de incidencias agrupándolos por municipio
+   */
+  private processIncidenciasData() {
+    // Agrupar incidencias por municipio
+    const municipiosMap = new Map<number, IncidenciasByMunicipio>();
+
+    this.allIncidenciasData.forEach(incidencia => {
+      const municipioId = incidencia.ciudad_id;
+
+      if (!municipiosMap.has(municipioId)) {
+        municipiosMap.set(municipioId, {
+          municipio_id: municipioId,
+          municipio: incidencia.ciudad_nombre,
+          total_incidencias: 0,
+          incidencias_pendientes: 0,
+          incidencias_publicadas: 0,
+          incidencias_rechazadas: 0,
+          incidencias_por_categoria: {
+            social: 0,
+            seguridad: 0,
+            ambiental: 0,
+            salud: 0,
+            otros: 0
+          }
+        });
+      }
+
+      const municipioData = municipiosMap.get(municipioId)!;
+      municipioData.total_incidencias++;
+
+      // Contabilizar por estado
+      if (incidencia.estado === 'pendiente') {
+        municipioData.incidencias_pendientes++;
+      } else if (incidencia.estado === 'publicada') {
+        municipioData.incidencias_publicadas++;
+      } else if (incidencia.estado === 'rechazada') {
+        municipioData.incidencias_rechazadas++;
+      }
+
+      // Contabilizar por categoría
+      if (municipioData.incidencias_por_categoria.hasOwnProperty(incidencia.categoria)) {
+        municipioData.incidencias_por_categoria[incidencia.categoria as keyof typeof municipioData.incidencias_por_categoria]++;
+      }
+    });
+
+    this.incidenciasData = Array.from(municipiosMap.values());
+    console.log('✅ Datos de incidencias procesados:', this.incidenciasData);
+  }
+
+  /**
+   * Método para cargar visualización de incidencias con datos reales
+   */
+  private loadIncidenciasVisualization() {
+    console.log('Cargando visualización de incidencias reales...');
+
+    if (!this.map || this.incidenciasData.length === 0) {
+      console.log('⏳ Esperando datos de incidencias o mapa...');
+      setTimeout(() => this.loadIncidenciasVisualization(), 500);
+      return;
+    }
+
+    // Mapeo de coordenadas por ID de municipio (igual que incidencias-heatmap)
+    const coordenadasPorId: { [key: number]: [number, number] } = {
+      1: [2.9342176864059044, -75.2809120516755], 2: [1.8051011976000793, -75.88969179256021], 3: [2.2596690023095336, -75.77201528148835], 4:[3.2224037822836413, -75.23707438612577],
+      5: [2.523221176724979, -75.31561267846055], 6: [2.0639571653007085, -75.78710852929741], 7: [3.152015605212019, -75.05526510157806], 8: [2.6848532937857708, -75.3250311047461],
+      9: [3.376806819733095, -74.80275084423351], 10: [2.0137472878289, -75.93992471259988], 11: [2.197557817535256, -75.62935533391476], 12: [2.381257952102255, -75.54907616880458],
+      13: [2.023974071979222, -75.7568741063892], 14: [2.584279433545576, -75.45183125317061], 15: [2.6494090642162234, -75.63546779025941], 16: [1.9302726059409736, -76.21517253771985],
+      17: [2.198550650524688, -75.97953194616365], 18: [2.389053941052161, -75.89092062343626], 19: [2.5450278538430373, -75.8088806212259], 20: [2.024937212672603, -75.99460905622094],
+      21: [2.4493126467097213, -75.77397469633821], 22: [2.888658857296718, -75.43478065345764], 23: [1.7238656109337673, -76.13379235141304], 24: [2.2671726195674426, -75.80376591792776],
+      25: [1.8563233315332122, -76.04613678182471], 26: [2.7779503812965016, -75.25753057594031], 27: [1.9915686069197125, -76.04543048051937], 28: [1.882404244189735, -76.27315747780969],
+      29: [2.9376192322492187, -75.58661962561581], 30: [1.9774131786192852, -75.79472529859227], 31: [2.113916527144062, -75.82522926495173], 32: [2.4873778076003057, -75.73025765066576],
+      33: [3.0679932979549887, -75.13791232250433], 34: [2.741395608516078, -75.56833083652862], 35: [1.9726873092733845, -75.93209728794793], 36: [3.219633614616072, -75.21888720322812],
+      37: [2.664409180971756, -75.51836619189542]
+    };
+
+    // Calcular estadísticas para normalización
+    const maxIncidencias = Math.max(...this.incidenciasData.map(d => d.total_incidencias));
+    const minIncidencias = Math.min(...this.incidenciasData.map(d => d.total_incidencias));
+
+    // Crear leyenda para incidencias
+    this.createIncidenciasLegend(minIncidencias, maxIncidencias);
+
+    // Crear visualización para cada municipio con incidencias
+    this.incidenciasData.forEach((data) => {
+      const coordenadas = coordenadasPorId[data.municipio_id] || [2.9273, -75.2819];
+
+      // Calcular intensidad normalizada (0-1) basada en total de incidencias
+      const intensidad = maxIncidencias > minIncidencias ?
+        (data.total_incidencias - minIncidencias) / (maxIncidencias - minIncidencias) : 0.5;
+
+      // Crear múltiples capas para efecto de glow (simplificado para esta implementación)
+      // this.createIncidenciasGlowEffect(coordenadas, intensidad, data);
+
+      // Crear círculo principal con colores específicos para incidencias
+      this.createIncidenciasCircle(coordenadas, intensidad, data);
+
+      // Agregar animación de pulso para valores altos (simplificado para esta implementación)
+      // if (intensidad > 0.7) {
+      //   this.createIncidenciasPulseEffect(coordenadas, data);
+      // }
+
+      // Crear número en el centro del círculo
+      this.createIncidenciasCenterNumber(coordenadas, data);
+    });
+
+    console.log(`✅ Visualización de incidencias reales cargada: ${this.incidenciasData.length} municipios visualizados`);
   }
 
   openDetailedMap() {
@@ -43,6 +282,7 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
     this.loadUserCount();
     this.loadHeatmapData();
     this.loadUserLeadersCount();
+    this.loadIncidenciasDataFromAPI(); // Cargar datos reales de incidencias
   }
 
   loadUserLeadersCount() {
@@ -448,14 +688,169 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
         const div = L.DomUtil.create('div', 'heatmap-legend');
         div.innerHTML = `
           <div class="legend-container">
-            <h4>Usuarios por municipio</h4>
+            <h4></h4>
           </div>
         `;
         return div;
       }
     }))();
 
+    this.currentLegend = legend;
     legend.addTo(this.map);
+  }
+
+  /**
+   * Crear leyenda para incidencias
+   */
+  private createIncidenciasLegend(min: number, max: number): void {
+    const legend = new (L.Control.extend({
+      options: {
+        position: 'bottomright'
+      },
+
+      onAdd: function(map: any) {
+        const div = L.DomUtil.create('div', 'heatmap-legend');
+        div.innerHTML = `
+          <div class="legend-container">
+            <h4></h4>
+          </div>
+        `;
+        return div;
+      }
+    }))();
+
+    this.currentLegend = legend;
+    legend.addTo(this.map);
+  }
+
+  /**
+   * Crear círculo para incidencias con colores específicos
+   */
+  private createIncidenciasCircle(coordenadas: [number, number], intensidad: number, data: any): void {
+    const radius = 12 + (intensidad * 15);
+    const colors = this.getIncidenciasGradientColors(intensidad);
+
+    const incidenciasCircle = L.circleMarker(coordenadas, {
+      radius: radius,
+      color: colors.border,
+      weight: 2,
+      fillColor: colors.fill,
+      fillOpacity: 0.8,
+      className: 'incidencias-main-circle',
+      interactive: true,
+      bubblingMouseEvents: false
+    }).addTo(this.map);
+
+    // Efectos hover
+    incidenciasCircle.on('mouseover', () => {
+      incidenciasCircle.setStyle({
+        radius: radius + 3,
+        weight: 3,
+        fillOpacity: 0.9
+      });
+    });
+
+    incidenciasCircle.on('mouseout', () => {
+      incidenciasCircle.setStyle({
+        radius: radius,
+        weight: 2,
+        fillOpacity: 0.8
+      });
+    });
+
+    // Popup con información de incidencias
+    const popupContent = this.createIncidenciasPopup(data, intensidad);
+    incidenciasCircle.bindPopup(popupContent);
+  }
+
+  /**
+   * Crear número central para incidencias
+   */
+  private createIncidenciasCenterNumber(coordenadas: [number, number], data: any): void {
+    const numberMarker = L.marker(coordenadas, {
+      icon: L.divIcon({
+        className: 'incidencias-center-number',
+        html: `<div class="center-number incidencias-number">${data.total_incidencias}</div>`,
+        iconSize: [30, 30],
+        iconAnchor: [15, 15]
+      }),
+      interactive: false,
+      keyboard: false,
+    }).addTo(this.map);
+
+    // Tooltip con nombre del municipio
+    numberMarker.bindTooltip(data.municipio, {
+      permanent: false,
+      direction: 'top',
+      offset: [0, -10],
+      interactive: false
+    });
+  }
+
+  /**
+   * Obtener colores específicos para incidencias
+   */
+  private getIncidenciasGradientColors(intensidad: number): {border: string, fill: string} {
+    // Usar colores rojizos/naranjas para incidencias (diferente a votantes)
+    if (intensidad >= 0.8) return {
+      border: '#D32F2F',
+      fill: 'rgba(244, 67, 54, 0.7)' // Rojo intenso
+    };
+    if (intensidad >= 0.6) return {
+      border: '#FF5722',
+      fill: 'rgba(255, 87, 34, 0.7)' // Naranja rojizo
+    };
+    if (intensidad >= 0.4) return {
+      border: '#FF9800',
+      fill: 'rgba(255, 152, 0, 0.7)' // Naranja
+    };
+    if (intensidad >= 0.2) return {
+      border: '#FFC107',
+      fill: 'rgba(255, 193, 7, 0.7)' // Amarillo
+    };
+    return {
+      border: '#4CAF50',
+      fill: 'rgba(76, 175, 80, 0.7)' // Verde para pocas incidencias
+    };
+  }
+
+  /**
+   * Crear popup para incidencias
+   */
+  private createIncidenciasPopup(data: any, intensidad: number): string {
+    const intensityLabel = intensidad >= 0.7 ? 'Alta' : intensidad >= 0.4 ? 'Media' : 'Baja';
+    const intensityColor = intensidad >= 0.7 ? '#FF5722' : intensidad >= 0.4 ? '#FF9800' : '#4CAF50';
+
+    return `
+      <div class="enhanced-heatmap-popup">
+        <div class="popup-header">
+          <div class="header-info">
+            <h3>${data.municipio}</h3>
+            <span class="density-badge" style="background: ${intensityColor};">Incidencias ${intensityLabel}</span>
+          </div>
+        </div>
+
+        <div class="popup-stats">
+          <div class="stat-row">
+            <ion-icon name="alert-circle-outline" class="stat-icon"></ion-icon>
+            <span class="stat-value">${data.total_incidencias}</span>
+            <span class="stat-label">Total</span>
+          </div>
+
+          <div class="stat-row">
+            <ion-icon name="time-outline" class="stat-icon pending"></ion-icon>
+            <span class="stat-value">${data.incidencias_pendientes}</span>
+            <span class="stat-label">Pendientes</span>
+          </div>
+
+          <div class="stat-row">
+            <ion-icon name="checkmark-circle-outline" class="stat-icon active"></ion-icon>
+            <span class="stat-value">${data.incidencias_resueltas}</span>
+            <span class="stat-label">Resueltas</span>
+          </div>
+        </div>
+      </div>
+    `;
   }
 
   /**

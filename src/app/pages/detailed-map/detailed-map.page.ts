@@ -17,6 +17,7 @@ export class DetailedMapPage implements AfterViewInit, OnDestroy, OnInit {
   heatmapData: HeatmapData[] = [];
   isLoading = true;
   totalUsuarios = 0;
+  showLegend = false;
 
   constructor(
     private router: Router,
@@ -459,5 +460,14 @@ export class DetailedMapPage implements AfterViewInit, OnDestroy, OnInit {
     // Implementar cambio entre vista satelital y mapa normal
     // Por ahora solo un placeholder
     console.log('Cambiar vista satelital');
+  }
+
+  // Métodos para manejar la leyenda desplegable
+  toggleLegend() {
+    this.showLegend = !this.showLegend;
+  }
+
+  closeLegend() {
+    this.showLegend = false;
   }
 }
