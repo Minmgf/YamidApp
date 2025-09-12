@@ -38,17 +38,17 @@
 
   <!-- 🔢 TARJETAS SUPERIORES -->
   <div class="dashboard-grid">
-    <div class="card alert">
+    <div class="card alert" (click)="navigateToIncidencias()">
       <ion-icon name="warning-outline"></ion-icon>
       <p>Incidencias</p>
-      <h2>TO DO</h2>
+      <h2>{{ totalIncidencias }}</h2>
     </div>
-    <div class="card group">
+    <div class="card group" (click)="navigateToVotantes()">
       <ion-icon name="people-outline"></ion-icon>
       <p>Votantes</p>
       <h2>{{ userCount }}</h2>
     </div>
-    <div class="card total-lideres">
+    <div class="card total-lideres" (click)="navigateToLideres()">
       <ion-icon name="person-add-outline"></ion-icon>
       <p>Total Líderes</p>
       <h2>{{ userLeadersCount }}</h2>

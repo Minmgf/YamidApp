@@ -190,6 +190,49 @@ ion-avatar {
   text-align: center;
   flex: 1;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+
+  // Efecto hover
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  // Efecto al hacer click
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  }
+
+  // Ripple effect
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s;
+  }
+
+  &:active::before {
+    width: 300px;
+    height: 300px;
+  }
+
+  // Asegurar que el contenido esté por encima del ripple
+  ion-icon,
+  p,
+  h2 {
+    position: relative;
+    z-index: 1;
+  }
 }
 
 .card h2 {
@@ -197,6 +240,45 @@ ion-avatar {
   font-size: 20px;
   font-weight: 700;
   color: #333;
+}
+
+// Estilos específicos para cada tipo de tarjeta
+.card.alert {
+  &:hover {
+    border-left: 4px solid #ff5722;
+
+    ion-icon {
+      color: #ff5722;
+      transform: scale(1.1);
+    }
+  }
+}
+
+.card.group {
+  &:hover {
+    border-left: 4px solid #2196f3;
+
+    ion-icon {
+      color: #2196f3;
+      transform: scale(1.1);
+    }
+  }
+}
+
+.card.total-lideres {
+  &:hover {
+    border-left: 4px solid #4caf50;
+
+    ion-icon {
+      color: #4caf50;
+      transform: scale(1.1);
+    }
+  }
+}
+
+// Transición suave para los iconos
+.card ion-icon {
+  transition: all 0.3s ease;
 }
 
 .card p {

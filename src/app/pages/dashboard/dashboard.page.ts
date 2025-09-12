@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 import { MainHeaderComponent } from '../../shared/main-header/main-header.component';
 import { UserCountService, UserLeadersCountService } from '../../services/user-count.service';
 import { HeatmapService, HeatmapData } from '../../services/heatmap.service';
+import { IncidenciasService } from '../../services/incidencias.service';
 import { environment } from '../../../environments/environment';
 
 interface IncidenciaData {
@@ -58,6 +59,7 @@ interface IncidenciasByMunicipio {
 export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
   userCount: number = 0; // Variable para almacenar el conteo
   userLeadersCount: number = 0; // Variable para almacenar el conteo de lideres
+  totalIncidencias: number = 0; // Variable para almacenar el total de incidencias
   heatmapData: HeatmapData[] = [];
   totalUsuariosSistema: number = 0;
 
@@ -76,6 +78,7 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
     private userCountService: UserCountService,
     private userLeadersCountService: UserLeadersCountService,
     private heatmapService: HeatmapService,
+    private incidenciasService: IncidenciasService,
     private http: HttpClient
   ) {}
 
@@ -83,6 +86,24 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
     localStorage.removeItem('token');
     localStorage.removeItem('currentUser');
     this.router.navigate(['/login'], { replaceUrl: true });
+  }
+
+  /**
+   * Navegación desde las tarjetas del dashboard
+   */
+  navigateToIncidencias() {
+    console.log('🚀 Navegando a página de incidencias...');
+    this.router.navigate(['/tabs/blog']);
+  }
+
+  navigateToVotantes() {
+    console.log('🚀 Navegando a mapa detallado de votantes...');
+    this.router.navigate(['/tabs/usuarios']);
+  }
+
+  navigateToLideres() {
+    console.log('🚀 Navegando a página de líderes...');
+    this.router.navigate(['/tabs/usuarios']);
   }
 
   /**
@@ -282,6 +303,7 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
     this.loadUserCount();
     this.loadHeatmapData();
     this.loadUserLeadersCount();
+    this.loadTotalIncidencias(); // Cargar total de incidencias
     this.loadIncidenciasDataFromAPI(); // Cargar datos reales de incidencias
   }
 
@@ -298,7 +320,30 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
     });
   }
 
-  loadUserCount() {
+  loadTotalIncidencias() {
+    console.log('🔗 Cargando total de incidencias usando IncidenciasService...');
+
+    this.incidenciasService.getTotalIncidencias().subscribe({
+      next: (response) => {
+        console.log('📊 Respuesta del endpoint /incidencias/total:', response);
+        // El endpoint puede devolver {total: number} o directamente el número
+        if (typeof response === 'number') {
+          this.totalIncidencias = response;
+        } else if (response && typeof response === 'object' && 'total' in response) {
+          this.totalIncidencias = response.total;
+        } else {
+          this.totalIncidencias = 0;
+        }
+        console.log('✅ Total incidencias asignado:', this.totalIncidencias);
+      },
+      error: (error) => {
+        console.error('❌ Error detallado loading total incidencias:', error);
+        console.error('❌ Status:', error.status);
+        console.error('❌ Message:', error.message);
+        this.totalIncidencias = 0; // Valor por defecto en caso de error
+      }
+    });
+  }  loadUserCount() {
     this.userCountService.getUserCount().subscribe({
       next: (response) => {
         this.userCount = response.count || response.total || response;

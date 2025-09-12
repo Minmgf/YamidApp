@@ -164,6 +164,13 @@ export class IncidenciasService {
   }
 
   /**
+   * Obtener total de incidencias
+   */
+  getTotalIncidencias(): Observable<number | {total: number}> {
+    return this.http.get<number | {total: number}>(`${this.apiUrl}/total`);
+  }
+
+  /**
    * Obtener lista de municipios
    */
   getMunicipios(): Observable<Municipio[]> {
