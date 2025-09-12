@@ -1,0 +1,200 @@
+<ion-header [translucent]="false">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()" fill="clear">
+        <ion-icon name="arrow-back" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Mapa de Incidencias por Municipio</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="resetView()" fill="clear">
+        <ion-icon name="locate" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <!-- Loading spinner -->
+  <div *ngIf="isLoading" class="loading-container">
+    <ion-spinner name="circular" color="primary"></ion-spinner>
+    <p>Cargando datos de incidencias...</p>
+  </div>
+
+  <!-- Botón de ayuda flotante en esquina superior derecha -->
+  <ion-button
+    (click)="toggleLegend()"
+    class="help-button"
+    fill="clear"
+    shape="round">
+    <ion-icon name="help-circle" slot="icon-only"></ion-icon>
+  </ion-button>
+
+  <!-- Leyenda desplegable -->
+  <div class="legend-backdrop" [class.show]="showLegend" (click)="closeLegend()"></div>
+  <div class="legend-panel" [class.show]="showLegend" (click)="$event.stopPropagation()">
+    <div class="legend-header">
+      <h4>Leyenda del Mapa</h4>
+      <ion-button (click)="toggleLegend()" fill="clear" size="small">
+        <ion-icon name="close" slot="icon-only"></ion-icon>
+      </ion-button>
+    </div>
+
+    <div class="legend-content">
+      <!-- Explicación de densidad -->
+      <div class="legend-section">
+        <h5>Densidad de Incidencias</h5>
+        <div class="legend-items">
+          <div class="legend-item">
+            <span class="legend-circle high-density"></span>
+            <span class="legend-text">
+              <strong>Alta:</strong> 15+ incidencias<br>
+              <small>Zonas con mayor concentración de reportes</small>
+            </span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-circle medium-density"></span>
+            <span class="legend-text">
+              <strong>Media:</strong> 5-14 incidencias<br>
+              <small>Zonas con actividad moderada</small>
+            </span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-circle low-density"></span>
+            <span class="legend-text">
+              <strong>Baja:</strong> Menos de 5 incidencias<br>
+              <small>Zonas con poca actividad</small>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Explicación de categorías -->
+      <div class="legend-section">
+        <h5>Categorías de Incidencias</h5>
+        <div class="category-legends">
+          <div class="category-item">
+            <ion-icon name="people" class="category-icon social"></ion-icon>
+            <span>Social</span>
+          </div>
+          <div class="category-item">
+            <ion-icon name="shield" class="category-icon security"></ion-icon>
+            <span>Seguridad</span>
+          </div>
+          <div class="category-item">
+            <ion-icon name="leaf" class="category-icon environmental"></ion-icon>
+            <span>Ambiental</span>
+          </div>
+          <div class="category-item">
+            <ion-icon name="medical" class="category-icon health"></ion-icon>
+            <span>Salud</span>
+          </div>
+          <div class="category-item">
+            <ion-icon name="ellipsis-horizontal" class="category-icon others"></ion-icon>
+            <span>Otros</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Explicación de estados -->
+      <div class="legend-section">
+        <h5>Estados de Incidencias</h5>
+        <div class="status-legends">
+          <div class="status-item">
+            <ion-icon name="time-outline" class="status-icon pending"></ion-icon>
+            <span>Pendiente</span>
+          </div>
+          <div class="status-item">
+            <ion-icon name="checkmark-circle-outline" class="status-icon published"></ion-icon>
+            <span>Publicada</span>
+          </div>
+          <div class="status-item">
+            <ion-icon name="close-circle-outline" class="status-icon rejected"></ion-icon>
+            <span>Rechazada</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Instrucciones de uso -->
+      <div class="legend-section">
+        <h5>Cómo usar el mapa</h5>
+        <div class="instructions">
+          <p><strong>📍 Haz clic</strong> en un círculo para ver detalles</p>
+          <p><strong>🔍 Usa filtros</strong> para ver categorías específicas</p>
+          <p><strong>🏠 Botón home</strong> para volver al dashboard</p>
+          <p><strong>📍 Botón ubicar</strong> para centrar la vista</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel de filtros flotante -->
+  <div class="filters-panel" [class.show]="showFilters">
+    <div class="filters-header">
+      <h4>Filtros de Incidencias</h4>
+      <ion-button (click)="toggleFilters()" fill="clear" size="small">
+        <ion-icon name="close" slot="icon-only"></ion-icon>
+      </ion-button>
+    </div>
+
+    <div class="filters-content">
+      <!-- Filtro por categoría -->
+      <div class="filter-group">
+        <label>Categoría</label>
+        <ion-select
+          [(ngModel)]="filters.categoria"
+          (ionChange)="applyFilters()"
+          placeholder="Todas las categorías"
+          multiple="false">
+          <ion-select-option value="">Todas</ion-select-option>
+          <ion-select-option value="social">Social</ion-select-option>
+          <ion-select-option value="seguridad">Seguridad</ion-select-option>
+          <ion-select-option value="ambiental">Ambiental</ion-select-option>
+          <ion-select-option value="salud">Salud</ion-select-option>
+          <ion-select-option value="otros">Otros</ion-select-option>
+        </ion-select>
+      </div>
+
+      <!-- Filtro por estado -->
+      <div class="filter-group">
+        <label>Estado</label>
+        <ion-select
+          [(ngModel)]="filters.estado"
+          (ionChange)="applyFilters()"
+          placeholder="Todos los estados"
+          multiple="false">
+          <ion-select-option value="">Todos</ion-select-option>
+          <ion-select-option value="pendiente">Pendiente</ion-select-option>
+          <ion-select-option value="publicada">Publicada</ion-select-option>
+          <ion-select-option value="rechazada">Rechazada</ion-select-option>
+        </ion-select>
+      </div>
+
+      <!-- Botón para limpiar filtros -->
+      <ion-button (click)="clearFilters()" fill="outline" size="small" expand="block">
+        <ion-icon name="refresh" slot="start"></ion-icon>
+        Limpiar filtros
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- Mapa principal que ocupa toda la pantalla -->
+  <div id="incidencias-map" class="incidencias-map-container"></div>
+
+
+
+  <!-- FAB con múltiples opciones -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button color="primary">
+      <ion-icon name="ellipsis-horizontal"></ion-icon>
+    </ion-fab-button>
+    <ion-fab-list side="top">
+      <ion-fab-button (click)="toggleFilters()" color="light">
+        <ion-icon name="filter"></ion-icon>
+      </ion-fab-button>
+      <ion-fab-button (click)="goBack()" color="primary">
+        <ion-icon name="home"></ion-icon>
+      </ion-fab-button>
+    </ion-fab-list>
+  </ion-fab>
+</ion-content>

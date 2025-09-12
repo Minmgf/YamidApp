@@ -30,6 +30,16 @@ const routes: Routes = [
         }
       },
       {
+        path: 'incidencias-heatmap',
+        loadComponent: () => import('../incidencias-heatmap/incidencias-heatmap.page').then(m => m.IncidenciasHeatmapPage),
+        canActivate: [RoleGuard],
+        data: {
+          roles: ['super_admin'],
+          permission: 'dashboard',
+          title: 'Mapa de Incidencias'
+        }
+      },
+      {
         path: 'municipios',
         loadChildren: () => import('../municipios/municipios.module').then(m => m.MunicipiosPageModule),
         canActivate: [RoleGuard],

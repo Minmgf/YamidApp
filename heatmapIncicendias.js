@@ -95,6 +95,8 @@ const verifyAdmin = (req, res, next) => {
  *                         type: string
  *                       usuario_id:
  *                         type: integer
+ *                       usuario_nombre:
+ *                         type: string
  *                       fecha_creacion:
  *                         type: string
  *                         format: date-time
@@ -152,9 +154,11 @@ router.get('/', async (req, res) => {
     const mainQuery = `
       SELECT
         i.*,
-        COALESCE(m.nombre, 'Sin ciudad') as ciudad_nombre
+        COALESCE(m.nombre, 'Sin ciudad') as ciudad_nombre,
+        COALESCE(u.nombre_completo, 'Usuario desconocido') as usuario_nombre
       FROM incidencias i
       LEFT JOIN municipios m ON i.ciudad_id = m.id
+      LEFT JOIN usuarios u ON i.usuario_id = u.id
       ${whereClause}
       ORDER BY i.fecha_creacion DESC
       LIMIT $${paramCounter} OFFSET $${paramCounter + 1}
@@ -324,9 +328,11 @@ router.get('/:id', async (req, res) => {
     const result = await pool.query(`
       SELECT
         i.*,
-        COALESCE(m.nombre, 'Sin ciudad') as ciudad_nombre
+        COALESCE(m.nombre, 'Sin ciudad') as ciudad_nombre,
+        COALESCE(u.nombre_completo, 'Usuario desconocido') as usuario_nombre
       FROM incidencias i
       LEFT JOIN municipios m ON i.ciudad_id = m.id
+      LEFT JOIN usuarios u ON i.usuario_id = u.id
       WHERE i.id = $1
     `, [id]);
 
@@ -652,6 +658,8 @@ router.delete('/:id', verifyToken, verifyAdmin, async (req, res) => {
  *                         type: string
  *                       usuario_id:
  *                         type: integer
+ *                       usuario_nombre:
+ *                         type: string
  *                       fecha_creacion:
  *                         type: string
  *                         format: date-time
@@ -741,9 +749,11 @@ router.get('/ciudad/:id', async (req, res) => {
     const mainQuery = `
       SELECT
         i.*,
-        COALESCE(m.nombre, 'Sin ciudad') as ciudad_nombre
+        COALESCE(m.nombre, 'Sin ciudad') as ciudad_nombre,
+        COALESCE(u.nombre_completo, 'Usuario desconocido') as usuario_nombre
       FROM incidencias i
       LEFT JOIN municipios m ON i.ciudad_id = m.id
+      LEFT JOIN usuarios u ON i.usuario_id = u.id
       ${whereClause}
       ORDER BY i.fecha_creacion DESC
       LIMIT $${paramCounter} OFFSET $${paramCounter + 1}
