@@ -13,34 +13,48 @@ ion-header {
 
 #map-wrapper {
   position: relative;
-  margin: 0 12px 16px 12px; // Quitar margen top ya que los tabs están arriba
+  margin: 0 16px 16px 16px; // Alinear con padding de tabs
 }
 
-// Tabs container para el mapa
+// Tabs container para el mapa - ESTILO MEJORADO IGUAL QUE BLOG Y AGENDA
 .map-tabs-container {
-  margin: 16px 12px 12px 12px; // Añadir margen horizontal para alinear con el mapa
+  padding: 16px;
+  padding-bottom: 0;
 
   ion-segment {
-    --background: rgba(255, 255, 255, 0.9);
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    background: var(--ion-color-light);
+    --background: var(--ion-color-light);
+    --indicator-color: transparent;
+    --indicator-height: 0;
 
     ion-segment-button {
-      --background-checked: var(--ion-color-primary);
-      --color-checked: white;
-      --color: var(--ion-color-medium);
-      --border-radius: 6px;
-      margin: 4px;
+      border-radius: 10px;
+      margin: 2px;
+      font-weight: 500;
       transition: all 0.3s ease;
+      --border-width: 0;
+      --border-style: none;
+      border: 1px solid --ion-color-primary-rgb;
+      margin-bottom: 10px  ;
 
-      ion-label {
-        font-size: 14px;
-        font-weight: 500;
+      &.segment-button-checked {
+        background: var(--ion-color-primary);
+        color: white;
+        box-shadow: 0 2px 8px rgba(var(--ion-color-primary-rgb), 0.3);
+        --border-width: 0;
+        --border-style: none;
+        --indicator-color: transparent;
       }
 
-      &:hover {
-        --color: var(--ion-color-primary);
+      ion-label {
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+
+      &:hover:not(.segment-button-checked) {
+        background: rgba(var(--ion-color-primary-rgb), 0.1);
+        color: var(--ion-color-primary);
       }
     }
   }
@@ -129,7 +143,7 @@ ion-avatar {
 }
 
 .dash {
-  --background: #f6f6f6;
+  --background: #ffffff;
 }
 
 // .dashboard-content {
@@ -180,7 +194,7 @@ ion-avatar {
 .dashboard-grid {
   display: flex;
   gap: 8px;
-  margin: 16px 12px;
+  margin: 16px 16px; // Alinear con padding de tabs
 }
 
 .card {

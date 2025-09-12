@@ -60,7 +60,7 @@ export class TabsPage implements OnInit, OnDestroy {
         visible: (user) => this.authService.hasPermission('agenda')
       },
       {
-        label: 'Blog',
+        label: 'Incidencias',
         icon: 'newspaper-outline',
         tab: 'blog',
         href: '/tabs/blog',
