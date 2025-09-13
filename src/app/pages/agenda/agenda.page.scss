@@ -1,6 +1,9 @@
 // ==========================================
 // ESTILOS GENERALES Y TABS
 // ==========================================
+.btn{
+  margin-left: 20px;
+}
 
 .tabs-container {
   padding: 16px;
@@ -39,7 +42,7 @@
 }
 
 .page-header {
-  padding: 16px;
+  padding: 16px 16px 0px 16px;
   background: var(--ion-background-color);
 
   ion-title {
@@ -61,7 +64,7 @@
 // ==========================================
 
 .filtros-container {
-  padding: 16px;
+  // padding: 16px;
   padding-bottom: 0;
 
   .seccion-card {

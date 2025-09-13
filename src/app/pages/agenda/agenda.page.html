@@ -94,10 +94,10 @@
 
   <!-- Botones de debug (temporales) -->
   <div class="debug-buttons" *ngIf="!isSuperAdmin">
-    <ion-button size="small" fill="outline" color="warning" (click)="testEventosAPI()">
+    <!-- <ion-button size="small" fill="outline" color="warning" (click)="testEventosAPI()">
       Debug Eventos API
-    </ion-button>
-    <ion-button size="small" fill="outline" color="success" (click)="recargarEventos()">
+    </ion-button> -->
+    <ion-button size="small" class="btn" fill="outline" color="success" (click)="recargarEventos()">
       Recargar Eventos
     </ion-button>
   </div>
