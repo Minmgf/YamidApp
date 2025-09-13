@@ -68,6 +68,7 @@ export class IncidenciasService {
     categoria?: string;
     estado?: string;
     ciudad_id?: number;
+    busqueda?: string;
   }): Observable<IncidenciasResponse> {
     let params = new HttpParams()
       .set('page', (filtros?.page || 1).toString())
@@ -83,6 +84,10 @@ export class IncidenciasService {
 
     if (filtros?.ciudad_id) {
       params = params.set('ciudad_id', filtros.ciudad_id.toString());
+    }
+
+    if (filtros?.busqueda) {
+      params = params.set('busqueda', filtros.busqueda);
     }
 
     const finalUrl = `${this.apiUrl}?${params.toString()}`;
