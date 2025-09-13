@@ -7,6 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { IncidenciasService, Incidencia, Municipio } from '../../services/incidencias.service';
 import { AuthService } from '../../services/auth.service';
 import { DetalleIncidenciaModalComponent } from '../../shared/modals/detalle-incidencia-modal/detalle-incidencia-modal.component';
+import { CrearIncidenciaModalComponent, NuevaIncidencia } from '../../shared/modals/crear-incidencia-modal/crear-incidencia-modal.component';
 
 @Component({
   selector: 'app-blog',
@@ -16,7 +17,6 @@ import { DetalleIncidenciaModalComponent } from '../../shared/modals/detalle-inc
   imports: [IonicModule, MainHeaderComponent, CommonModule, FormsModule]
 })
 export class BlogPage implements OnInit, AfterViewInit {
-  @ViewChild('modalIncidencia', { static: false }) modalIncidencia!: IonModal;
 
   // Tab activo
   tabActivo: 'incidencias' | 'gestionar' = 'incidencias';
@@ -45,17 +45,8 @@ export class BlogPage implements OnInit, AfterViewInit {
   // Variables para gestión (tab admin)
   expandedSection: 'pendientes' | 'publicadas' | 'rechazadas' | 'filtros' | null = null;
 
-  // Variables para nueva incidencia
-  nuevaIncidencia: Partial<Incidencia> = {
-    titulo: '',
-    categoria: 'otros',
-    descripcion: '',
-    ciudad_id: undefined
-  };
-
-  // Variables para modal
-  modoEdicion = false;
-  incidenciaEditando: Incidencia | null = null;
+  // Variables para nueva incidencia (ya no se usan con el nuevo modal)
+  // estas se mantienen temporalmente para compatibilidad con métodos existentes
 
   constructor(
     private router: Router,
@@ -74,8 +65,7 @@ export class BlogPage implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    console.log('🔍 BlogPage AfterViewInit - Verificando ViewChild...');
-    console.log('modalIncidencia:', !!this.modalIncidencia);
+    console.log('🔍 BlogPage AfterViewInit - Modal ya no se usa (componente separado)');
   }
 
   /**
@@ -362,40 +352,87 @@ export class BlogPage implements OnInit, AfterViewInit {
   /**
    * Abrir modal para crear nueva incidencia
    */
-  abrirModalCrear() {
-    this.modoEdicion = false;
-    this.nuevaIncidencia = {
-      titulo: '',
-      categoria: 'otros',
-      descripcion: '',
-      ciudad_id: undefined
-    };
-    this.modalIncidencia.present();
+  async abrirModalCrear() {
+    console.log('🔷 Abriendo modal para crear nueva incidencia...');
+    console.log('🔍 Estado inicial de municipios:', this.municipios);
+
+    // Verificar que los municipios estén cargados
+    if (!this.municipios || this.municipios.length === 0) {
+      console.log('⚠️ Municipios no están cargados, cargando ahora...');
+      await this.cargarMunicipios();
+      // Pequeña pausa para asegurar que el DOM se actualice
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+
+    console.log('🔍 Estado final de municipios antes de abrir modal:', this.municipios);
+
+    try {
+      const modal = await this.modalController.create({
+        component: CrearIncidenciaModalComponent,
+        componentProps: {
+          municipios: this.municipios,
+          usuarioNombre: this.authService.getCurrentUser()?.nombre || 'Usuario actual'
+        },
+        cssClass: 'crear-incidencia-modal'
+      });
+
+      modal.onDidDismiss().then((result) => {
+        if (result.data && result.data.action === 'guardar') {
+          console.log('💾 Guardando incidencia desde modal:', result.data.incidencia);
+          this.guardarIncidenciaFromModal(result.data.incidencia);
+        }
+      });
+
+      await modal.present();
+      console.log('✅ Modal presentado correctamente');
+      console.log('🔍 Municipios disponibles en el modal:', this.municipios);
+    } catch (error) {
+      console.error('❌ Error al presentar el modal:', error);
+      await this.mostrarToast('Error al abrir el modal', 'danger');
+    }
   }
 
+  // MÉTODOS COMENTADOS TEMPORALMENTE - YA NO SE USAN CON EL NUEVO MODAL
   /**
-   * Editar incidencia
+   * Editar incidencia - PENDIENTE DE IMPLEMENTAR CON NUEVO MODAL
    */
+  /*
   editarIncidencia(incidencia: Incidencia) {
-    this.modoEdicion = true;
-    this.incidenciaEditando = incidencia;
-    this.nuevaIncidencia = {
-      titulo: incidencia.titulo,
-      categoria: incidencia.categoria,
-      descripcion: incidencia.descripcion,
-      ciudad_id: incidencia.ciudad_id
-    };
-    this.modalIncidencia.present();
+    // TODO: Implementar con el nuevo modal
+    console.log('Editar incidencia pendiente de implementar');
   }
+  */
 
   /**
-   * Cerrar modal
+   * Cerrar modal - YA NO SE USA
    */
-  cerrarModal() {
-    this.modalIncidencia.dismiss();
-    this.modoEdicion = false;
-    this.incidenciaEditando = null;
+  /*
+  async cerrarModal() {
+    console.log('🔒 Cerrando modal...');
+
+    if (!this.modalIncidencia) {
+      console.error('❌ Modal no está disponible para cerrar');
+      return;
+    }
+
+    try {
+      await this.modalIncidencia.dismiss();
+      console.log('✅ Modal cerrado correctamente');
+
+      // Limpiar datos del formulario
+      this.modoEdicion = false;
+      this.incidenciaEditando = null;
+      this.nuevaIncidencia = {
+        titulo: '',
+        categoria: 'otros',
+        descripcion: '',
+        ciudad_id: undefined
+      };
+    } catch (error) {
+      console.error('❌ Error al cerrar el modal:', error);
+    }
   }
+  */
 
   /**
    * Abrir modal de detalle de incidencia
@@ -441,7 +478,9 @@ export class BlogPage implements OnInit, AfterViewInit {
             }
             break;
           case 'editar':
-            this.editarIncidencia(incidenciaAction);
+            // TODO: Implementar edición con nuevo modal
+            console.log('Editar incidencia pendiente de implementar');
+            // this.editarIncidencia(incidenciaAction);
             break;
         }
       }
@@ -461,9 +500,11 @@ export class BlogPage implements OnInit, AfterViewInit {
     // El modal se cierra automáticamente desde el componente modal
   }
 
+  // MÉTODOS DEL FORMULARIO ANTIGUO - COMENTADOS
   /**
-   * Validar formulario
+   * Validar formulario - YA NO SE USA
    */
+  /*
   validarFormulario(): boolean {
     return !!(
       this.nuevaIncidencia.titulo?.trim() &&
@@ -472,10 +513,12 @@ export class BlogPage implements OnInit, AfterViewInit {
       this.nuevaIncidencia.ciudad_id
     );
   }
+  */
 
   /**
-   * Guardar incidencia (crear o actualizar)
+   * Guardar incidencia (crear o actualizar) - YA NO SE USA
    */
+  /*
   async guardarIncidencia() {
     if (!this.validarFormulario()) {
       await this.mostrarToast('Por favor completa todos los campos', 'warning');
@@ -511,6 +554,37 @@ export class BlogPage implements OnInit, AfterViewInit {
     } catch (error) {
       console.error('Error al guardar incidencia:', error);
       await this.mostrarToast('Error al guardar incidencia', 'danger');
+    } finally {
+      await loading.dismiss();
+    }
+  }
+  */
+
+  /**
+   * Guardar incidencia desde el modal personalizado
+   */
+  async guardarIncidenciaFromModal(incidenciaData: NuevaIncidencia) {
+    const loading = await this.loadingController.create({
+      message: 'Creando incidencia...'
+    });
+    await loading.present();
+
+    try {
+      // Crear nueva incidencia
+      await this.incidenciasService.crearIncidencia(
+        incidenciaData as Omit<Incidencia, 'id' | 'fecha_creacion' | 'estado' | 'usuario_id'>
+      ).toPromise();
+
+      await this.mostrarToast('Incidencia creada exitosamente, será revisada por el equipo y publicada si corresponde a las políticas de la plataforma', 'success');
+
+      // Recargar datos
+      await this.cargarDatosIniciales();
+      if (this.tabActivo === 'gestionar') {
+        await this.cargarDatosGestion();
+      }
+    } catch (error) {
+      console.error('Error al crear incidencia:', error);
+      await this.mostrarToast('Error al crear incidencia', 'danger');
     } finally {
       await loading.dismiss();
     }
@@ -641,11 +715,16 @@ export class BlogPage implements OnInit, AfterViewInit {
    */
   getCategoriaColor(categoria: string): string {
     const colores: { [key: string]: string } = {
+      'social': 'primary',
+      'seguridad': 'danger',
+      'ambiental': 'success',
+      'salud': 'tertiary',
+      'educacion': 'warning',
+      'transporte': 'secondary',
+      'vivienda': 'medium',
       'infraestructura': 'primary',
       'servicios_publicos': 'secondary',
-      'seguridad': 'danger',
       'medio_ambiente': 'success',
-      'transporte': 'warning',
       'otros': 'medium'
     };
     return colores[categoria] || 'medium';
@@ -656,11 +735,16 @@ export class BlogPage implements OnInit, AfterViewInit {
    */
   getCategoriaLabel(categoria: string): string {
     const labels: { [key: string]: string } = {
+      'social': 'Social',
+      'seguridad': 'Seguridad',
+      'ambiental': 'Ambiental',
+      'salud': 'Salud',
+      'educacion': 'Educación',
+      'transporte': 'Transporte',
+      'vivienda': 'Vivienda',
       'infraestructura': 'Infraestructura',
       'servicios_publicos': 'Servicios Públicos',
-      'seguridad': 'Seguridad',
       'medio_ambiente': 'Medio Ambiente',
-      'transporte': 'Transporte',
       'otros': 'Otros'
     };
     return labels[categoria] || 'Otros';

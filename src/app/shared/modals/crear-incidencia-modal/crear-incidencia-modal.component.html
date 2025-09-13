@@ -1,0 +1,140 @@
+<ion-header>
+  <ion-toolbar>
+    <h1 class="crear-titulo">Nueva Incidencia</h1>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrarModal()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="crear-container">
+    <!-- Formulario para crear nueva incidencia -->
+    <form (ngSubmit)="guardarIncidencia()">
+
+      <!-- Sección: Información básica -->
+      <div class="crear-section">
+        <h3>
+          <ion-icon name="document-text-outline"></ion-icon>
+          Información básica
+        </h3>
+
+        <div class="form-group">
+          <ion-item>
+            <ion-label position="stacked">Título *</ion-label>
+            <ion-input
+              [(ngModel)]="nuevaIncidencia.titulo"
+              name="titulo"
+              placeholder="Describe brevemente la incidencia"
+              required>
+            </ion-input>
+          </ion-item>
+        </div>
+
+        <div class="form-group">
+          <ion-item>
+            <ion-label position="stacked">Categoría *</ion-label>
+            <ion-select [(ngModel)]="nuevaIncidencia.categoria" name="categoria" required>
+                <!-- <ion-select-option value="infraestructura">Infraestructura</ion-select-option> -->
+                <!-- <ion-select-option value="servicios_publicos">Servicios Públicos</ion-select-option> -->
+                <ion-select-option value="social">Social</ion-select-option>
+                <ion-select-option value="seguridad">Seguridad</ion-select-option>
+                <ion-select-option value="ambiental">Ambiental</ion-select-option>
+                <ion-select-option value="salud">Salud</ion-select-option>
+                <!-- <ion-select-option value="medio_ambiente">Medio Ambiente</ion-select-option> -->
+                <!-- <ion-select-option value="transporte">Transporte</ion-select-option> -->
+                <ion-select-option value="otros">Otros</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </div>
+      </div>
+
+      <!-- Sección: Ubicación -->
+      <div class="crear-section">
+        <h3>
+          <ion-icon name="location-outline"></ion-icon>
+          Ubicación
+        </h3>
+
+        <div class="form-group">
+          <ion-item>
+            <ion-label position="stacked">Municipio *</ion-label>
+            <ion-select [(ngModel)]="nuevaIncidencia.ciudad_id" name="ciudad_id" required>
+              <ion-select-option
+                *ngFor="let municipio of (municipios || [])"
+                [value]="municipio?.id"
+                [disabled]="!municipio">
+                {{municipio?.nombre || 'Cargando...'}}
+              </ion-select-option>
+            </ion-select>
+            <ion-note *ngIf="!municipios || municipios.length === 0" slot="helper">
+              Cargando municipios...
+            </ion-note>
+          </ion-item>
+        </div>
+      </div>
+
+      <!-- Sección: Descripción -->
+      <div class="crear-section">
+        <h3>
+          <ion-icon name="create-outline"></ion-icon>
+          Descripción detallada
+        </h3>
+
+        <div class="form-group">
+          <ion-item class="textarea-item">
+            <ion-label position="stacked">Descripción *</ion-label>
+            <ion-textarea
+              [(ngModel)]="nuevaIncidencia.descripcion"
+              name="descripcion"
+              placeholder="Describe detalladamente la incidencia: qué sucedió, cuándo, dónde exactamente, cómo afecta a la comunidad..."
+              rows="3"
+              required>
+            </ion-textarea>
+          </ion-item>
+        </div>
+      </div>
+
+      <!-- Información del usuario que reporta -->
+      <div class="crear-section">
+        <h3>
+          <ion-icon name="person-outline"></ion-icon>
+          Reportado por
+        </h3>
+        <div class="reporter-info">
+          <div class="reporter-avatar">
+            <span>{{getInitials(usuarioNombre)}}</span>
+          </div>
+          <div class="reporter-details">
+            <div class="reporter-name">{{usuarioNombre || 'Usuario actual'}}</div>
+            <div class="reporter-type">Ciudadano verificado</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botones de acción -->
+      <div class="crear-section">
+        <div class="form-actions">
+          <ion-button
+            expand="block"
+            type="submit"
+            [disabled]="!validarFormulario()"
+            color="primary">
+            <ion-icon name="save-outline" slot="start"></ion-icon>
+            Crear Incidencia
+          </ion-button>
+          <ion-button
+            expand="block"
+            fill="clear"
+            (click)="cerrarModal()"
+            color="medium">
+            <ion-icon name="close-outline" slot="start"></ion-icon>
+            Cancelar
+          </ion-button>
+        </div>
+      </div>
+    </form>
+  </div>
+</ion-content>

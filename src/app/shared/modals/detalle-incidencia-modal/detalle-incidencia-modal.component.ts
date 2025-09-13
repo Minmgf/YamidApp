@@ -41,6 +41,8 @@ export class DetalleIncidenciaModalComponent implements OnInit {
       'seguridad': 'danger',
       'medio_ambiente': 'success',
       'transporte': 'warning',
+      'salud': 'tertiary',
+      'ambiental': 'success',
       'otros': 'medium'
     };
     return colores[categoria] || 'medium';
@@ -56,6 +58,8 @@ export class DetalleIncidenciaModalComponent implements OnInit {
       'seguridad': 'Seguridad',
       'medio_ambiente': 'Medio Ambiente',
       'transporte': 'Transporte',
+      'salud': 'Salud',
+      'ambiental': 'Ambiental',
       'otros': 'Otros'
     };
     return labels[categoria] || 'Otros';

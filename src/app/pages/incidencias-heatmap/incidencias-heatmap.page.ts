@@ -236,13 +236,16 @@ export class IncidenciasHeatmapPage implements AfterViewInit, OnDestroy, OnInit 
 
   getCategoriaLabel(categoria: string): string {
     const labels: { [key: string]: string } = {
-      'social': 'Social',
+      'infraestructura': 'Infraestructura',
+      'servicios_publicos': 'Servicios Públicos',
       'seguridad': 'Seguridad',
-      'ambiental': 'Ambiental',
+      'medio_ambiente': 'Medio Ambiente',
+      'transporte': 'Transporte',
       'salud': 'Salud',
+      'ambiental': 'Ambiental',
       'otros': 'Otros'
     };
-    return labels[categoria] || categoria;
+    return labels[categoria] || 'Otros';
   }
 
   getEstadoLabel(estado: string): string {
@@ -260,6 +263,9 @@ export class IncidenciasHeatmapPage implements AfterViewInit, OnDestroy, OnInit 
       'seguridad': 'shield',
       'ambiental': 'leaf',
       'salud': 'medical',
+      'educacion': 'school',
+      'transporte': 'car',
+      'vivienda': 'home',
       'otros': 'ellipsis-horizontal'
     };
     return icons[categoria] || 'help';
