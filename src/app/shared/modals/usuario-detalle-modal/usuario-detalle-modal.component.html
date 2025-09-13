@@ -1,0 +1,186 @@
+<ion-header>
+  <ion-toolbar>
+    <h1 class="detalle-titulo">Información del Usuario</h1>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrarModal()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="detalle-container">
+
+    <!-- Estado de carga -->
+    <div *ngIf="loading" class="loading-container">
+      <ion-spinner></ion-spinner>
+      <p>Cargando información del usuario...</p>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="error && !loading" class="error-container">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      <h3>Error</h3>
+      <p>{{ error }}</p>
+      <ion-button fill="clear" (click)="cargarUsuario()">
+        <ion-icon name="refresh-outline" slot="start"></ion-icon>
+        Reintentar
+      </ion-button>
+    </div>
+
+    <!-- Contenido del usuario -->
+    <div *ngIf="usuario && !loading && !error">
+
+      <!-- Sección de perfil principal -->
+      <div class="detalle-section">
+        <h3>
+          <ion-icon name="person-outline"></ion-icon>
+          Información Personal
+        </h3>
+
+        <div class="profile-card">
+          <div class="profile-avatar">
+            <span>{{ getInitials(usuario.nombre_completo) }}</span>
+          </div>
+          <div class="profile-details">
+            <div class="user-name">{{ usuario.nombre_completo }}</div>
+            <div class="user-status" [class.active]="usuario.is_active">
+              <ion-icon name="checkmark-circle-outline" *ngIf="usuario.is_active"></ion-icon>
+              <ion-icon name="close-circle-outline" *ngIf="!usuario.is_active"></ion-icon>
+              {{ usuario.is_active ? 'Activo' : 'Inactivo' }}
+            </div>
+          </div>
+        </div>
+
+        <div class="info-items">
+          <div class="info-item">
+            <ion-icon name="mail-outline"></ion-icon>
+            <div class="info-content">
+              <span class="info-label">Correo electrónico</span>
+              <span class="info-value">{{ usuario.correo }}</span>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <ion-icon name="card-outline"></ion-icon>
+            <div class="info-content">
+              <span class="info-label">Cédula</span>
+              <span class="info-value">{{ usuario.cedula }}</span>
+            </div>
+          </div>
+
+          <div class="info-item" *ngIf="usuario.celular">
+            <ion-icon name="call-outline"></ion-icon>
+            <div class="info-content">
+              <span class="info-label">Celular</span>
+              <span class="info-value">{{ usuario.celular }}</span>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <ion-icon name="location-outline"></ion-icon>
+            <div class="info-content">
+              <span class="info-label">Municipio</span>
+              <span class="info-value">{{ usuario.municipio }}</span>
+            </div>
+          </div>
+
+          <div class="info-item" *ngIf="usuario.lugar_votacion">
+            <ion-icon name="business-outline"></ion-icon>
+            <div class="info-content">
+              <span class="info-label">Lugar de votación</span>
+              <span class="info-value">{{ usuario.lugar_votacion }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección de rol y permisos -->
+      <div class="detalle-section">
+        <h3>
+          <ion-icon name="shield-outline"></ion-icon>
+          Rol y Permisos
+        </h3>
+
+        <div class="role-card">
+          <ion-chip [color]="getRolColor()">
+            <ion-icon name="person-circle-outline"></ion-icon>
+            <ion-label>{{ getRolLabel() }}</ion-label>
+          </ion-chip>
+        </div>
+
+        <div class="permissions-container" *ngIf="getPermissionsList().length > 0">
+          <div class="permissions-title">Permisos activos:</div>
+          <div class="permissions-grid">
+            <ion-chip *ngFor="let permiso of getPermissionsList()" color="success">
+              <ion-icon name="checkmark-circle"></ion-icon>
+              <ion-label>{{ permiso }}</ion-label>
+            </ion-chip>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección de métricas -->
+      <div class="detalle-section">
+        <h3>
+          <ion-icon name="analytics-outline"></ion-icon>
+          Métricas y Estadísticas
+        </h3>
+
+        <div class="metrics-grid">
+          <!-- Votantes registrados -->
+          <div class="metric-card">
+            <div class="metric-header">
+              <ion-icon name="people-outline"></ion-icon>
+              <span>Votantes Registrados</span>
+            </div>
+            <div class="metric-value">{{ usuario.registers || 0 }}</div>
+          </div>
+
+          <!-- Calificación -->
+          <div class="metric-card">
+            <div class="metric-header">
+              <ion-icon name="star-outline"></ion-icon>
+              <span>Calificación</span>
+            </div>
+            <div class="rating-display">
+              <div class="rating-stars">
+                <ion-icon
+                  *ngFor="let star of [1,2,3,4,5]; let i = index"
+                  [name]="i < getStarCount() ? 'star' : 'star-outline'"
+                  [class]="i < getStarCount() ? 'star-filled' : 'star-empty'">
+                </ion-icon>
+              </div>
+              <span class="rating-number">{{ usuario.rating || 0 }}/5</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Información adicional -->
+      <div class="detalle-section">
+        <h3>
+          <ion-icon name="information-circle-outline"></ion-icon>
+          Información Adicional
+        </h3>
+
+        <div class="additional-items">
+          <div class="additional-item">
+            <span class="additional-label">Registrado el:</span>
+            <span class="additional-value">{{ formatearFecha(usuario.created_at) }}</span>
+          </div>
+          <div class="additional-item">
+            <span class="additional-label">ID de usuario:</span>
+            <span class="additional-value">#{{ usuario.id }}</span>
+          </div>
+          <div class="additional-item">
+            <span class="additional-label">Municipio ID:</span>
+            <span class="additional-value">#{{ usuario.municipio_id }}</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</ion-content>

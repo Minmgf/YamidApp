@@ -2,7 +2,9 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { UserRegistrationService } from '../../services/user-registration.service';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
+import { ModalController } from '@ionic/angular';
 import { trigger, state, style, transition, animate } from '@angular/animations';
+import { UsuarioDetalleModalComponent } from '../../shared/modals/usuario-detalle-modal/usuario-detalle-modal.component';
 
 interface Usuario {
   id: number;
@@ -64,7 +66,8 @@ export class UsuariosPage implements OnInit {
     private userService: UserRegistrationService,
     private authService: AuthService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private modalController: ModalController
   ) {}
 
   ngOnInit() {
@@ -284,5 +287,26 @@ export class UsuariosPage implements OnInit {
   logout() {
     this.authService.logout();
     this.router.navigate(['/login'], { replaceUrl: true });
+  }
+
+  /**
+   * Abrir modal con detalle del usuario
+   */
+  async abrirDetalleUsuario(usuarioId: number) {
+    console.log('🔍 Abriendo detalle del usuario ID:', usuarioId);
+
+    try {
+      const modal = await this.modalController.create({
+        component: UsuarioDetalleModalComponent,
+        componentProps: {
+          usuarioId: usuarioId
+        },
+        cssClass: 'usuario-detalle-modal'
+      });
+
+      await modal.present();
+    } catch (error) {
+      console.error('❌ Error al abrir modal de detalle:', error);
+    }
   }
 }

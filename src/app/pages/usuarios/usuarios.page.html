@@ -97,7 +97,7 @@
     </div>
 
     <!-- Lista de usuarios -->
-    <div *ngFor="let usuario of usuariosFiltrados" class="user-item">
+    <div *ngFor="let usuario of usuariosFiltrados" class="user-item" (click)="abrirDetalleUsuario(usuario.id)">
       <div class="user-content">
         <div class="user-main-info">
           <div class="user-name">{{ usuario.nombre_completo }}</div>
