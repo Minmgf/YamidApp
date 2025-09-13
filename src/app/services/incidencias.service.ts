@@ -189,7 +189,15 @@ export class IncidenciasService {
    */
   actualizarEstadoIncidencia(id: number, estado: string): Observable<any> {
     console.log(`Actualizando estado de incidencia ${id} a ${estado}:`, this.apiUrl);
-    return this.http.put(`${this.apiUrl}/${id}/estado`, { estado }).pipe(
+    let endpoint = '';
+    if (estado === 'rechazada') {
+      endpoint = `${this.apiUrl}/${id}/rechazar`;
+    } else {
+      endpoint = `${this.apiUrl}/${id}/aprobar`;
+    }
+    return this.http.put(endpoint, { estado }, {
+      headers: this.getAuthHeaders()
+    }).pipe(
       tap(response => console.log('Respuesta de actualizar estado:', response)),
       catchError(error => {
         console.error('Error al actualizar estado de incidencia:', error);
