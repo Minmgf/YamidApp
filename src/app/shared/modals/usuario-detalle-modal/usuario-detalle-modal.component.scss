@@ -251,6 +251,31 @@
 }
 
 // Items adicionales
+.incident-items {
+  .incident-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: #FFFAFF;
+    border-radius: 10px;
+    margin-bottom: 8px;
+
+    .incident-label {
+      color: #6b7280;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .incident-value {
+      color: #1a1a1a;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+  }
+}
+
+// Items adicionales
 .additional-items {
   .additional-item {
     display: flex;
