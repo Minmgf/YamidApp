@@ -1,0 +1,32 @@
+// Estilos globales para el modal de crear agenda
+// Basado en el patrón del usuario-detalle-modal
+
+:global(.create-agenda-modal) {
+  --width: 90%;
+  --max-width: 650px;
+  --height: 85vh;
+  --min-height: 600px;
+  --max-height: 90vh;
+  --border-radius: 16px;
+  --backdrop-opacity: 0.5;
+
+  .modal-wrapper {
+    height: 100%;
+    will-change: transform, opacity;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  @media (max-width: 768px) {
+    --width: 95%;
+    --height: 90vh;
+    --min-height: 500px;
+    --max-height: 95vh;
+    --border-radius: 12px;
+
+    .modal-wrapper {
+      border-radius: 12px;
+    }
+  }
+}

@@ -72,16 +72,13 @@ export class CreateAgendaModalComponent implements OnInit {
     // Formulario para agregar eventos a la agenda
     this.eventosForm = this.fb.group({
       nombre_evento: ['', Validators.required],
-      fecha: ['', Validators.required], // Fecha específica del evento
-      municipio_id: ['', Validators.required],
+      fecha_evento: ['', Validators.required], // Fecha específica del evento
       hora: ['', Validators.required],
-      lugar: ['']
+      lugar: ['', Validators.required]
     });
   }
 
   ngOnInit() {
-    this.loadMunicipios();
-
     // Generar título por defecto basado en mes y año seleccionados
     this.agendaForm.get('mes')?.valueChanges.subscribe(() => this.updateTitulo());
     this.agendaForm.get('anio')?.valueChanges.subscribe(() => this.updateTitulo());
@@ -102,27 +99,6 @@ export class CreateAgendaModalComponent implements OnInit {
       const titulo = `Agenda ${nombreMes} ${anio}`;
       this.agendaForm.patchValue({ titulo }, { emitEvent: false });
     }
-  }
-
-  /**
-   * Carga la lista de municipios
-   */
-  loadMunicipios() {
-    this.userService.getMunicipios().subscribe({
-      next: (municipios) => {
-        this.municipios = municipios;
-      },
-      error: (error) => {
-        console.error('Error loading municipios:', error);
-        this.municipios = [
-          { id: 1, nombre: "Neiva" },
-          { id: 2, nombre: "Campoalegre" },
-          { id: 3, nombre: "Rivera" },
-          { id: 4, nombre: "Garzón" },
-          { id: 5, nombre: "Pitalito" }
-        ];
-      }
-    });
   }
 
   /**
@@ -168,7 +144,7 @@ export class CreateAgendaModalComponent implements OnInit {
     }
 
     // Validar que la fecha esté dentro del mes/año de la agenda
-    const fechaEvento = new Date(this.eventosForm.value.fecha);
+    const fechaEvento = new Date(this.eventosForm.value.fecha_evento);
     const mesAgenda = this.agendaForm.get('mes')?.value;
     const anioAgenda = this.agendaForm.get('anio')?.value;
 
@@ -179,8 +155,8 @@ export class CreateAgendaModalComponent implements OnInit {
 
     const evento: AgendaEvento = {
       nombre_evento: this.eventosForm.value.nombre_evento,
-      fecha: this.eventosForm.value.fecha,
-      municipio_id: this.eventosForm.value.municipio_id,
+      fecha: this.eventosForm.value.fecha_evento,
+      municipio_id: 1, // Por defecto, puede ser configurable después
       hora: this.eventosForm.value.hora,
       lugar: this.eventosForm.value.lugar
     };
