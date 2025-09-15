@@ -92,6 +92,16 @@ export class AgendaPage implements OnInit {
         }
 
         console.log('✅ Municipios procesados:', municipios);
+        console.log('🔍 IDs de municipios encontrados:', municipios.map((m: any) => ({ id: m.id, nombre: m.nombre })));
+
+        // Buscar específicamente Garzón para debugging
+        const garzon = municipios.find((m: any) => m.nombre.toLowerCase().includes('garzón') || m.nombre.toLowerCase().includes('garzon'));
+        if (garzon) {
+          console.log('🎯 Garzón encontrado con ID:', garzon.id, 'Nombre:', garzon.nombre);
+        } else {
+          console.log('⚠️ Garzón NO encontrado en la lista de municipios');
+        }
+
         this.municipios = municipios;
 
         // Si no hay municipios, usar fallback
@@ -112,14 +122,15 @@ export class AgendaPage implements OnInit {
    */
   private useFallbackMunicipios() {
     // Fallback con municipios estáticos basados en la base de datos real
+    // IMPORTANTE: Estos IDs deben coincidir con los IDs reales en la base de datos
     this.municipios = [
       { id: 1, nombre: "Neiva" },
       { id: 23, nombre: "Campoalegre" },
       { id: 26, nombre: "Rivera" },
-      { id: 4, nombre: "Garzón" },
+      { id: 11, nombre: "Garzón" }, // Cambiado de 4 a 11 para coincidir con el filtro
       { id: 5, nombre: "Pitalito" }
     ];
-    console.log('🔄 Usando municipios fallback:', this.municipios);
+    console.log('🔄 Usando municipios fallback (IDs actualizados):', this.municipios);
   }
 
   /**
@@ -248,9 +259,31 @@ export class AgendaPage implements OnInit {
    * Aplicar filtros de eventos
    */
   aplicarFiltros() {
-    this.aplicarFiltroMunicipio(this.filtroMunicipio);
-    // Aquí puedes agregar lógica adicional para el filtro de mes
-    console.log('Aplicando filtros:', { municipio: this.filtroMunicipio, mes: this.filtroMes });
+    // Solo hacer logging, no llamar a aplicarFiltroMunicipio para evitar loop infinito
+    console.log('Aplicando filtros:', {
+      municipio: this.filtroMunicipio,
+      mes: this.filtroMes,
+      municipios_disponibles: this.municipios,
+      eventos_totales: this.eventosProximos.length,
+      eventos_con_municipio: this.eventosProximos.map(e => ({
+        nombre: e.nombre_evento,
+        municipio_id: e.municipio_id,
+        municipio_nombre: e.municipio_nombre,
+        lugar: e.lugar
+      }))
+    });
+
+    // Mostrar eventos por municipio para debugging
+    const eventosPorMunicipio = this.eventosProximos.reduce((acc: any, evento: any) => {
+      const municipioId = evento.municipio_id;
+      if (!acc[municipioId]) {
+        acc[municipioId] = [];
+      }
+      acc[municipioId].push(evento.nombre_evento);
+      return acc;
+    }, {});
+
+    console.log('Eventos agrupados por municipio:', eventosPorMunicipio);
   }
 
   /**
@@ -267,6 +300,8 @@ export class AgendaPage implements OnInit {
    */
   aplicarFiltroMunicipio(municipioId: number | 'todos') {
     this.filtroMunicipio = municipioId;
+    // Removido aplicarFiltros() para evitar loop infinito
+    console.log('Filtro municipio aplicado:', municipioId);
   }
 
   /**
@@ -289,26 +324,38 @@ export class AgendaPage implements OnInit {
    * Obtiene los eventos filtrados
    */
   get eventosProximosFiltrados() {
-    if (this.filtroMunicipio === 'todos') {
-      return this.eventosProximos;
+    console.log('Calculando eventos filtrados:', {
+      filtroMunicipio: this.filtroMunicipio,
+      filtroMes: this.filtroMes,
+      isSuperAdmin: this.isSuperAdmin,
+      totalEventos: this.eventosProximos.length
+    });
+
+    let eventosFiltrados = this.eventosProximos;
+
+    // Filtrar por municipio (si no es "todos")
+    if (this.filtroMunicipio !== 'todos') {
+      eventosFiltrados = eventosFiltrados.filter(evento => {
+        // Los eventos ya tienen municipio_id, no necesitamos buscar en agendas
+        const coincide = evento.municipio_id === this.filtroMunicipio;
+        console.log(`Evento ${evento.nombre_evento}: evento.municipio_id=${evento.municipio_id}, filtro=${this.filtroMunicipio}, coincide=${coincide}`);
+        return coincide;
+      });
     }
 
-    return this.eventosProximos.filter(evento => {
-      // Para super admin, usar todasLasAgendas
-      if (this.isSuperAdmin) {
-        const agenda = this.todasLasAgendas.find(a => a.id === evento.agenda_id);
-        return agenda && agenda.municipio_id === this.filtroMunicipio;
-      } else {
-        // Para usuarios normales, verificar si el evento pertenece a un municipio específico
-        if (this.todasLasAgendas.length > 0) {
-          // El evento ya tiene municipio_id, no necesitamos buscar en agenda
-          return evento.municipio_id === this.filtroMunicipio;
-        } else {
-          // Fallback: verificar en eventos de agendas locales
-          return evento.municipio_id === this.filtroMunicipio;
-        }
-      }
-    });
+    // Filtrar por mes (si está especificado y no es vacío)
+    if (this.filtroMes && this.filtroMes !== '') {
+      eventosFiltrados = eventosFiltrados.filter(evento => {
+        const fechaEvento = new Date(evento.fecha_completa || evento.fecha_evento);
+        const mesEvento = fechaEvento.getMonth() + 1; // getMonth() retorna 0-11
+        const coincideMes = mesEvento.toString() === this.filtroMes;
+        console.log(`Evento ${evento.nombre_evento}: mes=${mesEvento}, filtroMes=${this.filtroMes}, coincide=${coincideMes}`);
+        return coincideMes;
+      });
+    }
+
+    console.log(`Eventos filtrados: ${eventosFiltrados.length} de ${this.eventosProximos.length}`);
+    return eventosFiltrados;
   }
 
   /**
