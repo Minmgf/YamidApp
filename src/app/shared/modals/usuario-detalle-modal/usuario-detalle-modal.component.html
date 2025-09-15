@@ -102,23 +102,26 @@
           <ion-icon name="shield-outline"></ion-icon>
           Rol y Permisos
         </h3>
+        <div class="role-permissions-container">
 
-        <div class="role-card">
-          <ion-chip [color]="getRolColor()">
-            <ion-icon name="person-circle-outline"></ion-icon>
-            <ion-label>{{ getRolLabel() }}</ion-label>
-          </ion-chip>
-        </div>
-
-        <div class="permissions-container" *ngIf="getPermissionsList().length > 0">
-          <div class="permissions-title">Permisos activos:</div>
-          <div class="permissions-grid">
-            <ion-chip *ngFor="let permiso of getPermissionsList()" color="success">
-              <ion-icon name="checkmark-circle"></ion-icon>
-              <ion-label>{{ permiso }}</ion-label>
+          <div class="role-card">
+            <ion-chip [color]="getRolColor()">
+              <ion-icon name="person-circle-outline"></ion-icon>
+              <ion-label>{{ getRolLabel() }}</ion-label>
             </ion-chip>
           </div>
+
+          <div class="permissions-container" *ngIf="getPermissionsList().length > 0">
+            <div class="permissions-title">Permisos activos:</div>
+            <div class="permissions-grid">
+              <ion-chip *ngFor="let permiso of getPermissionsList()" color="success">
+                <ion-icon name="checkmark-circle"></ion-icon>
+                <ion-label>{{ permiso }}</ion-label>
+              </ion-chip>
+            </div>
+          </div>
         </div>
+
       </div>
 
       <!-- Sección de métricas -->
@@ -169,14 +172,6 @@
           <div class="additional-item">
             <span class="additional-label">Registrado el:</span>
             <span class="additional-value">{{ formatearFecha(usuario.created_at) }}</span>
-          </div>
-          <div class="additional-item">
-            <span class="additional-label">ID de usuario:</span>
-            <span class="additional-value">#{{ usuario.id }}</span>
-          </div>
-          <div class="additional-item">
-            <span class="additional-label">Municipio ID:</span>
-            <span class="additional-value">#{{ usuario.municipio_id }}</span>
           </div>
         </div>
       </div>

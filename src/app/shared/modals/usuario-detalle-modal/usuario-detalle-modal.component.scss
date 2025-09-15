@@ -132,6 +132,13 @@
   }
 }
 
+.role-permissions-container{
+  display: flex;
+  flex-direction: colu;
+  gap: 12px;
+}
+
+
 // Card de rol
 .role-card {
   margin-bottom: 16px;
@@ -419,7 +426,7 @@ ion-content {
   }
 
   .metrics-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: 8px;
   }
 
