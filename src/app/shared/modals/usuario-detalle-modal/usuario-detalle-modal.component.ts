@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { IonicModule, ModalController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 
 export interface UsuarioDetalle {
@@ -53,22 +53,41 @@ export class UsuarioDetalleModalComponent implements OnInit {
   }
 
   /**
+   * Obtiene headers con token de autenticación
+   */
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+  }
+
+  /**
    * Cargar información del usuario
    */
   async cargarUsuario() {
     try {
       this.loading = true;
       const response = await this.http.get<UsuarioDetalle>(
-        `${environment.apiUrl}/usuarios/${this.usuarioId}`
+        `${environment.apiUrl}/usuarios/${this.usuarioId}`,
+        { headers: this.getAuthHeaders() }
       ).toPromise();
 
       if (response) {
         this.usuario = response;
         console.log('✅ Usuario cargado:', this.usuario);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Error al cargar usuario:', error);
-      this.error = 'No se pudo cargar la información del usuario';
+
+      // Manejo específico de errores de autenticación
+      if (error.status === 401 || error.status === 403) {
+        this.error = 'Error de autenticación. Por favor, inicia sesión nuevamente.';
+        console.error('🔐 Error de autenticación - verificar token');
+      } else {
+        this.error = 'No se pudo cargar la información del usuario';
+      }
     } finally {
       this.loading = false;
     }

@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import * as L from 'leaflet';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import { IncidenciasService, IncidenciasResponse as ServiceIncidenciasResponse } from '../../services/incidencias.service';
 
 interface IncidenciaData {
   id: number;
@@ -70,6 +71,10 @@ export class IncidenciasHeatmapPage implements AfterViewInit, OnDestroy, OnInit 
   showFilters = false;
   showLegend = false;
 
+  // Variables para controlar el bucle infinito
+  private loadHeatmapRetryCount = 0;
+  private readonly MAX_RETRY_ATTEMPTS = 10;
+
   filters: FiltersType = {
     categoria: '',
     estado: ''
@@ -79,7 +84,8 @@ export class IncidenciasHeatmapPage implements AfterViewInit, OnDestroy, OnInit 
 
   constructor(
     private router: Router,
-    private http: HttpClient
+    private http: HttpClient,
+    private incidenciasService: IncidenciasService
   ) {}
 
   ngOnInit() {
@@ -116,28 +122,39 @@ export class IncidenciasHeatmapPage implements AfterViewInit, OnDestroy, OnInit 
   }
 
   loadIncidenciasData() {
-    // Construir parámetros de consulta
-    let params: any = {
+    console.log('🔗 Cargando datos de incidencias usando IncidenciasService...');
+
+    // Construir filtros para el servicio
+    let filtros: any = {
       limit: 1000, // Obtener todas las incidencias
       page: 1
     };
 
     // Agregar filtros si están activos
     if (this.filters.categoria) {
-      params.categoria = this.filters.categoria;
+      filtros.categoria = this.filters.categoria;
     }
     if (this.filters.estado) {
-      params.estado = this.filters.estado;
+      filtros.estado = this.filters.estado;
     }
 
-    const queryString = new URLSearchParams(params).toString();
-    const url = `${environment.apiUrl}/incidencias?${queryString}`;
-
-    this.http.get<IncidenciasResponse>(url).subscribe({
-      next: (response: IncidenciasResponse) => {
+    this.incidenciasService.getIncidencias(filtros).subscribe({
+      next: (response) => {
         console.log('📊 Datos de incidencias cargados:', response);
         if (response.success) {
-          this.allIncidenciasData = response.data;
+          // Convertir los datos del servicio al formato esperado
+          this.allIncidenciasData = response.data.map(incidencia => ({
+            id: incidencia.id || 0,
+            titulo: incidencia.titulo,
+            categoria: incidencia.categoria,
+            descripcion: incidencia.descripcion,
+            ciudad_id: incidencia.ciudad_id || 0,
+            ciudad_nombre: incidencia.ciudad_nombre || '',
+            usuario_id: incidencia.usuario_id || 0,
+            usuario_nombre: incidencia.usuario_nombre || '',
+            fecha_creacion: incidencia.fecha_creacion || '',
+            estado: incidencia.estado || 'pendiente'
+          }));
           this.totalIncidencias = response.total;
           this.processIncidenciasData();
           this.calculateCategoryStats();
@@ -147,10 +164,21 @@ export class IncidenciasHeatmapPage implements AfterViewInit, OnDestroy, OnInit 
           if (this.map) {
             this.loadHeatmapVisualization();
           }
+        } else {
+          console.warn('⚠️ Respuesta sin éxito de la API de incidencias');
+          this.isLoading = false;
         }
       },
       error: (error) => {
         console.error('❌ Error cargando datos de incidencias:', error);
+        console.error('❌ Status:', error.status);
+        console.error('❌ Error detail:', error.error);
+
+        // Si es error de autenticación, mostrar mensaje específico
+        if (error.status === 401 || error.status === 403) {
+          console.error('🔐 Error de autenticación - verificar token');
+        }
+
         this.isLoading = false;
       }
     });
@@ -422,10 +450,27 @@ export class IncidenciasHeatmapPage implements AfterViewInit, OnDestroy, OnInit 
    * Carga la visualización del mapa de calor con datos de incidencias
    */
   private loadHeatmapVisualization(): void {
+    console.log('Cargando visualización del heatmap de incidencias...');
+
     if (!this.map || this.incidenciasData.length === 0) {
+      this.loadHeatmapRetryCount++;
+
+      if (this.loadHeatmapRetryCount >= this.MAX_RETRY_ATTEMPTS) {
+        console.error('❌ Máximo número de intentos alcanzado para cargar visualización de heatmap de incidencias');
+        console.log('🔍 Estado actual:');
+        console.log('- Mapa inicializado:', !!this.map);
+        console.log('- Datos de incidencias disponibles:', this.incidenciasData.length);
+        console.log('- Todos los datos de incidencias:', this.allIncidenciasData.length);
+        return;
+      }
+
+      console.log(`⏳ Esperando datos de incidencias o mapa... (Intento ${this.loadHeatmapRetryCount}/${this.MAX_RETRY_ATTEMPTS})`);
       setTimeout(() => this.loadHeatmapVisualization(), 500);
       return;
     }
+
+    // Resetear contador si llegamos aquí exitosamente
+    this.loadHeatmapRetryCount = 0;
 
     // Mapeo de coordenadas por ID de municipio (igual que dashboard)
     const coordenadasPorId: { [key: number]: [number, number] } = {

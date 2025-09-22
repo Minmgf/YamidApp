@@ -94,7 +94,10 @@ export class IncidenciasService {
     console.log('🌐 URL completa de la petición:', finalUrl);
     console.log('📋 Parámetros construidos:', params.toString());
 
-    return this.http.get<IncidenciasResponse>(this.apiUrl, { params });
+    return this.http.get<IncidenciasResponse>(this.apiUrl, {
+      params,
+      headers: this.getAuthHeaders()
+    });
   }
 
   /**
@@ -110,7 +113,9 @@ export class IncidenciasService {
    * Obtener una incidencia por ID
    */
   getIncidenciaPorId(id: number): Observable<Incidencia> {
-    return this.http.get<Incidencia>(`${this.apiUrl}/${id}`);
+    return this.http.get<Incidencia>(`${this.apiUrl}/${id}`, {
+      headers: this.getAuthHeaders()
+    });
   }
 
   /**
@@ -165,28 +170,37 @@ export class IncidenciasService {
       params = params.set('estado', estado);
     }
 
-    return this.http.get<IncidenciasResponse>(`${this.apiUrl}/ciudad/${ciudadId}`, { params });
+    return this.http.get<IncidenciasResponse>(`${this.apiUrl}/ciudad/${ciudadId}`, {
+      params,
+      headers: this.getAuthHeaders()
+    });
   }
 
   /**
    * Obtener total de incidencias
    */
   getTotalIncidencias(): Observable<number | {total: number}> {
-    return this.http.get<number | {total: number}>(`${this.apiUrl}/total`);
+    return this.http.get<number | {total: number}>(`${this.apiUrl}/total`, {
+      headers: this.getAuthHeaders()
+    });
   }
 
   /**
    * Obtener lista de municipios
    */
   getMunicipios(): Observable<Municipio[]> {
-    return this.http.get<Municipio[]>(this.municipiosUrl);
+    return this.http.get<Municipio[]>(this.municipiosUrl, {
+      headers: this.getAuthHeaders()
+    });
   }
 
   /**
    * Obtener ciudades disponibles para incidencias
    */
   getCiudadesDisponibles(): Observable<Municipio[]> {
-    return this.http.get<Municipio[]>(`${this.apiUrl}/ciudades`);
+    return this.http.get<Municipio[]>(`${this.apiUrl}/ciudades`, {
+      headers: this.getAuthHeaders()
+    });
   }
 
   /**

@@ -471,24 +471,45 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
    * Cargar datos reales de incidencias desde la API
    */
   private loadIncidenciasDataFromAPI() {
-    const params = {
-      limit: '1000', // Obtener todas las incidencias
-      page: '1'
-    };
+    console.log('🔗 Cargando datos de incidencias usando IncidenciasService...');
 
-    const queryString = new URLSearchParams(params).toString();
-    const url = `${environment.apiUrl}/incidencias?${queryString}`;
-
-    this.http.get<IncidenciasResponse>(url).subscribe({
-      next: (response: IncidenciasResponse) => {
+    this.incidenciasService.getIncidencias({
+      limit: 1000, // Obtener todas las incidencias
+      page: 1
+    }).subscribe({
+      next: (response) => {
         console.log('📊 Datos de incidencias cargados en dashboard:', response);
         if (response.success) {
-          this.allIncidenciasData = response.data;
+          // Convertir los datos del servicio al formato esperado por el dashboard
+          this.allIncidenciasData = response.data.map(incidencia => ({
+            id: incidencia.id || 0,
+            titulo: incidencia.titulo,
+            categoria: incidencia.categoria,
+            descripcion: incidencia.descripcion,
+            ciudad_id: incidencia.ciudad_id || 0,
+            ciudad_nombre: incidencia.ciudad_nombre || '',
+            usuario_id: incidencia.usuario_id || 0,
+            usuario_nombre: incidencia.usuario_nombre || '',
+            fecha_creacion: incidencia.fecha_creacion || '',
+            estado: incidencia.estado || 'pendiente'
+          }));
           this.processIncidenciasData();
+        } else {
+          console.warn('⚠️ Respuesta sin éxito de la API de incidencias');
+          this.incidenciasData = [];
         }
       },
       error: (error) => {
         console.error('❌ Error cargando datos de incidencias en dashboard:', error);
+        console.error('❌ Status:', error.status);
+        console.error('❌ Error detail:', error.error);
+
+        // Si es error de autenticación, mostrar mensaje específico
+        if (error.status === 401 || error.status === 403) {
+          console.error('🔐 Error de autenticación - verificar token');
+          this.toast.error('Error de autenticación. Por favor, inicia sesión nuevamente.');
+        }
+
         this.incidenciasData = [];
       }
     });
@@ -544,6 +565,10 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
     console.log('✅ Datos de incidencias procesados:', this.incidenciasData);
   }
 
+  // Variable para controlar el número de intentos del bucle
+  private loadIncidenciasRetryCount = 0;
+  private readonly MAX_RETRY_ATTEMPTS = 10;
+
   /**
    * Método para cargar visualización de incidencias con datos reales
    */
@@ -551,10 +576,24 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
     console.log('Cargando visualización de incidencias reales...');
 
     if (!this.map || this.incidenciasData.length === 0) {
-      console.log('⏳ Esperando datos de incidencias o mapa...');
+      this.loadIncidenciasRetryCount++;
+
+      if (this.loadIncidenciasRetryCount >= this.MAX_RETRY_ATTEMPTS) {
+        console.error('❌ Máximo número de intentos alcanzado para cargar visualización de incidencias');
+        console.log('🔍 Estado actual:');
+        console.log('- Mapa inicializado:', !!this.map);
+        console.log('- Datos de incidencias disponibles:', this.incidenciasData.length);
+        console.log('- Todos los datos de incidencias:', this.allIncidenciasData.length);
+        return;
+      }
+
+      console.log(`⏳ Esperando datos de incidencias o mapa... (Intento ${this.loadIncidenciasRetryCount}/${this.MAX_RETRY_ATTEMPTS})`);
       setTimeout(() => this.loadIncidenciasVisualization(), 500);
       return;
     }
+
+    // Resetear contador si llegamos aquí exitosamente
+    this.loadIncidenciasRetryCount = 0;
 
     // Mapeo de coordenadas por ID de municipio (igual que incidencias-heatmap)
     const coordenadasPorId: { [key: number]: [number, number] } = {
