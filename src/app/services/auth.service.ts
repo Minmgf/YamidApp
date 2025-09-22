@@ -78,6 +78,13 @@ export class AuthService {
   }
 
   /**
+   * Obtiene el token de autenticación
+   */
+  getToken(): string | null {
+    return localStorage.getItem('token');
+  }
+
+  /**
    * Verifica si el usuario está autenticado
    */
   isAuthenticated(): boolean {
@@ -193,6 +200,24 @@ export class AuthService {
    * Cierra la sesión del usuario
    */
   logout(): void {
+    // Si existe el servicio de notificaciones, desregistrar el token
+    try {
+      // Importación dinámica para evitar dependencias circulares
+      import('./notification.service').then(({ NotificationService }) => {
+        // Verificar si hay una instancia del servicio disponible en el injector
+        const notificationService = (this as any).injector?.get(NotificationService);
+        if (notificationService) {
+          notificationService.unregisterTokenFromBackend().catch((error: any) => {
+            console.log('Could not unregister FCM token:', error);
+          });
+        }
+      }).catch(() => {
+        // No hacer nada si el servicio no está disponible
+      });
+    } catch (error) {
+      console.log('Notification service not available during logout');
+    }
+
     localStorage.removeItem('token');
     localStorage.removeItem('currentUser');
     this.currentUserSubject.next(null);

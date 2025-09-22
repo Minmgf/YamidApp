@@ -1,12 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Platform } from '@ionic/angular';
 import { StatusBar, Style } from '@capacitor/status-bar';
-import {
-  ActionPerformed,
-  PushNotificationSchema,
-  PushNotifications,
-  Token,
-} from '@capacitor/push-notifications';
+import { NotificationService } from './services/notification.service';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -15,54 +11,34 @@ import {
   standalone: false,
 })
 export class AppComponent implements OnInit {
-  constructor(private platform: Platform){
-    if (this.platform.is('capacitor')) {
-      this.initPush();
+  constructor(
+    private platform: Platform,
+    private notificationService: NotificationService,
+    private authService: AuthService
+  ) {}
+
+  /**
+   * Inicializa las notificaciones push después de que el usuario se autentique
+   */
+  private async initializePushNotifications(): Promise<void> {
+    if (!this.platform.is('capacitor')) {
+      console.log('🌐 Running on web - push notifications disabled');
+      return;
     }
-  }
 
-  initPush() {
-    console.log('Initializing HomePage');
+    // Solo inicializar si el usuario está autenticado
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser) {
+      console.log('👤 No authenticated user - push notifications will initialize after login');
+      return;
+    }
 
-    // Request permission to use push notifications
-    // iOS will prompt user and return if they granted permission or not
-    // Android will just grant without prompting
-    PushNotifications.requestPermissions().then(result => {
-      if (result.receive === 'granted') {
-        // Register with Apple / Google to receive push via APNS/FCM
-        PushNotifications.register();
-      } else {
-        // Show some error
-      }
-    });
-
-    // On success, we should be able to receive notifications
-    PushNotifications.addListener('registration',
-      (token: Token) => {
-        alert('Push registration success, token: ' + token.value);
-      }
-    );
-
-    // Some issue with our setup and push will not work
-    PushNotifications.addListener('registrationError',
-      (error: any) => {
-        alert('Error on registration: ' + JSON.stringify(error));
-      }
-    );
-
-    // Show us the notification payload if the app is open on our device
-    PushNotifications.addListener('pushNotificationReceived',
-      (notification: PushNotificationSchema) => {
-        alert('Push received: ' + JSON.stringify(notification));
-      }
-    );
-
-    // Method called when tapping on a notification
-    PushNotifications.addListener('pushNotificationActionPerformed',
-      (notification: ActionPerformed) => {
-        alert('Push action performed: ' + JSON.stringify(notification));
-      }
-    );
+    try {
+      await this.notificationService.initializePushNotifications();
+      console.log('🔔 Push notifications initialized in app.component');
+    } catch (error) {
+      console.error('❌ Error initializing push notifications in app.component:', error);
+    }
   }
 
   async ngOnInit() {
@@ -75,10 +51,21 @@ export class AppComponent implements OnInit {
         await StatusBar.setBackgroundColor({ color: '#ffffff' });
         await StatusBar.setOverlaysWebView({ overlay: false });
 
-        console.log('StatusBar configurado correctamente');
+        console.log('✅ StatusBar configurado correctamente');
       } catch (error) {
-        console.error('Error al configurar StatusBar:', error);
+        console.error('❌ Error al configurar StatusBar:', error);
       }
     }
+
+    // Suscribirse a cambios de autenticación para inicializar notificaciones
+    this.authService.currentUser$.subscribe(user => {
+      if (user) {
+        // Usuario autenticado - inicializar notificaciones push
+        this.initializePushNotifications();
+      } else {
+        // Usuario no autenticado - limpiar notificaciones si es necesario
+        console.log('👤 User logged out - push notifications will be cleaned up');
+      }
+    });
   }
 }

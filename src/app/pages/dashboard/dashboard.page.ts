@@ -1,5 +1,5 @@
 import { Component, AfterViewInit, OnInit } from '@angular/core';
-import { ViewDidEnter, IonicModule, SegmentValue } from '@ionic/angular';
+import { ViewDidEnter, IonicModule, SegmentValue, ModalController, AlertController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -10,7 +10,11 @@ import { MainHeaderComponent } from '../../shared/main-header/main-header.compon
 import { UserCountService, UserLeadersCountService } from '../../services/user-count.service';
 import { HeatmapService, HeatmapData } from '../../services/heatmap.service';
 import { IncidenciasService } from '../../services/incidencias.service';
+import { NotificationService } from '../../services/notification.service';
+import { AuthService } from '../../services/auth.service';
+import { HotToastService } from '@ngxpert/hot-toast';
 import { environment } from '../../../environments/environment';
+import { StatusModalComponent } from '../../components/status-modal/status-modal.component';
 
 interface IncidenciaData {
   id: number;
@@ -73,22 +77,326 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
   incidenciasData: IncidenciasByMunicipio[] = [];
   allIncidenciasData: IncidenciaData[] = [];
 
-  private map!: L.Map;  constructor(
+  private map!: L.Map;
+
+  // Propiedades para notificaciones
+  notificationModalOpen: boolean = false;
+  selectedNotificationType: 'manual' | 'municipio' = 'manual';
+  notificationData = {
+    usuarios_ids: [] as number[],
+    municipio_id: null as number | null,
+    titulo: '',
+    mensaje: '',
+    datos_extra: {}
+  };
+
+  constructor(
     private router: Router,
     private userCountService: UserCountService,
     private userLeadersCountService: UserLeadersCountService,
     private heatmapService: HeatmapService,
     private incidenciasService: IncidenciasService,
+    private notificationService: NotificationService,
+    private authService: AuthService,
+    private modalController: ModalController,
+    private alertController: AlertController,
+    private toast: HotToastService,
     private http: HttpClient
   ) {}
 
   logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('currentUser');
+    // Usar el método del AuthService que maneja el desregistro de notificaciones
+    this.authService.logout();
     this.router.navigate(['/login'], { replaceUrl: true });
   }
 
   /**
+   * 🔔 FUNCIONALIDADES DE NOTIFICACIONES
+   */
+
+  /**
+   * Verifica si el usuario actual puede enviar notificaciones (Solo Super Admin)
+   */
+  canSendNotifications(): boolean {
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser) return false;
+
+    // Solo super admin puede enviar notificaciones
+    return currentUser.rol === 'super_admin';
+  }
+
+  /**
+   * Abre el modal de notificaciones
+   */
+  async abrirModalNotificaciones(): Promise<void> {
+    if (!this.canSendNotifications()) {
+      this.toast.error('No tienes permisos para enviar notificaciones');
+      return;
+    }
+
+    const alert = await this.alertController.create({
+      header: '🔔 Enviar Notificación',
+      subHeader: 'Selecciona el tipo de notificación',
+      cssClass: 'notification-alert',
+      inputs: [
+        {
+          name: 'tipo',
+          type: 'radio',
+          label: 'Notificación Manual a Usuarios Específicos',
+          value: 'manual',
+          checked: true
+        },
+        {
+          name: 'tipo',
+          type: 'radio',
+          label: 'Notificación a Todo un Municipio',
+          value: 'municipio'
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Continuar',
+          handler: (data) => {
+            this.selectedNotificationType = data;
+            this.mostrarFormularioNotificacion();
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  /**
+   * Muestra el formulario según el tipo de notificación
+   */
+  private async mostrarFormularioNotificacion(): Promise<void> {
+    if (this.selectedNotificationType === 'manual') {
+      await this.mostrarFormularioManual();
+    } else {
+      await this.mostrarFormularioMunicipio();
+    }
+  }
+
+  /**
+   * Formulario para notificación manual
+   */
+  private async mostrarFormularioManual(): Promise<void> {
+    const alert = await this.alertController.create({
+      header: '📤 Notificación Manual',
+      cssClass: 'notification-form-alert',
+      inputs: [
+        {
+          name: 'titulo',
+          type: 'text',
+          placeholder: 'Título de la notificación',
+          value: this.notificationData.titulo
+        },
+        {
+          name: 'mensaje',
+          type: 'textarea',
+          placeholder: 'Mensaje de la notificación',
+          value: this.notificationData.mensaje
+        },
+        {
+          name: 'usuarios_ids',
+          type: 'text',
+          placeholder: 'IDs de usuarios (separados por comas): 1,2,3',
+          value: this.notificationData.usuarios_ids.join(',')
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Enviar',
+          handler: (data) => {
+            this.enviarNotificacionManual(data);
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  /**
+   * Formulario para notificación por municipio
+   */
+  private async mostrarFormularioMunicipio(): Promise<void> {
+    const alert = await this.alertController.create({
+      header: '🏛️ Notificación por Municipio',
+      cssClass: 'notification-form-alert',
+      inputs: [
+        {
+          name: 'titulo',
+          type: 'text',
+          placeholder: 'Título de la notificación',
+          value: this.notificationData.titulo
+        },
+        {
+          name: 'mensaje',
+          type: 'textarea',
+          placeholder: 'Mensaje de la notificación',
+          value: this.notificationData.mensaje
+        },
+        {
+          name: 'municipio_id',
+          type: 'number',
+          placeholder: 'ID del municipio (ej: 1 para Neiva)',
+          value: this.notificationData.municipio_id?.toString() || ''
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Enviar',
+          handler: (data) => {
+            this.enviarNotificacionMunicipio(data);
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  /**
+   * Envía notificación manual
+   */
+  private enviarNotificacionManual(data: any): void {
+    if (!data.titulo || !data.mensaje || !data.usuarios_ids) {
+      this.toast.error('Todos los campos son requeridos');
+      return;
+    }
+
+    // Parsear IDs de usuarios
+    const usuarios_ids = data.usuarios_ids.split(',')
+      .map((id: string) => parseInt(id.trim()))
+      .filter((id: number) => !isNaN(id));
+
+    if (usuarios_ids.length === 0) {
+      this.toast.error('Debes proporcionar al menos un ID de usuario válido');
+      return;
+    }
+
+    const notificationPayload = {
+      usuarios_ids,
+      titulo: data.titulo.trim(),
+      mensaje: data.mensaje.trim(),
+      datos_extra: {
+        tipo: 'manual',
+        enviado_desde: 'dashboard',
+        timestamp: new Date().toISOString()
+      }
+    };
+
+    this.toast.loading('Enviando notificación...', {
+      duration: 0
+    });
+
+    this.notificationService.sendManualNotification(notificationPayload).subscribe({
+      next: (response) => {
+        this.toast.success(`✅ Notificación enviada a ${usuarios_ids.length} usuarios`);
+        console.log('✅ Respuesta de notificación manual:', response);
+      },
+      error: (error) => {
+        console.error('❌ Error enviando notificación manual:', error);
+        this.toast.error('Error enviando notificación: ' + (error.error?.message || 'Error desconocido'));
+      }
+    });
+  }
+
+  /**
+   * Envía notificación por municipio
+   */
+  private enviarNotificacionMunicipio(data: any): void {
+    if (!data.titulo || !data.mensaje || !data.municipio_id) {
+      this.toast.error('Todos los campos son requeridos');
+      return;
+    }
+
+    const municipio_id = parseInt(data.municipio_id);
+    if (isNaN(municipio_id)) {
+      this.toast.error('El ID del municipio debe ser un número válido');
+      return;
+    }
+
+    const notificationPayload = {
+      municipio_id,
+      titulo: data.titulo.trim(),
+      mensaje: data.mensaje.trim()
+    };
+
+    this.toast.loading('Enviando notificación municipal...', {
+      duration: 0
+    });
+
+    this.notificationService.sendMunicipalNotification(notificationPayload).subscribe({
+      next: (response) => {
+        this.toast.success(`✅ Notificación enviada al municipio`);
+        console.log('✅ Respuesta de notificación municipal:', response);
+      },
+      error: (error) => {
+        console.error('❌ Error enviando notificación municipal:', error);
+        this.toast.error('Error enviando notificación: ' + (error.error?.message || 'Error desconocido'));
+      }
+    });
+  }
+
+  /**
+   * Muestra el estado del sistema en un modal dedicado
+   */
+  async mostrarEstadoNotificaciones(): Promise<void> {
+    this.toast.loading('Obteniendo estado del sistema...', {
+      duration: 0
+    });
+
+    this.notificationService.getNotificationStatus().subscribe({
+      next: async (response) => {
+        this.toast.success('Estado obtenido correctamente');
+
+        console.log('📊 Respuesta completa del estado:', response);
+
+        // Extraer datos de la respuesta real
+        const sistema = response.sistema || {};
+        const estadisticas = response.estadisticas || {};
+        const scheduler = response.scheduler || {};
+
+        // Crear modal con el componente dedicado
+        const modal = await this.modalController.create({
+          component: StatusModalComponent,
+          cssClass: 'status-modal-wrapper',
+          backdropDismiss: true,
+          showBackdrop: true,
+          componentProps: {
+            sistema,
+            estadisticas,
+            scheduler,
+            onRefresh: () => {
+              // Función para actualizar el estado
+              this.mostrarEstadoNotificaciones();
+            }
+          }
+        });
+
+        await modal.present();
+      },
+      error: (error) => {
+        console.error('❌ Error obteniendo estado:', error);
+        this.toast.error('Error obteniendo estado del sistema');
+      }
+    });
+  }  /**
    * Navegación desde las tarjetas del dashboard
    */
   navigateToIncidencias() {

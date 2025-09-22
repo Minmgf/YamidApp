@@ -1,0 +1,213 @@
+.status-modal-content {
+  --background: #f8f9fa;
+}
+
+.status-container {
+  padding: 16px;
+  gap: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.status-section {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #f0f0f0;
+
+    ion-icon {
+      font-size: 1.5rem;
+    }
+
+    h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #2c3e50;
+    }
+  }
+}
+
+/* Sección Firebase */
+.firebase-section {
+  border-left: 4px solid #e74c3c;
+}
+
+/* Sección Usuarios */
+.users-section {
+  border-left: 4px solid #3498db;
+}
+
+/* Sección Scheduler */
+.scheduler-section {
+  border-left: 4px solid #f39c12;
+}
+
+/* Items de estado */
+.status-items {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  .status-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+
+    .label {
+      font-weight: 500;
+      color: #495057;
+      font-size: 0.95rem;
+    }
+
+    .value {
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 4px 12px;
+      border-radius: 20px;
+
+      &.success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      &.error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+
+      &.mode-badge {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      &.number-badge {
+        background: #e3f2fd;
+        color: #1565c0;
+        border: 1px solid #bbdefb;
+        min-width: 40px;
+        text-align: center;
+
+        &.running {
+          background: #fff3e0;
+          color: #e65100;
+          border: 1px solid #ffcc02;
+          animation: pulse 2s infinite;
+        }
+      }
+    }
+  }
+}
+
+/* Grid de estadísticas */
+.status-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+
+  .stat-card {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 16px;
+    padding: 16px;
+    text-align: center;
+    border: 2px solid #dee2e6;
+    transition: all 0.3s ease;
+
+    &.highlight {
+      background: linear-gradient(135deg, #3498db, #2980b9);
+      color: white;
+      border-color: #2980b9;
+      box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+    }
+
+    .stat-number {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+
+      .highlight & {
+        color: white;
+      }
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      opacity: 0.8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+
+      .highlight & {
+        color: rgba(255, 255, 255, 0.9);
+      }
+    }
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+  }
+}
+
+/* Footer buttons */
+.footer-buttons {
+  display: flex;
+  gap: 12px;
+  padding: 12px 16px;
+  width: 100%;
+
+  ion-button {
+    flex: 1;
+    height: 44px;
+
+    &[fill="outline"] {
+      --border-color: #6c757d;
+      --color: #6c757d;
+    }
+
+    &[fill="solid"] {
+      --background: linear-gradient(135deg, #28a745, #20c997);
+      --color: white;
+    }
+  }
+}
+
+/* Animaciones */
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .status-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .status-container {
+    padding: 12px;
+  }
+
+  .status-section {
+    padding: 16px;
+  }
+}

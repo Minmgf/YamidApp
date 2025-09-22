@@ -976,3 +976,54 @@ ion-avatar {
   font-size: 13px;
 }
 
+/* ===== ESTILOS PARA MODAL DE ESTADO ===== */
+
+/* Wrapper del modal de estado */
+:global(.status-modal-wrapper) {
+  --width: 95%;
+  --max-width: 500px;
+  --height: auto;
+  --max-height: 90vh;
+  --border-radius: 20px;
+  --backdrop-opacity: 0.6;
+
+  ion-modal {
+    --border-radius: 20px;
+  }
+
+  .modal-wrapper {
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* Header del modal */
+:global(.status-modal-wrapper ion-header ion-toolbar) {
+  --background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --color: white;
+
+  ion-title {
+    font-weight: 600;
+    font-size: 1.2rem;
+    text-align: center;
+  }
+
+  ion-button {
+    --color: white;
+
+    &:hover {
+      --background: rgba(255, 255, 255, 0.1);
+    }
+  }
+}
+
+/* Footer del modal */
+:global(.status-modal-wrapper ion-footer) {
+  ion-toolbar {
+    --background: #f8f9fa;
+    --border-color: #dee2e6;
+    --border-width: 1px 0 0 0;
+  }
+}
+
