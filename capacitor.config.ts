@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'io.ionic.starter',
-  appName: 'Yamid',
+  appId: 'com.yamid.app',
+  appName: 'Yamid Sanabria',
   webDir: 'www',
   plugins: {
     StatusBar: {

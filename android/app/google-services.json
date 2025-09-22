@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "79704389027",
+    "project_id": "yamidtest",
+    "storage_bucket": "yamidtest.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:79704389027:android:7c39388e4a64757ec11616",
+        "android_client_info": {
+          "package_name": "com.yamid.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAEAcDYdPgRKPWRsBtjpjJQvyGkLSUs3A0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

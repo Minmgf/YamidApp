@@ -18,7 +18,7 @@
       <ion-input
         formControlName="nombre"
         placeholder="Ingrese el nombre completo"
-        [class.ion-invalid]="registerForm.get('nombre')?.invalid && registerForm.get('nombre')?.touched">
+        [class]="getInputClasses('nombre')">
       </ion-input>
     </ion-item>
     <div class="error-message" *ngIf="getErrorMessage('nombre')">
@@ -32,7 +32,7 @@
         formControlName="cedula"
         type="number"
         placeholder="Ingrese la cédula"
-        [class.ion-invalid]="registerForm.get('cedula')?.invalid && registerForm.get('cedula')?.touched">
+        [class]="getInputClasses('cedula')">
       </ion-input>
     </ion-item>
     <div class="error-message" *ngIf="getErrorMessage('cedula')">
@@ -46,7 +46,7 @@
         formControlName="celular"
         type="tel"
         placeholder="Ingrese el número de celular"
-        [class.ion-invalid]="registerForm.get('celular')?.invalid && registerForm.get('celular')?.touched">
+        [class]="getInputClasses('celular')">
       </ion-input>
     </ion-item>
     <div class="error-message" *ngIf="getErrorMessage('celular')">
@@ -60,7 +60,7 @@
         formControlName="email"
         type="email"
         placeholder="Ingrese el correo electrónico"
-        [class.ion-invalid]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
+        [class]="getInputClasses('email')">
       </ion-input>
     </ion-item>
     <div class="error-message" *ngIf="getErrorMessage('email')">
@@ -74,7 +74,7 @@
         formControlName="password"
         [type]="showPassword ? 'text' : 'password'"
         placeholder="Ingrese la contraseña"
-        [class.ion-invalid]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
+        [class]="getInputClasses('password')">
       </ion-input>
       <ion-button
         slot="end"
@@ -94,7 +94,7 @@
       <ion-select
         formControlName="municipio_id"
         placeholder="Seleccione un municipio"
-        [class.ion-invalid]="registerForm.get('municipio_id')?.invalid && registerForm.get('municipio_id')?.touched">
+        [class]="getInputClasses('municipio_id')">
         <ion-select-option
           *ngFor="let municipio of municipios"
           [value]="municipio.id">
@@ -121,9 +121,9 @@
       <ion-select
         formControlName="rol_id"
         placeholder="Seleccione un rol"
-        [class.ion-invalid]="registerForm.get('rol_id')?.invalid && registerForm.get('rol_id')?.touched">
+        [class]="getInputClasses('rol_id')">
         <ion-select-option
-          *ngFor="let rol of roles"
+          *ngFor="let rol of rolesDisponibles"
           [value]="rol.id">
           {{ rol.nombre }} - {{ rol.descripcion }}
         </ion-select-option>
@@ -133,12 +133,32 @@
       {{ getErrorMessage('rol_id') }}
     </div>
 
+    <!-- Mensaje informativo sobre permisos de roles -->
+    <ion-item *ngIf="rolesDisponibles.length === 0" lines="none">
+      <ion-label color="warning">
+        <p>
+          <ion-icon name="warning-outline"></ion-icon>
+          Tu rol actual ({{ currentUserRole }}) no tiene permisos para registrar usuarios.
+        </p>
+      </ion-label>
+    </ion-item>
+
+    <ion-item *ngIf="rolesDisponibles.length > 0" lines="none">
+      <ion-label color="medium">
+        <p>
+          <ion-icon name="information-circle-outline"></ion-icon>
+          Como {{ currentUserRole }}, puedes registrar:
+          <strong>{{ getRolesDisponiblesNames() }}</strong>
+        </p>
+      </ion-label>
+    </ion-item>
+
     <!-- Botones -->
     <div class="button-container">
       <ion-button
         expand="block"
         type="submit"
-        [disabled]="registerForm.invalid || isLoading"
+        [disabled]="isLoading || rolesDisponibles.length === 0"
         class="register-button">
         <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
         <span *ngIf="!isLoading">Registrar Usuario</span>

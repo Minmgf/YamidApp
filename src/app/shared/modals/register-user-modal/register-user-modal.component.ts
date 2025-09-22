@@ -21,8 +21,11 @@ export class RegisterUserModalComponent implements OnInit {
   registerForm: FormGroup;
   municipios: Municipio[] = [];
   roles: Rol[] = [];
+  rolesDisponibles: Rol[] = []; // Roles filtrados según la jerarquía
   isLoading = false;
   showPassword = false;
+  currentUserRole: string = '';
+  showValidationErrors = false; // Controla cuándo mostrar errores de validación
 
   constructor(
     private fb: FormBuilder,
@@ -31,21 +34,107 @@ export class RegisterUserModalComponent implements OnInit {
     private userRegistrationService: UserRegistrationService,
     private authService: AuthService
   ) {
+    // Crear formulario sin validaciones inicialmente
     this.registerForm = this.fb.group({
-      nombre: ['', [Validators.required, Validators.minLength(2)]],
-      cedula: ['', [Validators.required, Validators.pattern(/^\d{8,10}$/)]],
-      celular: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
-      email: ['', [Validators.required, Validators.email, Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      municipio_id: ['', Validators.required],
+      nombre: [''],
+      cedula: [''],
+      celular: [''],
+      email: [''],
+      password: [''],
+      municipio_id: [''],
       lugar_votacion: [''],
-      rol_id: ['', Validators.required]
+      rol_id: ['']
+    });
+  }
+
+  /**
+   * Aplica las validaciones al formulario
+   */
+  private applyValidations() {
+    this.registerForm.get('nombre')?.setValidators([Validators.required, Validators.minLength(2)]);
+    this.registerForm.get('cedula')?.setValidators([Validators.required, Validators.pattern(/^\d{8,10}$/)]);
+    this.registerForm.get('celular')?.setValidators([Validators.required, Validators.pattern(/^\d{10}$/)]);
+    this.registerForm.get('email')?.setValidators([Validators.required, Validators.email, Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)]);
+    this.registerForm.get('password')?.setValidators([Validators.required, Validators.minLength(6)]);
+    this.registerForm.get('municipio_id')?.setValidators([Validators.required]);
+    this.registerForm.get('rol_id')?.setValidators([Validators.required]);
+
+    // Actualizar validaciones en todos los campos
+    Object.keys(this.registerForm.controls).forEach(key => {
+      this.registerForm.get(key)?.updateValueAndValidity();
     });
   }
 
   ngOnInit() {
+    this.getCurrentUserRole();
     this.loadMunicipios();
     this.loadRoles();
+  }
+
+  /**
+   * Obtiene el rol del usuario actual de la sesión
+   */
+  getCurrentUserRole() {
+    const currentUser = this.authService.getCurrentUser();
+    if (currentUser && currentUser.rol) {
+      this.currentUserRole = currentUser.rol;
+      console.log('Rol del usuario actual:', this.currentUserRole);
+    } else {
+      console.error('No se pudo obtener el rol del usuario actual');
+      this.toast.error('Error: No se pudo identificar tu rol de usuario');
+    }
+  }
+
+  /**
+   * Filtra los roles disponibles según la jerarquía del usuario actual
+   */
+  filterRolesByHierarchy() {
+    if (!this.currentUserRole || this.roles.length === 0) {
+      this.rolesDisponibles = [];
+      return;
+    }
+
+    console.log('Filtrando roles para usuario con rol:', this.currentUserRole);
+    console.log('Roles totales disponibles:', this.roles);
+
+    switch (this.currentUserRole) {
+      case 'super_admin':
+        // Super admin puede registrar todos los roles
+        this.rolesDisponibles = this.roles.filter(rol => rol.nombre !== 'super_admin');
+        break;
+
+      case 'lider_principal':
+        // Lider puede registrar aliados y simpatizantes
+        this.rolesDisponibles = this.roles.filter(rol =>
+          rol.nombre === 'aliado' || rol.nombre === 'simpatizante'
+        );
+        break;
+
+      case 'simpatizante':
+        // Simpatizante solo puede registrar aliados
+        this.rolesDisponibles = this.roles.filter(rol => rol.nombre === 'aliado');
+        break;
+
+      default:
+        // Cualquier otro rol no puede registrar usuarios
+        this.rolesDisponibles = [];
+        console.warn('Usuario sin permisos de registro:', this.currentUserRole);
+        break;
+    }
+
+    console.log('Roles disponibles para registro:', this.rolesDisponibles);
+
+    // Si no hay roles disponibles, mostrar mensaje de error
+    if (this.rolesDisponibles.length === 0) {
+      this.toast.warning('Tu rol no tiene permisos para registrar usuarios');
+    }
+  }
+
+  /**
+   * Obtiene los nombres de los roles disponibles como string
+   */
+  getRolesDisponiblesNames(): string {
+    return this.rolesDisponibles.map(rol => rol.nombre).join(', ');
   }
   /**
    * Carga la lista de municipios
@@ -82,6 +171,8 @@ export class RegisterUserModalComponent implements OnInit {
       next: (roles) => {
         this.roles = roles;
         console.log('Roles cargados:', roles.length);
+        // Filtrar roles según la jerarquía después de cargarlos
+        this.filterRolesByHierarchy();
       },
       error: (error) => {
         console.error('Error loading roles:', error);
@@ -109,6 +200,8 @@ export class RegisterUserModalComponent implements OnInit {
           }
         ];
         this.toast.warning('Se cargaron roles desde datos locales. Verifica tu conexión');
+        // Filtrar roles según la jerarquía después de cargar el fallback
+        this.filterRolesByHierarchy();
       }
     });
   }
@@ -124,8 +217,21 @@ export class RegisterUserModalComponent implements OnInit {
    * Envía el formulario de registro
    */
   async onSubmit() {
+    // Aplicar validaciones y activar la visualización de errores
+    this.applyValidations();
+    this.showValidationErrors = true;
+
     if (this.registerForm.invalid) {
       this.markFormGroupTouched();
+      return;
+    }
+
+    // Validar que el rol seleccionado está dentro de los roles permitidos
+    const selectedRolId = this.registerForm.get('rol_id')?.value;
+    const isRoleAllowed = this.rolesDisponibles.some(rol => rol.id === selectedRolId);
+
+    if (!isRoleAllowed) {
+      this.toast.error('El rol seleccionado no está permitido para tu nivel de usuario');
       return;
     }
 
@@ -183,7 +289,8 @@ export class RegisterUserModalComponent implements OnInit {
    */
   getErrorMessage(fieldName: string): string {
     const control = this.registerForm.get(fieldName);
-    if (control?.errors && control?.touched) {
+    // Solo mostrar errores si showValidationErrors está activo Y el campo tiene errores
+    if (control?.errors && this.showValidationErrors) {
       const errors = control.errors;
 
       if (errors['required']) return `${this.getFieldLabel(fieldName)} es requerido`;
@@ -194,6 +301,24 @@ export class RegisterUserModalComponent implements OnInit {
         if (fieldName === 'email') return 'Ingrese un correo electrónico válido';
       }
       if (errors['email']) return 'Ingrese un correo electrónico válido';
+    }
+    return '';
+  }
+
+  /**
+   * Verifica si un campo tiene errores Y debe mostrarlos
+   */
+  hasFieldError(fieldName: string): boolean {
+    const control = this.registerForm.get(fieldName);
+    return !!(control?.errors && this.showValidationErrors);
+  }
+
+  /**
+   * Obtiene las clases CSS para el input según su estado de validación
+   */
+  getInputClasses(fieldName: string): string {
+    if (this.hasFieldError(fieldName)) {
+      return 'ion-invalid';
     }
     return '';
   }
