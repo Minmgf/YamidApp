@@ -77,6 +77,9 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
   incidenciasData: IncidenciasByMunicipio[] = [];
   allIncidenciasData: IncidenciaData[] = [];
 
+  // Lista de municipios para seleccionar
+  municipios: any[] = [];
+
   private map!: L.Map;
 
   // Propiedades para notificaciones
@@ -230,8 +233,60 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
    * Formulario para notificación por municipio
    */
   private async mostrarFormularioMunicipio(): Promise<void> {
+    // Verificar que tenemos municipios cargados
+    if (!this.municipios || this.municipios.length === 0) {
+      this.toast.error('No se han cargado los municipios. Intentando cargar...');
+      this.loadMunicipios();
+      return;
+    }
+
+    // Crear opciones de radio para municipios
+    const municipioOptions = this.municipios.map(municipio => ({
+      name: 'municipio_id',
+      type: 'radio' as const,
+      label: municipio.nombre,
+      value: municipio.id,
+      checked: false
+    }));
+
+    // Primer modal: Seleccionar municipio
+    const municipioAlert = await this.alertController.create({
+      header: '🏛️ Seleccionar Municipio',
+      subHeader: 'Selecciona el municipio para enviar la notificación:',
+      cssClass: 'municipio-select-alert',
+      inputs: municipioOptions,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Continuar',
+          handler: (municipioId) => {
+            if (!municipioId) {
+              this.toast.error('Debes seleccionar un municipio');
+              return false;
+            }
+            this.mostrarFormularioNotificacionConMunicipio(municipioId);
+            return true;
+          }
+        }
+      ]
+    });
+
+    await municipioAlert.present();
+  }
+
+  /**
+   * Mostrar formulario de notificación después de seleccionar municipio
+   */
+  private async mostrarFormularioNotificacionConMunicipio(municipioId: number): Promise<void> {
+    const municipioSeleccionado = this.municipios.find(m => m.id === municipioId);
+    const municipioNombre = municipioSeleccionado ? municipioSeleccionado.nombre : 'Municipio seleccionado';
+
     const alert = await this.alertController.create({
-      header: '🏛️ Notificación por Municipio',
+      header: '📤 Notificación Municipal',
+      subHeader: `Enviando a: ${municipioNombre}`,
       cssClass: 'notification-form-alert',
       inputs: [
         {
@@ -245,12 +300,6 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
           type: 'textarea',
           placeholder: 'Mensaje de la notificación',
           value: this.notificationData.mensaje
-        },
-        {
-          name: 'municipio_id',
-          type: 'number',
-          placeholder: 'ID del municipio (ej: 1 para Neiva)',
-          value: this.notificationData.municipio_id?.toString() || ''
         }
       ],
       buttons: [
@@ -261,7 +310,12 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
         {
           text: 'Enviar',
           handler: (data) => {
-            this.enviarNotificacionMunicipio(data);
+            // Agregar el municipio_id a los datos
+            const dataConMunicipio = {
+              ...data,
+              municipio_id: municipioId
+            };
+            this.enviarNotificacionMunicipio(dataConMunicipio);
           }
         }
       ]
@@ -652,6 +706,7 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
     this.loadUserLeadersCount();
     this.loadTotalIncidencias(); // Cargar total de incidencias
     this.loadIncidenciasDataFromAPI(); // Cargar datos reales de incidencias
+    this.loadMunicipios(); // Cargar lista de municipios
   }
 
   loadUserLeadersCount() {
@@ -688,6 +743,24 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
         console.error('❌ Status:', error.status);
         console.error('❌ Message:', error.message);
         this.totalIncidencias = 0; // Valor por defecto en caso de error
+      }
+    });
+  }
+
+  /**
+   * Cargar lista de municipios
+   */
+  loadMunicipios() {
+    console.log('🏛️ Cargando lista de municipios...');
+
+    this.incidenciasService.getMunicipios().subscribe({
+      next: (response) => {
+        console.log('✅ Municipios cargados:', response);
+        this.municipios = response;
+      },
+      error: (error) => {
+        console.error('❌ Error cargando municipios:', error);
+        this.municipios = [];
       }
     });
   }  loadUserCount() {

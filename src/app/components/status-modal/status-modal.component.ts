@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
   template: `
     <ion-header>
       <ion-toolbar color="primary">
-        <ion-title>📊 Estado del Sistema</ion-title>
+        <ion-title>Estado del Sistema</ion-title>
         <ion-buttons slot="end">
           <ion-button fill="clear" (click)="dismiss()">
             <ion-icon name="close" color="light"></ion-icon>
