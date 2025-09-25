@@ -1,2 +1,171 @@
 // For information on how to create your own theme, please see:
 // http://ionicframework.com/docs/theming/
+
+/** Ionic CSS Variables **/
+:root {
+  /** primary - Basado en #cbd501 (Verde Lima) **/
+  --ion-color-primary: #cbd501;
+  --ion-color-primary-rgb: 203, 213, 1;
+  --ion-color-primary-contrast: #000000;
+  --ion-color-primary-contrast-rgb: 0, 0, 0;
+  --ion-color-primary-shade: #b3bb01;
+  --ion-color-primary-tint: #d0d91a;
+
+  /** Variables personalizadas para estados interactivos **/
+  --ion-color-primary-hover: #9ba001; /* Verde lima más oscuro para hover */
+  --ion-color-primary-active: #8a9501; /* Aún más oscuro para active */
+  --ion-color-primary-focus: #a8b501; /* Color intermedio para focus */
+
+  /** secondary - Complementario al verde lima **/
+  --ion-color-secondary: #e2b436;
+  --ion-color-secondary-rgb: 1, 168, 203;
+  --ion-color-secondary-contrast: #ffffff;
+  --ion-color-secondary-contrast-rgb: 255, 255, 255;
+  --ion-color-secondary-shade: #0194b3;
+  --ion-color-secondary-tint: #1ab1d0;
+
+  /** tertiary - Variación más suave del primary **/
+  --ion-color-tertiary: #e8f301;
+  --ion-color-tertiary-rgb: 232, 243, 1;
+  --ion-color-tertiary-contrast: #000000;
+  --ion-color-tertiary-contrast-rgb: 0, 0, 0;
+  --ion-color-tertiary-shade: #ccd601;
+  --ion-color-tertiary-tint: #eaf41a;
+
+  /** success **/
+  --ion-color-success: #2dd36f;
+  --ion-color-success-rgb: 45, 211, 111;
+  --ion-color-success-contrast: #ffffff;
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+  --ion-color-success-shade: #28ba62;
+  --ion-color-success-tint: #42d77d;
+
+  /** warning **/
+  --ion-color-warning: #ffc409;
+  --ion-color-warning-rgb: 255, 196, 9;
+  --ion-color-warning-contrast: #000000;
+  --ion-color-warning-contrast-rgb: 0, 0, 0;
+  --ion-color-warning-shade: #e0ac08;
+  --ion-color-warning-tint: #ffca22;
+
+  /** danger **/
+  --ion-color-danger: #eb445a;
+  --ion-color-danger-rgb: 235, 68, 90;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: #cf3c4f;
+  --ion-color-danger-tint: #ed576b;
+
+  /** dark **/
+  --ion-color-dark: #222428;
+  --ion-color-dark-rgb: 34, 36, 40;
+  --ion-color-dark-contrast: #ffffff;
+  --ion-color-dark-contrast-rgb: 255, 255, 255;
+  --ion-color-dark-shade: #1e2023;
+  --ion-color-dark-tint: #383a3e;
+
+  /** medium **/
+  --ion-color-medium: #92949c;
+  --ion-color-medium-rgb: 146, 148, 156;
+  --ion-color-medium-contrast: #ffffff;
+  --ion-color-medium-contrast-rgb: 255, 255, 255;
+  --ion-color-medium-shade: #808289;
+  --ion-color-medium-tint: #9d9fa6;
+
+  /** light **/
+  --ion-color-light: #f4f5f8;
+  --ion-color-light-rgb: 244, 245, 248;
+  --ion-color-light-contrast: #000000;
+  --ion-color-light-contrast-rgb: 0, 0, 0;
+  --ion-color-light-shade: #d7d8da;
+  --ion-color-light-tint: #f5f6f9;
+
+  /** Colores personalizados adicionales basados en #cbd501 **/
+
+  /** lime-dark - Versión más oscura del primary **/
+  --ion-color-lime-dark: #9ba001;
+  --ion-color-lime-dark-rgb: 155, 160, 1;
+  --ion-color-lime-dark-contrast: #ffffff;
+  --ion-color-lime-dark-contrast-rgb: 255, 255, 255;
+  --ion-color-lime-dark-shade: #888d01;
+  --ion-color-lime-dark-tint: #a5aa1a;
+
+  /** lime-light - Versión más clara del primary **/
+  --ion-color-lime-light: #dde633;
+  --ion-color-lime-light-rgb: 221, 230, 51;
+  --ion-color-lime-light-contrast: #000000;
+  --ion-color-lime-light-contrast-rgb: 0, 0, 0;
+  --ion-color-lime-light-shade: #c2ca2d;
+  --ion-color-lime-light-tint: #e0e947;
+}
+
+/* Clases auxiliares para los colores personalizados */
+.ion-color-lime-dark {
+  --ion-color-base: var(--ion-color-lime-dark);
+  --ion-color-base-rgb: var(--ion-color-lime-dark-rgb);
+  --ion-color-contrast: var(--ion-color-lime-dark-contrast);
+  --ion-color-contrast-rgb: var(--ion-color-lime-dark-contrast-rgb);
+  --ion-color-shade: var(--ion-color-lime-dark-shade);
+  --ion-color-tint: var(--ion-color-lime-dark-tint);
+}
+
+.ion-color-lime-light {
+  --ion-color-base: var(--ion-color-lime-light);
+  --ion-color-base-rgb: var(--ion-color-lime-light-rgb);
+  --ion-color-contrast: var(--ion-color-lime-light-contrast);
+  --ion-color-contrast-rgb: var(--ion-color-lime-light-contrast-rgb);
+  --ion-color-shade: var(--ion-color-lime-light-shade);
+  --ion-color-tint: var(--ion-color-lime-light-tint);
+}
+
+/* Estilos personalizados para botones con hover diferenciado */
+ion-button {
+  /* Estado normal */
+  &[color="primary"] {
+    --background: var(--ion-color-primary);
+    --color: var(--ion-color-primary-contrast);
+
+    /* Estado hover */
+    &:hover {
+      --background: var(--ion-color-primary-hover) !important;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(203, 213, 1, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    /* Estado activo (cuando se presiona) */
+    &:active {
+      --background: var(--ion-color-primary-active) !important;
+      transform: translateY(0);
+      box-shadow: 0 2px 6px rgba(203, 213, 1, 0.2);
+    }
+
+    /* Estado focus (para accesibilidad) */
+    &:focus {
+      --background: var(--ion-color-primary-focus) !important;
+      outline: 2px solid var(--ion-color-primary-tint);
+      outline-offset: 2px;
+    }
+  }
+}
+
+/* Estilos específicos para diferentes tipos de botones */
+ion-button[fill="outline"][color="primary"] {
+  --border-color: var(--ion-color-primary);
+  --color: var(--ion-color-primary);
+
+  &:hover {
+    --background: var(--ion-color-primary-hover) !important;
+    --color: white !important;
+    --border-color: var(--ion-color-primary-hover);
+  }
+}
+
+ion-button[fill="clear"][color="primary"] {
+  --color: var(--ion-color-primary);
+
+  &:hover {
+    --background: rgba(203, 213, 1, 0.1) !important;
+    --color: var(--ion-color-primary-hover) !important;
+  }
+}

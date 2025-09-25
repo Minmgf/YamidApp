@@ -35,13 +35,12 @@ ion-header {
       transition: all 0.3s ease;
       --border-width: 0;
       --border-style: none;
-      border: 1px solid --ion-color-primary-rgb;
       margin-bottom: 10px  ;
 
       &.segment-button-checked {
-        background: var(--ion-color-primary);
+        background: rgb(203, 213, 1);
         color: white;
-        box-shadow: 0 2px 8px rgba(var(--ion-color-primary-rgb), 0.3);
+        box-shadow: 0 2px 8px rgba(203, 213, 1, 0.3);
         --border-width: 0;
         --border-style: none;
         --indicator-color: transparent;
@@ -52,10 +51,9 @@ ion-header {
         font-weight: 600;
       }
 
-      &:hover:not(.segment-button-checked) {
-        background: rgba(var(--ion-color-primary-rgb), 0.1);
-        color: var(--ion-color-primary);
-      }
+      // &:hover:not(.segment-button-checked) {
+      //   background: rgba(var(--ion-color-primary-rgb), 0.1);
+      // }
     }
   }
 }
@@ -259,10 +257,10 @@ ion-avatar {
 // Estilos específicos para cada tipo de tarjeta
 .card.alert {
   &:hover {
-    border-left: 4px solid #ff5722;
+    border-left: 4px solid #cbd501;
 
     ion-icon {
-      color: #ff5722;
+      color: #cbd501;
       transform: scale(1.1);
     }
   }
@@ -270,10 +268,10 @@ ion-avatar {
 
 .card.group {
   &:hover {
-    border-left: 4px solid #2196f3;
+    border-left: 4px solid #cbd501;
 
     ion-icon {
-      color: #2196f3;
+      color: #cbd501;
       transform: scale(1.1);
     }
   }
@@ -281,10 +279,10 @@ ion-avatar {
 
 .card.total-lideres {
   &:hover {
-    border-left: 4px solid #4caf50;
+    border-left: 4px solid #cbd501;
 
     ion-icon {
-      color: #4caf50;
+      color: #cbd501;
       transform: scale(1.1);
     }
   }
@@ -410,7 +408,7 @@ ion-avatar {
 
 /* Badge de contador de usuarios del mapa de calor */
 .municipio-count-badge {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  // background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   padding: 4px 8px;
   border-radius: 12px;
