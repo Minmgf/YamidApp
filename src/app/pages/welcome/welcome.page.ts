@@ -6,8 +6,10 @@ import { FormsModule } from '@angular/forms';
 import { MainHeaderComponent } from '../../shared/main-header/main-header.component';
 import { RegisterUserModalComponent } from '../../shared/modals/register-user-modal/register-user-modal.component';
 import { EvaluateLeaderModalComponent } from '../../shared/modals/evaluate-leader-modal/evaluate-leader-modal.component';
+import { UserIncidenciasModalComponent } from '../../shared/modals/user-incidencias-modal/user-incidencias-modal.component';
 import { UserRegistrationService } from '../../services/user-registration.service';
 import { AuthService } from '../../services/auth.service';
+import { IncidenciasService } from '../../services/incidencias.service';
 
 @Component({
   standalone: true,
@@ -35,7 +37,8 @@ export class WelcomePage implements OnInit {
     private modalCtrl: ModalController,
     private alertCtrl: AlertController,
     private userService: UserRegistrationService,
-    private authService: AuthService
+    private authService: AuthService,
+    private incidenciasService: IncidenciasService
   ) {}
 
   ngOnInit() {
@@ -239,6 +242,42 @@ export class WelcomePage implements OnInit {
   }
 
   /**
+   * Abre el modal para ver las incidencias del usuario
+   */
+  async openIncidenciasModal() {
+    if (!this.user?.id) {
+      await this.showAlert('Error', 'No se pudo obtener la información del usuario');
+      return;
+    }
+
+    try {
+      const modal = await this.modalCtrl.create({
+        component: UserIncidenciasModalComponent,
+        cssClass: 'user-incidencias-modal',
+        backdropDismiss: true,
+        showBackdrop: true,
+        animated: true,
+        presentingElement: document.querySelector('ion-router-outlet') || undefined,
+        canDismiss: true,
+        componentProps: {
+          userId: this.user.id,
+          userName: this.user.nombre_completo || `${this.user.nombre} ${this.user.apellido}`
+        }
+      });
+
+      await modal.present();
+
+      // Opcional: manejar el cierre si necesitas hacer algo después
+      modal.onDidDismiss().then((result) => {
+        // Aquí puedes agregar lógica después de cerrar el modal si es necesario
+      });
+    } catch (error) {
+      console.error('Error al abrir modal de incidencias:', error);
+      await this.showAlert('Error', 'No se pudo abrir el modal de incidencias');
+    }
+  }
+
+  /**
    * Muestra una alerta
    */
   private async showAlert(header: string, message: string) {
@@ -369,7 +408,9 @@ export class WelcomePage implements OnInit {
   hasAnyActions(): boolean {
     const hasRegisterPermission = this.user?.permisos?.puede_registrar_usuarios;
     const hasEvaluateOption = this.user?.created_by && this.createdByName !== 'Sistema';
-    return hasRegisterPermission || hasEvaluateOption;
+    const hasIncidenciasOption = this.user?.id; // Siempre disponible si tiene ID de usuario
+
+    return hasRegisterPermission || hasEvaluateOption || hasIncidenciasOption;
   }
 
   // =================== MÉTODOS DE DEBUG ===================

@@ -271,6 +271,14 @@
         color: #ffc107;
       }
     }
+
+    &.incidencias-btn {
+      border-left: 4px solid #dc3545;
+
+      .action-icon {
+        color: #dc3545;
+      }
+    }
   }
 }
 

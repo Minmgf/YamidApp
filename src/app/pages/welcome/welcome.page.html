@@ -82,5 +82,13 @@
       <ion-icon name="star" class="action-icon"></ion-icon>
       <span>Evaluar a {{ createdByName }}</span>
     </button>
+
+    <!-- Botón para ver incidencias registradas -->
+    <button
+      (click)="openIncidenciasModal()"
+      class="action-button incidencias-btn">
+      <ion-icon name="warning" class="action-icon"></ion-icon>
+      <span>Mis Incidencias</span>
+    </button>
   </div>
 </ion-content>

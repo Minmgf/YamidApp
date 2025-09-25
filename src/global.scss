@@ -347,3 +347,56 @@ ion-header {
     }
   }
 }
+
+// Estilos específicos para el modal de incidencias de usuario
+.user-incidencias-modal {
+  --width: 85%;
+  --max-width: 700px;
+  --height: 80vh;
+  --min-height: 500px;
+  --max-height: 85vh;
+  --border-radius: 16px;
+  --backdrop-opacity: 0.5;
+
+  .modal-wrapper {
+    height: 100%;
+    will-change: transform, opacity;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  ion-header {
+    --border-radius: 16px 16px 0 0;
+    border-radius: 16px 16px 0 0;
+    box-shadow: none !important;
+    border-bottom: 1px solid var(--ion-color-light) !important;
+  }
+
+  ion-content {
+    --overflow: auto;
+    height: 100% !important;
+    --border-radius: 0 0 16px 16px;
+  }
+
+  @media (max-width: 768px) {
+    --width: 95%;
+    --height: 85vh;
+    --min-height: 450px;
+    --max-height: 90vh;
+    --border-radius: 12px;
+
+    .modal-wrapper {
+      border-radius: 12px;
+    }
+
+    ion-header {
+      --border-radius: 12px 12px 0 0;
+      border-radius: 12px 12px 0 0;
+    }
+
+    ion-content {
+      --border-radius: 0 0 12px 12px;
+    }
+  }
+}

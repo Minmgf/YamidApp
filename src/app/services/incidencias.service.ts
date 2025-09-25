@@ -177,6 +177,20 @@ export class IncidenciasService {
   }
 
   /**
+   * Obtener incidencias de un usuario específico
+   */
+  getIncidenciasPorUsuario(usuarioId: number, page: number = 1, limit: number = 50): Observable<IncidenciasResponse> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('limit', limit.toString());
+
+    return this.http.get<IncidenciasResponse>(`${this.apiUrl}/usuario/${usuarioId}`, {
+      params,
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  /**
    * Obtener total de incidencias
    */
   getTotalIncidencias(): Observable<number | {total: number}> {

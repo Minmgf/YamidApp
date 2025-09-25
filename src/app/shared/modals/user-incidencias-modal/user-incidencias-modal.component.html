@@ -1,0 +1,100 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Mis Incidencias</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()" fill="clear">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="user-incidencias-content">
+  <!-- Loading spinner -->
+  <div class="loading-container" *ngIf="isLoading">
+    <ion-spinner name="dots"></ion-spinner>
+    <p>Cargando incidencias...</p>
+  </div>
+
+  <!-- Error message -->
+  <div class="error-container" *ngIf="error && !isLoading">
+    <ion-icon name="alert-circle" class="error-icon"></ion-icon>
+    <p>{{ error }}</p>
+    <ion-button (click)="loadIncidencias()" fill="outline" size="small">
+      Reintentar
+    </ion-button>
+  </div>
+
+  <!-- Contenido principal cuando hay datos -->
+  <div *ngIf="!isLoading && !error">
+    <!-- Resumen estadístico arriba -->
+    <div class="estadisticas" *ngIf="incidencias.length > 0">
+      <ion-card class="stats-card">
+        <ion-card-header>
+          <ion-card-title>Resumen de {{ userName || 'tus' }} incidencias</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <span class="stat-number">{{ incidencias.length }}</span>
+              <span class="stat-label">Total</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">{{ getCountByEstado('pendiente') }}</span>
+              <span class="stat-label">Pendientes</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">{{ getCountByEstado('publicada') }}</span>
+              <span class="stat-label">Publicadas</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">{{ getCountByEstado('rechazada') }}</span>
+              <span class="stat-label">Rechazadas</span>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- Lista de incidencias -->
+    <div class="incidencias-list">
+      <!-- Mensaje cuando no hay incidencias -->
+      <div class="empty-state" *ngIf="incidencias.length === 0">
+        <ion-icon name="document-text" class="empty-icon"></ion-icon>
+        <h4>No tienes incidencias registradas</h4>
+        <p>Cuando reportes una incidencia, aparecerá aquí.</p>
+      </div>
+
+      <!-- Cards de incidencias -->
+      <ion-card *ngFor="let incidencia of incidencias" class="incidencia-card">
+        <ion-card-header>
+          <div class="card-header-content">
+            <div class="titulo-categoria">
+              <ion-icon [name]="getCategoriaIcon(incidencia.categoria)" class="categoria-icon"></ion-icon>
+              <ion-card-title>{{ incidencia.titulo }}</ion-card-title>
+            </div>
+            <ion-chip [class]="getEstadoClass(incidencia.estado)" size="small">
+              {{ getEstadoText(incidencia.estado) }}
+            </ion-chip>
+          </div>
+          <ion-card-subtitle>
+            <div class="subtitle-info">
+              <span class="categoria">{{ getCategoriaText(incidencia.categoria) }}</span>
+              <span class="fecha">{{ formatDate(incidencia.fecha_creacion) }}</span>
+            </div>
+          </ion-card-subtitle>
+        </ion-card-header>
+
+        <ion-card-content>
+          <p class="descripcion">{{ incidencia.descripcion }}</p>
+
+          <!-- Información adicional -->
+          <div class="info-adicional" *ngIf="incidencia.ciudad_nombre">
+            <ion-icon name="location" class="location-icon"></ion-icon>
+            <span>{{ incidencia.ciudad_nombre }}</span>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </div>
+</ion-content>
