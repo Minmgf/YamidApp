@@ -3,6 +3,7 @@ import { IonicModule, ModalController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
+import { IncidenciasService, Incidencia } from '../../../services/incidencias.service';
 
 export interface UsuarioDetalle {
   id: number;
@@ -42,14 +43,24 @@ export class UsuarioDetalleModalComponent implements OnInit {
   loading = true;
   error = '';
 
+  // Propiedades para incidencias
+  incidencias: Incidencia[] = [];
+  incidenciasLoading = false;
+  incidenciasError = '';
+  currentPage = 1;
+  itemsPerPage = 5;
+  totalPages = 0;
+
   constructor(
     private modalCtrl: ModalController,
-    private http: HttpClient
+    private http: HttpClient,
+    private incidenciasService: IncidenciasService
   ) { }
 
   ngOnInit() {
     console.log('👤 Cargando detalle del usuario ID:', this.usuarioId);
     this.cargarUsuario();
+    this.cargarIncidencias();
   }
 
   /**
@@ -90,6 +101,34 @@ export class UsuarioDetalleModalComponent implements OnInit {
       }
     } finally {
       this.loading = false;
+    }
+  }
+
+  /**
+   * Cargar incidencias del usuario
+   */
+  async cargarIncidencias() {
+    try {
+      this.incidenciasLoading = true;
+      this.incidenciasError = '';
+
+      const response = await this.incidenciasService.getIncidenciasPorUsuario(this.usuarioId).toPromise();
+
+      if (response && response.success && response.data) {
+        this.incidencias = response.data;
+        this.totalPages = Math.ceil(this.incidencias.length / this.itemsPerPage);
+        console.log('✅ Incidencias cargadas:', this.incidencias.length);
+      } else {
+        this.incidencias = [];
+        this.totalPages = 0;
+      }
+    } catch (error: any) {
+      console.error('❌ Error al cargar incidencias:', error);
+      this.incidenciasError = 'No se pudieron cargar las incidencias';
+      this.incidencias = [];
+      this.totalPages = 0;
+    } finally {
+      this.incidenciasLoading = false;
     }
   }
 
@@ -171,5 +210,128 @@ export class UsuarioDetalleModalComponent implements OnInit {
       case 'votante': return 'Votante';
       default: return this.usuario?.rol || 'Sin rol';
     }
+  }
+
+  /**
+   * Obtener incidencias paginadas
+   */
+  getIncidenciasPaginadas(): Incidencia[] {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    return this.incidencias.slice(startIndex, endIndex);
+  }
+
+  /**
+   * Cambiar página
+   */
+  changePage(page: number) {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+    }
+  }
+
+  /**
+   * Obtener páginas para mostrar en la paginación
+   */
+  getPages(): number[] {
+    const pages: number[] = [];
+    const maxPages = Math.min(5, this.totalPages); // Mostrar máximo 5 páginas
+    let startPage = Math.max(1, this.currentPage - Math.floor(maxPages / 2));
+    let endPage = Math.min(this.totalPages, startPage + maxPages - 1);
+
+    // Ajustar si no hay suficientes páginas al final
+    if (endPage - startPage + 1 < maxPages) {
+      startPage = Math.max(1, endPage - maxPages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+    return pages;
+  }
+
+  /**
+   * Obtener ícono para la categoría
+   */
+  getCategoriaIcon(categoria: string): string {
+    switch (categoria) {
+      case 'salud': return 'medical';
+      case 'social': return 'people';
+      case 'ambiental': return 'leaf';
+      case 'infraestructura': return 'construct';
+      case 'servicios_publicos': return 'water';
+      case 'seguridad': return 'shield-checkmark';
+      case 'transporte': return 'car';
+      case 'otros': return 'ellipsis-horizontal';
+      default: return 'information-circle';
+    }
+  }
+
+  /**
+   * Obtener texto amigable para la categoría
+   */
+  getCategoriaText(categoria: string): string {
+    switch (categoria) {
+      case 'salud': return 'Salud';
+      case 'social': return 'Social';
+      case 'ambiental': return 'Ambiental';
+      case 'infraestructura': return 'Infraestructura';
+      case 'servicios_publicos': return 'Servicios Públicos';
+      case 'seguridad': return 'Seguridad';
+      case 'transporte': return 'Transporte';
+      case 'otros': return 'Otros';
+      default: return 'Sin categoría';
+    }
+  }
+
+  /**
+   * Obtener clase CSS para el estado de la incidencia
+   */
+  getEstadoClass(estado: string | undefined): string {
+    switch (estado) {
+      case 'pendiente': return 'estado-pendiente';
+      case 'publicada': return 'estado-publicada';
+      case 'rechazada': return 'estado-rechazada';
+      default: return 'estado-pendiente';
+    }
+  }
+
+  /**
+   * Obtener texto amigable para el estado
+   */
+  getEstadoText(estado: string | undefined): string {
+    switch (estado) {
+      case 'pendiente': return 'Pendiente';
+      case 'publicada': return 'Publicada';
+      case 'rechazada': return 'Rechazada';
+      default: return 'Pendiente';
+    }
+  }
+
+  /**
+   * Formatear fecha para mostrar
+   */
+  formatDate(dateString: string | undefined): string {
+    if (!dateString) return 'Sin fecha';
+
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (error) {
+      return 'Fecha inválida';
+    }
+  }
+
+  /**
+   * Contar incidencias por estado
+   */
+  getCountByEstado(estado: string): number {
+    return this.incidencias.filter(i => i.estado === estado).length;
   }
 }

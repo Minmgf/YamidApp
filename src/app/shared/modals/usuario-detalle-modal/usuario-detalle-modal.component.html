@@ -168,10 +168,115 @@
           Incidencias Reportadas
         </h3>
 
-        <div class="incident-items">
-          <div class="incident-item">
-            <span class="incident-label">Coming Soon:</span>
-            <span class="incident-value">:D</span>
+        <!-- Loading incidencias -->
+        <div *ngIf="incidenciasLoading" class="incidencias-loading">
+          <ion-spinner size="small"></ion-spinner>
+          <span>Cargando incidencias...</span>
+        </div>
+
+        <!-- Error incidencias -->
+        <div *ngIf="incidenciasError && !incidenciasLoading" class="incidencias-error">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          <span>{{ incidenciasError }}</span>
+          <ion-button fill="clear" size="small" (click)="cargarIncidencias()">
+            <ion-icon name="refresh-outline" slot="start"></ion-icon>
+            Reintentar
+          </ion-button>
+        </div>
+
+        <!-- Sin incidencias -->
+        <div *ngIf="!incidenciasLoading && !incidenciasError && incidencias.length === 0" class="sin-incidencias">
+          <ion-icon name="document-text-outline"></ion-icon>
+          <p>Este usuario no ha reportado incidencias</p>
+        </div>
+
+        <!-- Tabla de incidencias -->
+        <div *ngIf="!incidenciasLoading && !incidenciasError && incidencias.length > 0" class="incidencias-table">
+          <!-- Resumen -->
+          <div class="incidencias-resumen">
+            <span class="total-incidencias">Total: {{ incidencias.length }} incidencias</span>
+            <div class="estados-resumen">
+              <ion-chip color="medium" size="small">
+                <ion-label>Pendientes: {{ getCountByEstado('pendiente') }}</ion-label>
+              </ion-chip>
+              <ion-chip color="success" size="small">
+                <ion-label>Publicadas: {{ getCountByEstado('publicada') }}</ion-label>
+              </ion-chip>
+              <ion-chip color="danger" size="small">
+                <ion-label>Rechazadas: {{ getCountByEstado('rechazada') }}</ion-label>
+              </ion-chip>
+            </div>
+          </div>
+
+          <!-- Tabla responsive -->
+          <div class="table-container">
+            <table class="incidencias-tabla">
+              <thead>
+                <tr>
+                  <th>Título</th>
+                  <th>Categoría</th>
+                  <th>Estado</th>
+                  <th>Municipio</th>
+                  <th>Fecha</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let incidencia of getIncidenciasPaginadas()">
+                  <td class="titulo-cell">
+                    <div class="titulo-content">
+                      <strong>{{ incidencia.titulo }}</strong>
+                      <p class="descripcion-preview">{{ incidencia.descripcion | slice:0:50 }}{{ incidencia.descripcion.length > 50 ? '...' : '' }}</p>
+                    </div>
+                  </td>
+                  <td class="categoria-cell">
+                    <div class="categoria-badge">
+                      <ion-icon [name]="getCategoriaIcon(incidencia.categoria)"></ion-icon>
+                      <span>{{ getCategoriaText(incidencia.categoria) }}</span>
+                    </div>
+                  </td>
+                  <td class="estado-cell">
+                    <ion-chip [class]="getEstadoClass(incidencia.estado)" size="small">
+                      {{ getEstadoText(incidencia.estado) }}
+                    </ion-chip>
+                  </td>
+                  <td class="municipio-cell">
+                    <ion-icon name="location-outline"></ion-icon>
+                    {{ incidencia.ciudad_nombre }}
+                  </td>
+                  <td class="fecha-cell">
+                    {{ formatDate(incidencia.fecha_creacion) }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Paginación -->
+          <div class="pagination" *ngIf="totalPages > 1">
+            <ion-button
+              fill="clear"
+              size="small"
+              [disabled]="currentPage === 1"
+              (click)="changePage(currentPage - 1)">
+              <ion-icon name="chevron-back-outline"></ion-icon>
+            </ion-button>
+
+            <ion-button
+              *ngFor="let page of getPages()"
+              [fill]="page === currentPage ? 'solid' : 'clear'"
+              size="small"
+              [color]="page === currentPage ? 'primary' : 'medium'"
+              (click)="changePage(page)">
+              {{ page }}
+            </ion-button>
+
+            <ion-button
+              fill="clear"
+              size="small"
+              [disabled]="currentPage === totalPages"
+              (click)="changePage(currentPage + 1)">
+              <ion-icon name="chevron-forward-outline"></ion-icon>
+            </ion-button>
           </div>
         </div>
       </div>

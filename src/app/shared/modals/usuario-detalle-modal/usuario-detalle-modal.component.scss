@@ -482,3 +482,305 @@ ion-content {
     }
   }
 }
+
+// Estilos para las incidencias
+.incidencias-loading, .incidencias-error, .sin-incidencias {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px;
+  color: #6b7280;
+  font-size: 0.9rem;
+
+  ion-icon {
+    font-size: 1.5rem;
+  }
+
+  &.incidencias-error {
+    flex-direction: column;
+    text-align: center;
+
+    ion-button {
+      margin-top: 8px;
+    }
+  }
+
+  &.sin-incidencias {
+    flex-direction: column;
+    text-align: center;
+
+    ion-icon {
+      font-size: 2.5rem;
+      margin-bottom: 8px;
+      color: #cbd5e1;
+    }
+
+    p {
+      margin: 0;
+      color: #9ca3af;
+    }
+  }
+}
+
+.incidencias-table {
+  .incidencias-resumen {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding: 12px 16px;
+    background: #f8f9fa;
+    border-radius: 10px;
+
+    .total-incidencias {
+      color: #1a1a1a;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .estados-resumen {
+      display: flex;
+      gap: 6px;
+
+      ion-chip {
+        font-size: 0.7rem;
+        height: 24px;
+
+        ion-label {
+          font-size: 0.7rem;
+        }
+      }
+    }
+  }
+
+  .table-container {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    border: 1px solid #f3f4f6;
+  }
+
+  .incidencias-tabla {
+    width: 100%;
+    border-collapse: collapse;
+
+    thead {
+      background: #f8f9fa;
+
+      th {
+        padding: 12px 8px;
+        text-align: left;
+        color: #6b7280;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid #e5e7eb;
+      }
+    }
+
+    tbody {
+      tr {
+        border-bottom: 1px solid #f3f4f6;
+
+        &:hover {
+          background: #fefefe;
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+      }
+
+      td {
+        padding: 12px 8px;
+        font-size: 0.85rem;
+        color: #1a1a1a;
+        vertical-align: top;
+      }
+
+      .titulo-cell {
+        width: 30%; // Reducir un poco para dar más espacio a categorías
+
+        .titulo-content {
+          strong {
+            color: #1a1a1a;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 4px;
+          }
+
+          .descripcion-preview {
+            color: #6b7280;
+            font-size: 0.75rem;
+            line-height: 1.3;
+            margin: 0;
+          }
+        }
+      }      .categoria-cell {
+        width: 18%; // Un poco más de ancho para el texto
+
+        .categoria-badge {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+
+          ion-icon {
+            font-size: 0.9rem;
+            color: var(--ion-color-primary);
+            flex-shrink: 0;
+          }
+
+          span {
+            font-size: 0.85rem;
+            color: #1a1a1a;
+            font-weight: 500;
+          }
+        }
+      }
+
+      .estado-cell {
+        width: 12%;
+
+        ion-chip {
+          font-size: 0.7rem;
+          height: 24px;
+
+          &.estado-pendiente {
+            --background: #fef3c7;
+            --color: #92400e;
+          }
+
+          &.estado-publicada {
+            --background: #d1fae5;
+            --color: #065f46;
+          }
+
+          &.estado-rechazada {
+            --background: #fee2e2;
+            --color: #991b1b;
+          }
+        }
+      }
+
+      .municipio-cell {
+        width: 20%;
+
+        ion-icon {
+          font-size: 0.9rem;
+          color: #6b7280;
+          margin-right: 4px;
+        }
+      }
+
+      .fecha-cell {
+        width: 15%;
+        color: #6b7280;
+        font-size: 0.75rem;
+      }
+    }
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    margin-top: 16px;
+    padding: 12px;
+
+    ion-button {
+      --padding-start: 8px;
+      --padding-end: 8px;
+      height: 32px;
+
+      &[fill="solid"] {
+        --background: var(--ion-color-primary);
+        --color: white;
+      }
+
+      &[fill="clear"] {
+        --color: #6b7280;
+
+        &:hover {
+          --color: var(--ion-color-primary);
+        }
+      }
+
+      &[disabled] {
+        --color: #d1d5db;
+      }
+    }
+  }
+}
+
+// Responsive para móviles - tabla de incidencias
+@media (max-width: 768px) {
+  .incidencias-table {
+    .incidencias-resumen {
+      flex-direction: column;
+      gap: 8px;
+      align-items: flex-start;
+
+      .estados-resumen {
+        flex-wrap: wrap;
+      }
+    }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+    .incidencias-tabla {
+      min-width: 600px; // Forzar scroll horizontal en móviles
+
+      thead th {
+        padding: 8px 6px;
+        font-size: 0.7rem;
+      }
+
+      tbody td {
+        padding: 8px 6px;
+        font-size: 0.8rem;
+      }
+
+      .titulo-cell {
+        .titulo-content {
+          strong {
+            font-size: 0.8rem;
+          }
+
+          .descripcion-preview {
+            font-size: 0.7rem;
+          }
+        }
+      }
+
+      .categoria-cell {
+        .categoria-badge {
+          span {
+            font-size: 0.75rem; // Texto más pequeño en móviles pero visible
+          }
+
+          ion-icon {
+            display: none; // Ocultar ícono en móviles para dar más espacio al texto
+          }
+        }
+      }
+
+      .fecha-cell {
+        font-size: 0.7rem;
+      }
+    }
+
+    .pagination {
+      ion-button {
+        height: 28px;
+        font-size: 0.8rem;
+      }
+    }
+  }
+}
