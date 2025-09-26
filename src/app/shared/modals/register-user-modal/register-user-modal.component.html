@@ -125,7 +125,7 @@
         <ion-select-option
           *ngFor="let rol of rolesDisponibles"
           [value]="rol.id">
-          {{ rol.nombre }} - {{ rol.descripcion }}
+          {{ formatRoleName(rol.nombre) }} - {{ formatRoleDescription(rol.descripcion) }}
         </ion-select-option>
       </ion-select>
     </ion-item>
@@ -138,7 +138,7 @@
       <ion-label color="warning">
         <p>
           <ion-icon name="warning-outline"></ion-icon>
-          Tu rol actual ({{ currentUserRole }}) no tiene permisos para registrar usuarios.
+          Tu rol actual ({{ formatRoleName(currentUserRole) }}) no tiene permisos para registrar usuarios.
         </p>
       </ion-label>
     </ion-item>
@@ -147,7 +147,7 @@
       <ion-label color="medium">
         <p>
           <ion-icon name="information-circle-outline"></ion-icon>
-          Como {{ currentUserRole }}, puedes registrar:
+          Como {{ formatRoleName(currentUserRole) }}, puedes registrar:
           <strong>{{ getRolesDisponiblesNames() }}</strong>
         </p>
       </ion-label>

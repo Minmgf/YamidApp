@@ -106,7 +106,7 @@
         <div class="user-right-info">
           <div class="user-role">
             <ion-chip [color]="getRolColor(usuario.rol_id)" size="small">
-              <ion-label>{{ usuario.rol }}</ion-label>
+              <ion-label>{{ formatRoleName(usuario.rol) }}</ion-label>
             </ion-chip>
           </div>
           <!-- <div class="user-status">

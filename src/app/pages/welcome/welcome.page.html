@@ -20,7 +20,7 @@
       <p class="user-phone">Celular: {{ user.celular || 'No disponible' }}</p>
       <p class="user-location">Municipio: {{ user.municipio || 'Municipio ID: ' + user.municipio_id }}</p>
       <p class="user-phone">Registrado por: {{ createdByName }}</p>
-      <p class="user-role">Rol: {{ user.rol }}</p>
+      <p class="user-role">Rol: {{ formatRoleName(user.rol) }}</p>
       <p class="user-role">Permisos:</p>
        <ion-chip *ngFor="let permiso of getPermissionsList()" color="success">
           <ion-icon name="checkmark-circle" class="check-icon"></ion-icon>

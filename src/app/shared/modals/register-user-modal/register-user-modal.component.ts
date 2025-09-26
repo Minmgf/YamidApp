@@ -134,7 +134,44 @@ export class RegisterUserModalComponent implements OnInit {
    * Obtiene los nombres de los roles disponibles como string
    */
   getRolesDisponiblesNames(): string {
-    return this.rolesDisponibles.map(rol => rol.nombre).join(', ');
+    return this.rolesDisponibles.map(rol => this.formatRoleName(rol.nombre)).join(', ');
+  }
+
+  /**
+   * Formatea el nombre del rol para mostrar de manera amigable
+   */
+  formatRoleName(roleName: string | undefined): string {
+    if (!roleName) return 'Sin rol';
+
+    switch (roleName) {
+      case 'super_admin': return 'Super Admin';
+      case 'lider_principal': return 'Líder Principal';
+      case 'simpatizante': return 'Simpatizante';
+      case 'aliado': return 'Aliado';
+      case 'admin': return 'Administrador';
+      case 'lider': return 'Líder';
+      case 'votante': return 'Votante';
+      default: return roleName;
+    }
+  }
+
+  /**
+   * Formatea la descripción del rol para mostrar de manera más concisa
+   */
+  formatRoleDescription(descripcion: string | undefined): string {
+    if (!descripcion) return 'Sin descripción';
+
+    // Simplificar las descripciones largas
+    if (descripcion.includes('Administrador con acceso completo')) {
+      return 'Acceso completo al sistema';
+    }
+    if (descripcion.includes('puede registrar usuarios')) {
+      return 'Puede registrar usuarios';
+    }
+    if (descripcion.includes('sin permisos de registro')) {
+      return 'Sin permisos de registro';
+    }
+    return descripcion;
   }
   /**
    * Carga la lista de municipios

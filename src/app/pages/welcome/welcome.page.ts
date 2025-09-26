@@ -156,6 +156,24 @@ export class WelcomePage implements OnInit {
   }
 
   /**
+   * Formatea el nombre del rol para mostrar de manera amigable
+   */
+  formatRoleName(roleName: string): string {
+    if (!roleName) return 'Sin rol';
+
+    switch (roleName) {
+      case 'super_admin': return 'Super Admin';
+      case 'lider_principal': return 'Líder Principal';
+      case 'simpatizante': return 'Simpatizante';
+      case 'aliado': return 'Aliado';
+      case 'admin': return 'Administrador';
+      case 'lider': return 'Líder';
+      case 'votante': return 'Votante';
+      default: return roleName;
+    }
+  }
+
+  /**
    * Obtiene el nombre del usuario que registró al usuario actual
    */
   getCreatedByName(): string {

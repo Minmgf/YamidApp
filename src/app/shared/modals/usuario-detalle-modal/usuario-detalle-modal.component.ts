@@ -192,6 +192,9 @@ export class UsuarioDetalleModalComponent implements OnInit {
   getRolColor(): string {
     switch (this.usuario?.rol) {
       case 'super_admin': return 'danger';
+      case 'lider_principal': return 'primary';
+      case 'simpatizante': return 'success';
+      case 'aliado': return 'warning';
       case 'admin': return 'warning';
       case 'lider': return 'primary';
       case 'votante': return 'success';
@@ -204,7 +207,10 @@ export class UsuarioDetalleModalComponent implements OnInit {
    */
   getRolLabel(): string {
     switch (this.usuario?.rol) {
-      case 'super_admin': return 'Super Administrador';
+      case 'super_admin': return 'Super Admin';
+      case 'lider_principal': return 'Líder Principal';
+      case 'simpatizante': return 'Simpatizante';
+      case 'aliado': return 'Aliado';
       case 'admin': return 'Administrador';
       case 'lider': return 'Líder';
       case 'votante': return 'Votante';
