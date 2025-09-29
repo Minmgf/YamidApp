@@ -88,7 +88,7 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
   notificationData = {
     usuarios_ids: [] as number[],
     municipio_id: null as number | null,
-    titulo: '',
+    titulo: 'Yamid Sanabria',
     mensaje: '',
     datos_extra: {}
   };
@@ -196,7 +196,7 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
         {
           name: 'titulo',
           type: 'text',
-          placeholder: 'Título de la notificación',
+          placeholder: 'Yamid Sanabria',
           value: this.notificationData.titulo
         },
         {
@@ -292,7 +292,7 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
         {
           name: 'titulo',
           type: 'text',
-          placeholder: 'Título de la notificación',
+          placeholder: 'Yamid Sanabria',
           value: this.notificationData.titulo
         },
         {
@@ -448,6 +448,48 @@ export class DashboardPage implements AfterViewInit, ViewDidEnter, OnInit {
       error: (error) => {
         console.error('❌ Error obteniendo estado:', error);
         this.toast.error('Error obteniendo estado del sistema');
+      }
+    });
+  }
+
+  /**
+   * Muestra los dispositivos registrados del usuario actual
+   */
+  async mostrarDispositivosUsuario(): Promise<void> {
+    this.toast.loading('Obteniendo dispositivos...', {
+      duration: 2000
+    });
+
+    this.notificationService.getUserDevices().subscribe({
+      next: async (response) => {
+        console.log('📱 Dispositivos del usuario:', response);
+
+        if (response.devices && response.devices.length > 0) {
+          const deviceList = response.devices.map((device: any, index: number) => `
+            <div class="device-info">
+              <strong>Dispositivo ${index + 1}:</strong><br>
+              📱 Plataforma: ${device.platform}<br>
+              🕐 Registrado: ${new Date(device.created_at).toLocaleDateString()}<br>
+              ${device.is_active ? '🟢 Activo' : '🔴 Inactivo'}
+            </div>
+          `).join('<br>');
+
+          const alert = await this.alertController.create({
+            header: '📱 Mis Dispositivos',
+            subHeader: `Tienes ${response.devices.length} dispositivo(s) registrado(s)`,
+            message: deviceList,
+            cssClass: 'devices-alert',
+            buttons: ['OK']
+          });
+
+          await alert.present();
+        } else {
+          this.toast.warning('No se encontraron dispositivos registrados');
+        }
+      },
+      error: (error) => {
+        console.error('❌ Error obteniendo dispositivos:', error);
+        this.toast.error('Error obteniendo información de dispositivos');
       }
     });
   }  /**

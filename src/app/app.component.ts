@@ -33,11 +33,32 @@ export class AppComponent implements OnInit {
       return;
     }
 
+    console.log('👤 Authenticated user found - initializing push notifications');
+
     try {
-      await this.notificationService.initializePushNotifications();
+      // Si ya están inicializadas, re-intentar para asegurar que el token se envíe
+      if (this.notificationService.isReady()) {
+        console.log('🔄 Notifications already initialized, forcing token refresh...');
+        await this.notificationService.forceTokenRefresh();
+      } else {
+        console.log('🚀 Initializing push notifications...');
+        await this.notificationService.initializePushNotifications();
+      }
+
       console.log('🔔 Push notifications initialized in app.component');
     } catch (error) {
       console.error('❌ Error initializing push notifications in app.component:', error);
+
+      // Re-intentar después de 3 segundos
+      setTimeout(async () => {
+        console.log('🔄 Retrying push notification initialization...');
+        try {
+          await this.notificationService.retryInitialization();
+          console.log('✅ Push notifications retry successful');
+        } catch (retryError) {
+          console.error('❌ Push notifications retry failed:', retryError);
+        }
+      }, 3000);
     }
   }
 
@@ -46,10 +67,19 @@ export class AppComponent implements OnInit {
 
     if (this.platform.is('capacitor')) {
       try {
-        // Configurar la barra de estado
-        await StatusBar.setStyle({ style: Style.Light });
-        await StatusBar.setBackgroundColor({ color: '#ffffff' });
-        await StatusBar.setOverlaysWebView({ overlay: false });
+        // Configurar la barra de estado según la plataforma
+        if (this.platform.is('ios')) {
+          await StatusBar.setStyle({ style: Style.Light });
+          await StatusBar.setBackgroundColor({ color: '#ffffff' });
+          await StatusBar.setOverlaysWebView({ overlay: false });
+        } else if (this.platform.is('android')) {
+          await StatusBar.setStyle({ style: Style.Dark }); // Texto oscuro en fondo claro
+          await StatusBar.setBackgroundColor({ color: '#ffffff' });
+          await StatusBar.setOverlaysWebView({ overlay: false });
+
+          // En Android, asegurar que no se superponga
+          console.log('📱 Android detected - status bar configured');
+        }
 
         console.log('✅ StatusBar configurado correctamente');
       } catch (error) {

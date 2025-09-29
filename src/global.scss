@@ -78,6 +78,39 @@ ion-header {
   }
 }
 
+/* Fix específico para Android - forzar status bar padding */
+.plt-android {
+  ion-app {
+    padding-top: max(env(safe-area-inset-top), 24px); /* Status bar height en Android */
+  }
+
+  ion-header {
+    margin-top: 0;
+    padding-top: 0;
+  }
+
+  ion-content {
+    --padding-top: 0; /* En Android el padding ya está en ion-app */
+  }
+
+  /* Asegurar que el splash screen también respete el padding */
+  .splash-container,
+  ion-router-outlet {
+    padding-top: inherit;
+  }
+}
+
+/* Fix específico para iOS */
+.plt-ios {
+  ion-app {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  ion-content {
+    --padding-top: env(safe-area-inset-top);
+  }
+}
+
 /**
  * Ionic Dark Mode
  * -----------------------------------------------------

@@ -10,6 +10,7 @@ import { UserIncidenciasModalComponent } from '../../shared/modals/user-incidenc
 import { UserRegistrationService } from '../../services/user-registration.service';
 import { AuthService } from '../../services/auth.service';
 import { IncidenciasService } from '../../services/incidencias.service';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   standalone: true,
@@ -38,7 +39,8 @@ export class WelcomePage implements OnInit {
     private alertCtrl: AlertController,
     private userService: UserRegistrationService,
     private authService: AuthService,
-    private incidenciasService: IncidenciasService
+    private incidenciasService: IncidenciasService,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit() {
@@ -432,6 +434,14 @@ export class WelcomePage implements OnInit {
   }
 
   // =================== MÉTODOS DE DEBUG ===================
+
+  /**
+   * Test para diagnosticar FCM
+   */
+  async testFCM(): Promise<void> {
+    console.log('🔧 Ejecutando test de FCM desde Welcome...');
+    await this.notificationService.diagnoseFCM();
+  }
 
   /**
    * Obtiene el tipo de la propiedad registers para debug
