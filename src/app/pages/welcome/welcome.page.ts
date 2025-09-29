@@ -11,6 +11,7 @@ import { UserRegistrationService } from '../../services/user-registration.servic
 import { AuthService } from '../../services/auth.service';
 import { IncidenciasService } from '../../services/incidencias.service';
 import { NotificationService } from '../../services/notification.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   standalone: true,
@@ -433,14 +434,74 @@ export class WelcomePage implements OnInit {
     return hasRegisterPermission || hasEvaluateOption || hasIncidenciasOption;
   }
 
+  /**
+   * Verifica si estamos en entorno de producción
+   */
+  isProduction(): boolean {
+    return environment.production;
+  }
+
   // =================== MÉTODOS DE DEBUG ===================
 
   /**
-   * Test para diagnosticar FCM
+   * Test completo para diagnosticar FCM
    */
   async testFCM(): Promise<void> {
-    console.log('🔧 Ejecutando test de FCM desde Welcome...');
+    console.log('🔧 === DIAGNÓSTICO COMPLETO FCM ===');
+
+    const alert = await this.alertCtrl.create({
+      header: '🔧 Test FCM Iniciado',
+      message: 'Revisa la consola para los logs detallados...',
+      buttons: ['OK']
+    });
+    await alert.present();
+
+    // 1. Verificar estado del usuario
+    const currentUser = this.authService.getCurrentUser();
+    console.log('👤 Usuario actual:', currentUser);
+
+    if (!currentUser) {
+      console.error('❌ No hay usuario autenticado');
+      return;
+    }
+
+    // 2. Verificar servicio de notificaciones
+    console.log('🔔 Verificando NotificationService...');
+    console.log('🔔 Service ready:', this.notificationService.isReady());
+
+    // 3. Ejecutar diagnóstico del servicio
+    console.log('🔍 Ejecutando diagnóstico del servicio...');
     await this.notificationService.diagnoseFCM();
+
+    // 4. Forzar inicialización si no está lista
+    if (!this.notificationService.isReady()) {
+      console.log('🔄 Forzando inicialización...');
+      try {
+        await this.notificationService.initializePushNotifications();
+        console.log('✅ Inicialización forzada exitosa');
+      } catch (error) {
+        console.error('❌ Error en inicialización forzada:', error);
+      }
+    }
+
+    // 5. Intentar refrescar token
+    console.log('🔄 Forzando refresh del token...');
+    try {
+      await this.notificationService.forceTokenRefresh();
+      console.log('✅ Refresh del token completado');
+    } catch (error) {
+      console.error('❌ Error en refresh del token:', error);
+    }
+
+    console.log('🔧 === FIN DIAGNÓSTICO FCM ===');
+
+    // Mostrar resultado final
+    const finalAlert = await this.alertCtrl.create({
+      header: '🔧 Diagnóstico Completado',
+      message: 'Revisa la consola para todos los logs. Si no hay errores pero sigue sin funcionar, puede ser un problema del backend.',
+      buttons: ['OK']
+    });
+    await finalAlert.present();
   }
 
   /**

@@ -52,63 +52,59 @@
   --ion-safe-area-right: env(safe-area-inset-right);
 }
 
-/* Asegurar que el contenido respete el área segura */
-ion-app {
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
-  padding-left: env(safe-area-inset-left);
-  padding-right: env(safe-area-inset-right);
-}
-
-/* Fix para iOS - evitar que el header se superponga */
+/* Headers siempre deben respetar el safe area */
 ion-header {
   position: relative;
   z-index: 10;
+  padding-top: env(safe-area-inset-top);
 }
 
-/* En dispositivos móviles, asegurar padding superior */
-@media screen and (max-width: 768px) {
-  ion-app {
-    padding-top: max(env(safe-area-inset-top), 20px);
-  }
-
-  ion-content {
-    --padding-top: env(safe-area-inset-top);
-    --padding-bottom: env(safe-area-inset-bottom);
-  }
+/* Content base - con espacio para separación del header */
+ion-content {
+  --padding-top: 16px; /* Espacio base entre header y contenido */
+  --padding-bottom: env(safe-area-inset-bottom);
+  --padding-left: env(safe-area-inset-left);
+  --padding-right: env(safe-area-inset-right);
 }
 
-/* Fix específico para Android - forzar status bar padding */
+/* Fix específico para Android */
 .plt-android {
-  ion-app {
+  ion-header {
     padding-top: max(env(safe-area-inset-top), 24px); /* Status bar height en Android */
   }
 
-  ion-header {
-    margin-top: 0;
-    padding-top: 0;
-  }
-
+  /* En Android, más espacio entre header y contenido */
   ion-content {
-    --padding-top: 0; /* En Android el padding ya está en ion-app */
+    --padding-top: 20px; /* Más espacio en Android */
   }
 
-  /* Asegurar que el splash screen también respete el padding */
-  .splash-container,
-  ion-router-outlet {
-    padding-top: inherit;
+  /* Tab bar con padding substancial para Android */
+  ion-tab-bar {
+    padding-bottom: max(env(safe-area-inset-bottom), 24px) !important;
+    min-height: calc(60px + env(safe-area-inset-bottom)) !important;
   }
 }
 
 /* Fix específico para iOS */
 .plt-ios {
-  ion-app {
+  ion-header {
     padding-top: env(safe-area-inset-top);
   }
 
   ion-content {
-    --padding-top: env(safe-area-inset-top);
+    --padding-top: 12px; /* Menos espacio en iOS */
   }
+
+  ion-tab-bar {
+    padding-bottom: env(safe-area-inset-bottom);
+    min-height: calc(50px + env(safe-area-inset-bottom));
+  }
+}
+
+/* Tab bar universal - configuración base */
+ion-tab-bar {
+  padding-bottom: env(safe-area-inset-bottom);
+  min-height: calc(50px + env(safe-area-inset-bottom));
 }
 
 /**

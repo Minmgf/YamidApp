@@ -1,0 +1,10 @@
+/* Tab content debe ajustarse al tab bar con safe area */
+ion-tabs {
+  --ion-tab-bar-height: calc(60px + env(safe-area-inset-bottom));
+}
+
+/* Clase personalizada para el tab bar */
+.custom-tabbar {
+  --background: var(--ion-background-color);
+  --border: 1px solid var(--ion-color-light-shade);
+}

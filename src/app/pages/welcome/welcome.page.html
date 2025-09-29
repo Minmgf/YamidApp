@@ -91,8 +91,9 @@
       <span>Mis Incidencias</span>
     </button>
 
-    <!-- Botón de test FCM (temporal para debug) -->
+    <!-- Botón de test FCM (solo para debug en desarrollo) -->
     <button
+      *ngIf="!isProduction()"
       (click)="testFCM()"
       class="action-button test-fcm-btn">
       <ion-icon name="bug" class="action-icon"></ion-icon>
