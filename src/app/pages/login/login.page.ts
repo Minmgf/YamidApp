@@ -45,7 +45,7 @@ export class LoginPage {
 
     // Si es solo números, validar como cédula (8-10 dígitos)
     if (/^\d+$/.test(value)) {
-      return /^\d{8,10}$/.test(value) ? null : { invalidCedula: true };
+      return /^\d{6,10}$/.test(value) ? null : { invalidCedula: true };
     }
 
     // Si contiene @, validar como email
@@ -70,7 +70,7 @@ export class LoginPage {
     if (control?.errors && control?.touched) {
       if (control.errors['required']) return 'Este campo es requerido';
       if (control.errors['invalidEmail']) return 'Correo electrónico inválido';
-      if (control.errors['invalidCedula']) return 'La cédula debe tener entre 8 y 10 dígitos';
+      if (control.errors['invalidCedula']) return 'La cédula debe tener entre 6 y 10 dígitos';
       if (control.errors['invalidFormat']) return 'Ingrese un correo electrónico o cédula válidos';
     }
     return '';

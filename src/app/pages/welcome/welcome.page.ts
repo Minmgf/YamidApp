@@ -215,7 +215,7 @@ export class WelcomePage implements OnInit {
       // Manejar el cierre de forma asíncrona
       modal.onDidDismiss().then((result) => {
         if (result.data?.success) {
-          this.showAlert('Éxito', 'Usuario registrado correctamente');
+          // this.showAlert('Éxito', 'Usuario registrado correctamente');
         }
       });
     } catch (error) {

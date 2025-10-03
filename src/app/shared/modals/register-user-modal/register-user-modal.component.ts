@@ -52,7 +52,7 @@ export class RegisterUserModalComponent implements OnInit {
    */
   private applyValidations() {
     this.registerForm.get('nombre')?.setValidators([Validators.required, Validators.minLength(2)]);
-    this.registerForm.get('cedula')?.setValidators([Validators.required, Validators.pattern(/^\d{8,10}$/)]);
+    this.registerForm.get('cedula')?.setValidators([Validators.required, Validators.pattern(/^\d{6,10}$/)]);
     this.registerForm.get('celular')?.setValidators([Validators.required, Validators.pattern(/^\d{10}$/)]);
     this.registerForm.get('email')?.setValidators([Validators.required, Validators.email, Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)]);
     this.registerForm.get('password')?.setValidators([Validators.required, Validators.minLength(6)]);
@@ -293,7 +293,7 @@ export class RegisterUserModalComponent implements OnInit {
         const userName = formData.nombre || 'Usuario';
         this.toast.success(`${userName} registrado correctamente`);
         console.log('Usuario registrado exitosamente:', response);
-        this.modalCtrl.dismiss({ success: true, user: response.user });
+        this.modalCtrl.dismiss({ success: true});
       },
       error: async (error) => {
         this.isLoading = false;
@@ -333,7 +333,7 @@ export class RegisterUserModalComponent implements OnInit {
       if (errors['required']) return `${this.getFieldLabel(fieldName)} es requerido`;
       if (errors['minlength']) return `${this.getFieldLabel(fieldName)} debe tener al menos ${errors['minlength'].requiredLength} caracteres`;
       if (errors['pattern']) {
-        if (fieldName === 'cedula') return 'La cédula debe tener entre 8 y 10 dígitos';
+        if (fieldName === 'cedula') return 'La cédula debe tener entre 6 y 10 dígitos';
         if (fieldName === 'celular') return 'El celular debe tener 10 dígitos';
         if (fieldName === 'email') return 'Ingrese un correo electrónico válido';
       }
