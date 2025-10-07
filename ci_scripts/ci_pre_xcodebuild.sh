@@ -7,7 +7,7 @@ echo "📍 Current directory: $(pwd)"
 
 # Instalar dependencias de Node
 echo "📦 Installing npm dependencies..."
-npm ci
+npm i
 
 # Build de la app (si usas Ionic/Angular/React)
 echo "🔨 Building app..."
