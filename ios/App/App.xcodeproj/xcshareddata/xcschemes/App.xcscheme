@@ -6,6 +6,24 @@
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES"
       buildArchitectures = "Automatic">
+      <PreActions>
+         <ExecutionAction
+            ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
+            <ActionContent
+               title = "Run Script"
+               scriptText = "# Type a script or drag a script file from your workspace to insert its path.&#10;cd &quot;${SRCROOT}/../..&quot;&#10;&#10;echo &quot;&#x1f527; Installing dependencies...&quot;&#10;&#10;# Instalar npm dependencies&#10;if [ ! -d &quot;node_modules&quot; ]; then&#10;    npm install&#10;fi&#10;&#10;# Build&#10;npm run build&#10;&#10;# Sync Capacitor&#10;npx cap sync ios&#10;&#10;echo &quot;&#x2705; Dependencies installed!&quot;&#10;">
+               <EnvironmentBuildable>
+                  <BuildableReference
+                     BuildableIdentifier = "primary"
+                     BlueprintIdentifier = "504EC3031FED79650016851F"
+                     BuildableName = "App.app"
+                     BlueprintName = "App"
+                     ReferencedContainer = "container:App.xcodeproj">
+                  </BuildableReference>
+               </EnvironmentBuildable>
+            </ActionContent>
+         </ExecutionAction>
+      </PreActions>
       <BuildActionEntries>
          <BuildActionEntry
             buildForTesting = "YES"
