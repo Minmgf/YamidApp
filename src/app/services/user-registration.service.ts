@@ -81,8 +81,20 @@ export class UserRegistrationService {
   /**
    * Obtiene todos los usuarios (solo para super admins)
    */
-  getAllUsers(): Observable<any> {
+  getAllUsers(page: number = 1, limit: number = 50, rolId?: number, municipio?: string, search?: string): Observable<any> {
     const headers = this.getAuthHeaders();
-    return this.http.get<any>(`${this.apiUrl}/usuarios`, { headers });
+    let params = `?page=${page}&limit=${limit}`;
+
+    if (rolId && rolId > 0) {
+      params += `&rol_id=${rolId}`;
+    }
+    if (municipio && municipio.trim()) {
+      params += `&municipio=${encodeURIComponent(municipio)}`;
+    }
+    if (search && search.trim()) {
+      params += `&search=${encodeURIComponent(search)}`;
+    }
+
+    return this.http.get<any>(`${this.apiUrl}/usuarios${params}`, { headers });
   }
 }

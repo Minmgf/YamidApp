@@ -52,6 +52,12 @@ export class UsuariosPage implements OnInit {
   searchTerm: string = '';
   mostrarFiltros: boolean = false;
 
+  // Paginación
+  currentPage: number = 1;
+  pageSize: number = 50;
+  totalUsuarios: number = 0;
+  totalPages: number = 0;
+
   filtros = [
     { value: 'todos', label: 'Todos los usuarios', count: 0 },
     { value: '1', label: 'Super Admins', count: 0 },
@@ -94,29 +100,40 @@ export class UsuariosPage implements OnInit {
   }
 
   /**
-   * Carga todos los usuarios
+   * Carga los usuarios con paginación
    */
   loadUsuarios() {
     this.isLoading = true;
 
-    this.userService.getAllUsers().subscribe({
+    const rolId = this.filtroSeleccionado !== 'todos' ? parseInt(this.filtroSeleccionado) : undefined;
+
+    this.userService.getAllUsers(
+      this.currentPage,
+      this.pageSize,
+      rolId,
+      this.municipioSeleccionado,
+      this.searchTerm
+    ).subscribe({
       next: (response: any) => {
         console.log('Respuesta del servidor:', response);
 
-        // El backend devuelve { success: true, data: [...] }
         if (response && response.success && Array.isArray(response.data)) {
           this.usuarios = response.data;
+          this.usuariosFiltrados = response.data;
+
+          // Datos de paginación
+          this.totalUsuarios = response.total || 0;
+          this.totalPages = Math.ceil(this.totalUsuarios / this.pageSize);
+
+          // Actualizar contadores desde la API
+          if (response.roles && Array.isArray(response.roles)) {
+            this.actualizarContadoresDesdeAPI(response.roles);
+          }
+
           this.extraerMunicipiosUnicos();
-          this.actualizarContadores();
-          this.aplicarFiltro();
-        } else if (response && Array.isArray(response)) {
-          // Fallback si devuelve directamente el array
-          this.usuarios = response;
-          this.extraerMunicipiosUnicos();
-          this.actualizarContadores();
-          this.aplicarFiltro();
         }
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (error) => {
         console.error('Error al cargar usuarios:', error);
@@ -139,71 +156,22 @@ export class UsuariosPage implements OnInit {
   }
 
   /**
-   * Actualiza los contadores de cada filtro
+   * Actualiza los contadores desde la respuesta de la API
    */
-  actualizarContadores() {
-    // Obtener usuarios base para el cálculo de contadores (sin filtro de municipio)
-    let usuariosParaConteo = [...this.usuarios];
+  actualizarContadoresDesdeAPI(roles: { id: number; nombre: string; cantidad: number }[]) {
+    const rolesMap = new Map(roles.map(r => [r.id, r.cantidad]));
+    const totalGeneral = roles.reduce((sum, r) => sum + r.cantidad, 0);
 
-    // Si hay un municipio seleccionado, aplicar ese filtro para los contadores
-    if (this.municipioSeleccionado && this.municipioSeleccionado.trim()) {
-      usuariosParaConteo = usuariosParaConteo.filter(usuario =>
-        usuario.municipio === this.municipioSeleccionado
-      );
-    }
-
-    // Crear un nuevo array para forzar la detección de cambios
     this.filtros = [
-      { value: 'todos', label: 'Todos los usuarios', count: usuariosParaConteo.length },
-      { value: '1', label: 'Super Admins', count: usuariosParaConteo.filter(u => u.rol_id === 1).length },
-      { value: '2', label: 'Líderes Principales', count: usuariosParaConteo.filter(u => u.rol_id === 2).length },
-      { value: '3', label: 'Simpatizantes', count: usuariosParaConteo.filter(u => u.rol_id === 3).length },
-      { value: '4', label: 'Aliados', count: usuariosParaConteo.filter(u => u.rol_id === 4).length }
+      { value: 'todos', label: 'Todos los usuarios', count: totalGeneral },
+      { value: '1', label: 'Super Admins', count: rolesMap.get(1) || 0 },
+      { value: '2', label: 'Líderes Principales', count: rolesMap.get(2) || 0 },
+      { value: '3', label: 'Simpatizantes', count: rolesMap.get(3) || 0 },
+      { value: '4', label: 'Aliados', count: rolesMap.get(4) || 0 }
     ];
 
-    // Forzar detección de cambios
     this.cdr.detectChanges();
-    console.log('Contadores actualizados:', this.filtros);
-  }
-
-  /**
-   * Aplica el filtro seleccionado
-   */
-  aplicarFiltro() {
-    let usuariosFiltrados = [...this.usuarios];
-
-    console.log('Aplicando filtro:', this.filtroSeleccionado);
-    console.log('Usuarios antes del filtro:', usuariosFiltrados.length);
-
-    // Filtrar por rol
-    if (this.filtroSeleccionado !== 'todos') {
-      const rolId = parseInt(this.filtroSeleccionado);
-      usuariosFiltrados = usuariosFiltrados.filter(usuario => usuario.rol_id === rolId);
-      console.log('Usuarios después del filtro de rol:', usuariosFiltrados.length);
-    }
-
-    // Filtrar por municipio
-    if (this.municipioSeleccionado && this.municipioSeleccionado.trim()) {
-      usuariosFiltrados = usuariosFiltrados.filter(usuario =>
-        usuario.municipio === this.municipioSeleccionado
-      );
-      console.log('Usuarios después del filtro de municipio:', usuariosFiltrados.length);
-    }
-
-    // Filtrar por término de búsqueda
-    if (this.searchTerm.trim()) {
-      const termino = this.searchTerm.toLowerCase().trim();
-      usuariosFiltrados = usuariosFiltrados.filter(usuario =>
-        usuario.nombre_completo.toLowerCase().includes(termino) ||
-        usuario.correo.toLowerCase().includes(termino) ||
-        usuario.cedula.includes(termino) ||
-        (usuario.celular && usuario.celular.includes(termino))
-      );
-      console.log('Usuarios después del filtro de búsqueda:', usuariosFiltrados.length);
-    }
-
-    this.usuariosFiltrados = usuariosFiltrados;
-    console.log('Usuarios finales filtrados:', this.usuariosFiltrados.length);
+    console.log('Contadores actualizados desde API:', this.filtros);
   }
 
   /**
@@ -211,23 +179,54 @@ export class UsuariosPage implements OnInit {
    */
   onFiltroChange(filtro: string | number | undefined) {
     this.filtroSeleccionado = String(filtro || 'todos');
-    this.aplicarFiltro();
+    this.currentPage = 1;
+    this.loadUsuarios();
   }
 
   /**
    * Maneja el cambio de municipio
    */
   onMunicipioChange() {
-    // Actualizar contadores cuando cambia el municipio
-    this.actualizarContadores();
-    this.aplicarFiltro();
+    this.currentPage = 1;
+    this.loadUsuarios();
   }
 
   /**
    * Maneja la búsqueda
    */
   onSearchChange() {
-    this.aplicarFiltro();
+    this.currentPage = 1;
+    this.loadUsuarios();
+  }
+
+  /**
+   * Ir a la página anterior
+   */
+  previousPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.loadUsuarios();
+    }
+  }
+
+  /**
+   * Ir a la página siguiente
+   */
+  nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.loadUsuarios();
+    }
+  }
+
+  /**
+   * Ir a una página específica
+   */
+  goToPage(page: number) {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.loadUsuarios();
+    }
   }
 
   /**

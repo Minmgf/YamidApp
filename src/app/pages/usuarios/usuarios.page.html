@@ -109,14 +109,35 @@
               <ion-label>{{ formatRoleName(usuario.rol) }}</ion-label>
             </ion-chip>
           </div>
-          <!-- <div class="user-status">
-            <ion-checkbox
-              [checked]="usuario.estado === 'activo'"
-              [disabled]="true"
-              color="success">
-            </ion-checkbox>
-          </div> -->
         </div>
+      </div>
+    </div>
+
+    <!-- Paginación -->
+    <div *ngIf="totalPages > 1" class="pagination-container">
+      <div class="pagination-info">
+        Mostrando {{ usuariosFiltrados.length }} de {{ totalUsuarios }} usuarios
+      </div>
+      <div class="pagination-controls">
+        <ion-button
+          fill="clear"
+          size="small"
+          [disabled]="currentPage === 1"
+          (click)="previousPage()">
+          <ion-icon name="chevron-back-outline"></ion-icon>
+        </ion-button>
+
+        <span class="page-indicator">
+          Página {{ currentPage }} de {{ totalPages }}
+        </span>
+
+        <ion-button
+          fill="clear"
+          size="small"
+          [disabled]="currentPage === totalPages"
+          (click)="nextPage()">
+          <ion-icon name="chevron-forward-outline"></ion-icon>
+        </ion-button>
       </div>
     </div>
   </div>
