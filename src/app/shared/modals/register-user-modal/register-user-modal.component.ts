@@ -54,7 +54,7 @@ export class RegisterUserModalComponent implements OnInit {
     this.registerForm.get('nombre')?.setValidators([Validators.required, Validators.minLength(2)]);
     this.registerForm.get('cedula')?.setValidators([Validators.required, Validators.pattern(/^\d{6,10}$/)]);
     this.registerForm.get('celular')?.setValidators([Validators.required, Validators.pattern(/^\d{10}$/)]);
-    this.registerForm.get('email')?.setValidators([Validators.required, Validators.email, Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)]);
+    // this.registerForm.get('email')?.setValidators([Validators.required, Validators.email, Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)]);
     this.registerForm.get('password')?.setValidators([Validators.required, Validators.minLength(6)]);
     this.registerForm.get('municipio_id')?.setValidators([Validators.required]);
     this.registerForm.get('rol_id')?.setValidators([Validators.required]);
