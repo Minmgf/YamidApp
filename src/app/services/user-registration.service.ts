@@ -97,4 +97,12 @@ export class UserRegistrationService {
 
     return this.http.get<any>(`${this.apiUrl}/usuarios${params}`, { headers });
   }
+
+  /**
+   * Obtiene los usuarios registrados por un usuario específico
+   */
+  getUsuariosRegistradosPor(userId: number, page: number = 1, limit: number = 50): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.get<any>(`${this.apiUrl}/usuarios/${userId}/registrados?page=${page}&limit=${limit}`, { headers });
+  }
 }

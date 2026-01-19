@@ -4,6 +4,22 @@ import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { IncidenciasService, Incidencia } from '../../../services/incidencias.service';
+import { UserRegistrationService } from '../../../services/user-registration.service';
+
+export interface UsuarioRegistrado {
+  id: number;
+  nombre_completo: string;
+  cedula: string;
+  celular: string;
+  correo: string;
+  lugar_votacion: string;
+  municipio: string;
+  municipio_id: number;
+  rol: string;
+  rol_id: number;
+  created_at: string;
+  estado: string;
+}
 
 export interface UsuarioDetalle {
   id: number;
@@ -51,16 +67,31 @@ export class UsuarioDetalleModalComponent implements OnInit {
   itemsPerPage = 5;
   totalPages = 0;
 
+  // Propiedades para usuarios registrados
+  usuariosRegistrados: UsuarioRegistrado[] = [];
+  usuariosRegistradosLoading = false;
+  usuariosRegistradosError = '';
+  usuariosCurrentPage = 1;
+  usuariosItemsPerPage = 5;
+  usuariosTotalPages = 0;
+  usuariosTotalRegistrados = 0;
+
+  // Propiedad para el nombre del creador
+  creadorNombre: string = '';
+  creadorLoading = false;
+
   constructor(
     private modalCtrl: ModalController,
     private http: HttpClient,
-    private incidenciasService: IncidenciasService
+    private incidenciasService: IncidenciasService,
+    private userService: UserRegistrationService
   ) { }
 
   ngOnInit() {
     console.log('👤 Cargando detalle del usuario ID:', this.usuarioId);
     this.cargarUsuario();
     this.cargarIncidencias();
+    this.cargarUsuariosRegistrados();
   }
 
   /**
@@ -88,6 +119,11 @@ export class UsuarioDetalleModalComponent implements OnInit {
       if (response) {
         this.usuario = response;
         console.log('✅ Usuario cargado:', this.usuario);
+
+        // Cargar nombre del creador si existe created_by
+        if (this.usuario.created_by) {
+          this.cargarCreador(this.usuario.created_by);
+        }
       }
     } catch (error: any) {
       console.error('❌ Error al cargar usuario:', error);
@@ -101,6 +137,26 @@ export class UsuarioDetalleModalComponent implements OnInit {
       }
     } finally {
       this.loading = false;
+    }
+  }
+
+  /**
+   * Cargar nombre del usuario que registró a este usuario
+   */
+  async cargarCreador(creadorId: number) {
+    try {
+      this.creadorLoading = true;
+      const response = await this.userService.getUserById(creadorId).toPromise();
+
+      if (response && response.nombre_completo) {
+        this.creadorNombre = response.nombre_completo;
+        console.log('✅ Creador cargado:', this.creadorNombre);
+      }
+    } catch (error: any) {
+      console.error('❌ Error al cargar creador:', error);
+      this.creadorNombre = 'No disponible';
+    } finally {
+      this.creadorLoading = false;
     }
   }
 
@@ -129,6 +185,96 @@ export class UsuarioDetalleModalComponent implements OnInit {
       this.totalPages = 0;
     } finally {
       this.incidenciasLoading = false;
+    }
+  }
+
+  /**
+   * Cargar usuarios registrados por este usuario
+   */
+  async cargarUsuariosRegistrados() {
+    try {
+      this.usuariosRegistradosLoading = true;
+      this.usuariosRegistradosError = '';
+
+      const response = await this.userService.getUsuariosRegistradosPor(
+        this.usuarioId,
+        this.usuariosCurrentPage,
+        this.usuariosItemsPerPage
+      ).toPromise();
+
+      if (response && response.success && response.data) {
+        this.usuariosRegistrados = response.data;
+        this.usuariosTotalRegistrados = response.total || response.data.length;
+        this.usuariosTotalPages = Math.ceil(this.usuariosTotalRegistrados / this.usuariosItemsPerPage);
+        console.log('✅ Usuarios registrados cargados:', this.usuariosRegistrados.length);
+      } else {
+        this.usuariosRegistrados = [];
+        this.usuariosTotalPages = 0;
+        this.usuariosTotalRegistrados = 0;
+      }
+    } catch (error: any) {
+      console.error('❌ Error al cargar usuarios registrados:', error);
+      this.usuariosRegistradosError = 'No se pudieron cargar los usuarios registrados';
+      this.usuariosRegistrados = [];
+      this.usuariosTotalPages = 0;
+      this.usuariosTotalRegistrados = 0;
+    } finally {
+      this.usuariosRegistradosLoading = false;
+    }
+  }
+
+  /**
+   * Cambiar página de usuarios registrados
+   */
+  changeUsuariosPage(page: number) {
+    if (page >= 1 && page <= this.usuariosTotalPages) {
+      this.usuariosCurrentPage = page;
+      this.cargarUsuariosRegistrados();
+    }
+  }
+
+  /**
+   * Obtener páginas para paginación de usuarios registrados
+   */
+  getUsuariosPages(): number[] {
+    const pages: number[] = [];
+    const maxPages = Math.min(5, this.usuariosTotalPages);
+    let startPage = Math.max(1, this.usuariosCurrentPage - Math.floor(maxPages / 2));
+    let endPage = Math.min(this.usuariosTotalPages, startPage + maxPages - 1);
+
+    if (endPage - startPage + 1 < maxPages) {
+      startPage = Math.max(1, endPage - maxPages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+    return pages;
+  }
+
+  /**
+   * Obtener color del rol para usuarios registrados
+   */
+  getUsuarioRolColor(rolId: number): string {
+    switch (rolId) {
+      case 1: return 'danger';
+      case 2: return 'primary';
+      case 3: return 'success';
+      case 4: return 'warning';
+      default: return 'medium';
+    }
+  }
+
+  /**
+   * Formatear nombre del rol
+   */
+  formatRoleName(rol: string): string {
+    switch (rol) {
+      case 'super_admin': return 'Super Admin';
+      case 'lider_principal': return 'Líder Principal';
+      case 'simpatizante': return 'Simpatizante';
+      case 'aliado': return 'Aliado';
+      default: return rol || 'Sin rol';
     }
   }
 

@@ -138,7 +138,7 @@
               <ion-icon name="people-outline"></ion-icon>
               <span>Votantes Registrados</span>
             </div>
-            <div class="metric-value">{{ usuario.registers || 0 }}</div>
+            <div class="metric-value">{{ usuariosTotalRegistrados || usuario.registers || 0 }}</div>
           </div>
 
           <!-- Calificación -->
@@ -156,6 +156,104 @@
                 </ion-icon>
               </div>
               <span class="rating-number">{{ usuario.rating || 0 }}/5</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla de usuarios registrados -->
+        <div class="usuarios-registrados-section">
+          <h4>
+            <ion-icon name="person-add-outline"></ion-icon>
+            Usuarios Registrados por {{ usuario.nombre_completo }}
+          </h4>
+
+          <!-- Loading -->
+          <div *ngIf="usuariosRegistradosLoading" class="usuarios-loading">
+            <ion-spinner size="small"></ion-spinner>
+            <span>Cargando usuarios registrados...</span>
+          </div>
+
+          <!-- Error -->
+          <div *ngIf="usuariosRegistradosError && !usuariosRegistradosLoading" class="usuarios-error">
+            <ion-icon name="alert-circle-outline"></ion-icon>
+            <span>{{ usuariosRegistradosError }}</span>
+            <ion-button fill="clear" size="small" (click)="cargarUsuariosRegistrados()">
+              <ion-icon name="refresh-outline" slot="start"></ion-icon>
+              Reintentar
+            </ion-button>
+          </div>
+
+          <!-- Sin usuarios -->
+          <div *ngIf="!usuariosRegistradosLoading && !usuariosRegistradosError && usuariosRegistrados.length === 0" class="sin-usuarios">
+            <ion-icon name="people-outline"></ion-icon>
+            <p>Este usuario no ha registrado a ningún votante</p>
+          </div>
+
+          <!-- Tabla de usuarios -->
+          <div *ngIf="!usuariosRegistradosLoading && !usuariosRegistradosError && usuariosRegistrados.length > 0" class="usuarios-table">
+            <div class="table-container">
+              <table class="usuarios-tabla">
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Cédula</th>
+                    <th>Municipio</th>
+                    <th>Rol</th>
+                    <th>Fecha Registro</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let usr of usuariosRegistrados">
+                    <td class="nombre-cell">
+                      <div class="nombre-content">
+                        <strong>{{ usr.nombre_completo }}</strong>
+                        <span class="correo-preview">{{ usr.correo }}</span>
+                      </div>
+                    </td>
+                    <td class="cedula-cell">{{ usr.cedula }}</td>
+                    <td class="municipio-cell">
+                      <ion-icon name="location-outline"></ion-icon>
+                      {{ usr.municipio }}
+                    </td>
+                    <td class="rol-cell">
+                      <ion-chip [color]="getUsuarioRolColor(usr.rol_id)" size="small">
+                        {{ formatRoleName(usr.rol) }}
+                      </ion-chip>
+                    </td>
+                    <td class="fecha-cell">
+                      {{ formatearFecha(usr.created_at) }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Paginación -->
+            <div class="pagination" *ngIf="usuariosTotalPages > 1">
+              <ion-button
+                fill="clear"
+                size="small"
+                [disabled]="usuariosCurrentPage === 1"
+                (click)="changeUsuariosPage(usuariosCurrentPage - 1)">
+                <ion-icon name="chevron-back-outline"></ion-icon>
+              </ion-button>
+
+              <ion-button
+                *ngFor="let page of getUsuariosPages()"
+                [fill]="page === usuariosCurrentPage ? 'solid' : 'clear'"
+                size="small"
+                [color]="page === usuariosCurrentPage ? 'primary' : 'medium'"
+                (click)="changeUsuariosPage(page)">
+                {{ page }}
+              </ion-button>
+
+              <ion-button
+                fill="clear"
+                size="small"
+                [disabled]="usuariosCurrentPage === usuariosTotalPages"
+                (click)="changeUsuariosPage(usuariosCurrentPage + 1)">
+                <ion-icon name="chevron-forward-outline"></ion-icon>
+              </ion-button>
             </div>
           </div>
         </div>
@@ -293,6 +391,13 @@
           <div class="additional-item">
             <span class="additional-label">Registrado el:</span>
             <span class="additional-value">{{ formatearFecha(usuario.created_at) }}</span>
+          </div>
+          <div class="additional-item" *ngIf="usuario.created_by">
+            <span class="additional-label">Registrado por:</span>
+            <span class="additional-value">
+              <ion-spinner *ngIf="creadorLoading" name="dots" size="small"></ion-spinner>
+              <span *ngIf="!creadorLoading">{{ creadorNombre || 'No disponible' }}</span>
+            </span>
           </div>
         </div>
       </div>

@@ -188,6 +188,251 @@
   margin-bottom: 16px;
 }
 
+// Sección de usuarios registrados
+.usuarios-registrados-section {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #f3f4f6;
+
+  h4 {
+    color: #1a1a1a;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin: 0 0 16px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    ion-icon {
+      font-size: 1.1rem;
+      color: var(--ion-color-primary);
+    }
+  }
+}
+
+.usuarios-loading, .usuarios-error, .sin-usuarios {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px;
+  color: #6b7280;
+  font-size: 0.9rem;
+
+  ion-icon {
+    font-size: 1.5rem;
+  }
+
+  &.usuarios-error {
+    flex-direction: column;
+    text-align: center;
+
+    ion-button {
+      margin-top: 8px;
+    }
+  }
+
+  &.sin-usuarios {
+    flex-direction: column;
+    text-align: center;
+
+    ion-icon {
+      font-size: 2.5rem;
+      margin-bottom: 8px;
+      color: #cbd5e1;
+    }
+
+    p {
+      margin: 0;
+      color: #9ca3af;
+    }
+  }
+}
+
+.usuarios-table {
+  .table-container {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    border: 1px solid #f3f4f6;
+  }
+
+  .usuarios-tabla {
+    width: 100%;
+    border-collapse: collapse;
+
+    thead {
+      background: #f8f9fa;
+
+      th {
+        padding: 12px 8px;
+        text-align: left;
+        color: #6b7280;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid #e5e7eb;
+      }
+    }
+
+    tbody {
+      tr {
+        border-bottom: 1px solid #f3f4f6;
+
+        &:hover {
+          background: #fefefe;
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+      }
+
+      td {
+        padding: 12px 8px;
+        font-size: 0.85rem;
+        color: #1a1a1a;
+        vertical-align: top;
+      }
+
+      .nombre-cell {
+        width: 30%;
+
+        .nombre-content {
+          strong {
+            color: #1a1a1a;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 2px;
+          }
+
+          .correo-preview {
+            color: #6b7280;
+            font-size: 0.75rem;
+          }
+        }
+      }
+
+      .cedula-cell {
+        width: 15%;
+        color: #6b7280;
+      }
+
+      .municipio-cell {
+        width: 20%;
+
+        ion-icon {
+          font-size: 0.9rem;
+          color: #6b7280;
+          margin-right: 4px;
+        }
+      }
+
+      .rol-cell {
+        width: 18%;
+
+        ion-chip {
+          font-size: 0.7rem;
+          height: 24px;
+        }
+      }
+
+      .fecha-cell {
+        width: 17%;
+        color: #6b7280;
+        font-size: 0.75rem;
+      }
+    }
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    margin-top: 16px;
+    padding: 12px;
+
+    ion-button {
+      --padding-start: 8px;
+      --padding-end: 8px;
+      height: 32px;
+
+      &[fill="solid"] {
+        --background: var(--ion-color-primary);
+        --color: white;
+      }
+
+      &[fill="clear"] {
+        --color: #6b7280;
+
+        &:hover {
+          --color: var(--ion-color-primary);
+        }
+      }
+
+      &[disabled] {
+        --color: #d1d5db;
+      }
+    }
+  }
+}
+
+// Responsive para usuarios registrados
+@media (max-width: 768px) {
+  .usuarios-registrados-section {
+    h4 {
+      font-size: 0.9rem;
+    }
+  }
+
+  .usuarios-table {
+    .table-container {
+      overflow-x: auto;
+    }
+
+    .usuarios-tabla {
+      min-width: 550px;
+
+      thead th {
+        padding: 8px 6px;
+        font-size: 0.7rem;
+      }
+
+      tbody td {
+        padding: 8px 6px;
+        font-size: 0.8rem;
+      }
+
+      .nombre-cell {
+        .nombre-content {
+          strong {
+            font-size: 0.8rem;
+          }
+
+          .correo-preview {
+            font-size: 0.7rem;
+          }
+        }
+      }
+
+      .fecha-cell {
+        font-size: 0.7rem;
+      }
+    }
+
+    .pagination {
+      ion-button {
+        height: 28px;
+        font-size: 0.8rem;
+      }
+    }
+  }
+}
+
 .metric-card {
   background: #FFFAFF;
   border-radius: 12px;
